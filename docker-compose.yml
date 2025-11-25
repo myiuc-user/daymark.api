@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   api:
@@ -12,9 +12,10 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      - postgres   # démarre seulement après PostgreSQL (sans healthcheck)
     volumes:
       - ./uploads:/app/uploads
+      - ./src:/app/src            # Hot reload (optionnel si tu utilises nodemon)
     networks:
       - daymark-network
 
@@ -23,15 +24,15 @@ services:
     container_name: daymark-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: daymark
-      POSTGRES_USER: daymark
-      POSTGRES_PASSWORD: DaymarkSecure2024Abc9
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PWD}
+      PGDATA: /var/lib/postgresql/data/pgdata   # plus sûr pour upgrades
     ports:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
-
     networks:
       - daymark-network
 
@@ -42,4 +43,3 @@ volumes:
 networks:
   daymark-network:
     driver: bridge
-    external: false

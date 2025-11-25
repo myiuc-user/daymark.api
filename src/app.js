@@ -8,7 +8,7 @@ import './config/database.js';
 import pkg from '@prisma/client';
 const { PrismaClient } = pkg;
 import { createRootAdmin } from './services/authService.js';
-import { createDatabaseIfNotExists } from './utils/database.js';
+import { createDatabaseIfNotExists } from './config/database.js';
 import { socketService } from './services/socketService.js';
 import { cronService } from './services/cronService.js';
 

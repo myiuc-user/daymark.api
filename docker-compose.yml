@@ -13,8 +13,6 @@ services:
       - .env
     depends_on:
       - postgres   # démarre seulement après PostgreSQL (sans healthcheck)
-    volumes:
-      - ./uploads:/app/uploads
     networks:
       - daymark-network
 

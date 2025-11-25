@@ -51,42 +51,42 @@ Au premier démarrage, un compte super admin est créé automatiquement :
 ## 📡 API Endpoints
 
 ### Authentification
-- `POST /api/auth/login` - Connexion
-- `GET /api/auth/me` - Profil utilisateur
-- `POST /api/auth/logout` - Déconnexion
+- `POST /auth/login` - Connexion
+- `GET /auth/me` - Profil utilisateur
+- `POST /auth/logout` - Déconnexion
 
 ### Administration (Super Admin uniquement)
-- `GET /api/admin/users` - Liste des utilisateurs
-- `POST /api/admin/users` - Créer un utilisateur
-- `PUT /api/admin/users/:id/role` - Modifier le rôle
-- `PUT /api/admin/users/:id/status` - Activer/Désactiver
-- `DELETE /api/admin/users/:id` - Supprimer utilisateur
+- `GET /admin/users` - Liste des utilisateurs
+- `POST /admin/users` - Créer un utilisateur
+- `PUT /admin/users/:id/role` - Modifier le rôle
+- `PUT /admin/users/:id/status` - Activer/Désactiver
+- `DELETE /admin/users/:id` - Supprimer utilisateur
 
 ### Workspaces
-- `GET /api/workspaces` - Liste des workspaces
-- `POST /api/workspaces` - Créer workspace
-- `GET /api/workspaces/:id` - Détails workspace
-- `PUT /api/workspaces/:id` - Modifier workspace
-- `DELETE /api/workspaces/:id` - Supprimer workspace
+- `GET /workspaces` - Liste des workspaces
+- `POST /workspaces` - Créer workspace
+- `GET /workspaces/:id` - Détails workspace
+- `PUT /workspaces/:id` - Modifier workspace
+- `DELETE /workspaces/:id` - Supprimer workspace
 
 ### Projets
-- `GET /api/projects?workspaceId=:id` - Liste des projets
-- `POST /api/projects` - Créer projet
-- `GET /api/projects/:id` - Détails projet
-- `PUT /api/projects/:id` - Modifier projet
-- `DELETE /api/projects/:id` - Supprimer projet
+- `GET /projects?workspaceId=:id` - Liste des projets
+- `POST /projects` - Créer projet
+- `GET /projects/:id` - Détails projet
+- `PUT /projects/:id` - Modifier projet
+- `DELETE /projects/:id` - Supprimer projet
 
 ### Tâches
-- `GET /api/tasks?projectId=:id` - Liste des tâches
-- `POST /api/tasks` - Créer tâche
-- `GET /api/tasks/:id` - Détails tâche
-- `PUT /api/tasks/:id` - Modifier tâche
-- `DELETE /api/tasks/:id` - Supprimer tâche
-- `POST /api/tasks/:id/comments` - Ajouter commentaire
+- `GET /tasks?projectId=:id` - Liste des tâches
+- `POST /tasks` - Créer tâche
+- `GET /tasks/:id` - Détails tâche
+- `PUT /tasks/:id` - Modifier tâche
+- `DELETE /tasks/:id` - Supprimer tâche
+- `POST /tasks/:id/comments` - Ajouter commentaire
 
 ### Utilisateurs
-- `GET /api/users/search?q=:query` - Rechercher utilisateurs
-- `GET /api/users/:id` - Profil utilisateur
+- `GET /users/search?q=:query` - Rechercher utilisateurs
+- `GET /users/:id` - Profil utilisateur
 
 ## 🔒 Authentification
 

@@ -10,8 +10,8 @@ services:
     ports:
       - "3001:3001"
     environment:
-      DATABASE_URL: postgresql://daymark:DaymarkSecure2024!@%23@postgres:5432/daymark
-      DIRECT_URL: postgresql://daymark:DaymarkSecure2024!@%23@postgres:5432/daymark
+      DATABASE_URL: postgresql://daymark:DaymarkSecure2024!@%23@postgres:5433/daymark
+      DIRECT_URL: postgresql://daymark:DaymarkSecure2024!@%23@postgres:5433/daymark
       JWT_SECRET: ${JWT_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       ROOT_ADMIN_EMAIL: ${ROOT_ADMIN_EMAIL}
@@ -43,7 +43,7 @@ services:
       POSTGRES_USER: daymark
       POSTGRES_PASSWORD: DaymarkSecure2024!@#
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql

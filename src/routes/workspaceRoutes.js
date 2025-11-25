@@ -327,6 +327,10 @@ router.post('/accept-invitation/:token', async (req, res) => {
     const { token } = req.params;
     const { name, password } = req.body;
 
+    if (!password) {
+      return res.status(400).json({ error: 'Password is required' });
+    }
+
     // Find invitation
     const invitation = await prisma.workspaceInvitation.findUnique({
       where: { token },

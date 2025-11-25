@@ -15,7 +15,7 @@ COPY . .
 
 
 # Stage 2: Runtime
-FROM node:20-alpine
+FROM node:20-slim
 
 WORKDIR /app
 

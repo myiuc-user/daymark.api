@@ -1,19 +1,25 @@
 # Stage 1: Build dependencies
-FROM node:18-slim as builder
+FROM node:20 as builder
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml* ./
+# 🛠️ Correct order to avoid pnpm lockfile mismatch
+COPY package.json ./
 
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+# Install pnpm and dependencies in one layer
+RUN npm install -g pnpm
+RUN pnpm install
+
+# Copy source files
+COPY . .
+
 
 # Stage 2: Runtime
-FROM node:18-slim
+FROM node:20-alpine
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y curl postgresql-client && rm -rf /var/lib/apt/lists/* && npm install -g pnpm
-
+RUN apk add --no-cache curl postgresql-client && npm install -g pnpm
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 COPY prisma ./prisma

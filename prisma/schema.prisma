@@ -75,6 +75,7 @@ model User {
     workspaces      WorkspaceMember[]
     projects        Project[]         @relation("ProjectOwner")
     tasks           Task[]            @relation("TaskAssignee")
+    createdTasks    Task[]            @relation("TaskCreatedBy")
     comments        Comment[]
     ownedWorkspaces Workspace[]
     ProjectMember   ProjectMember[]
@@ -142,10 +143,10 @@ model Project {
     team_lead   String
     workspaceId String
     progress    Int             @default(0)
-    githubRepo  String?         // Format: "owner/repo"
-    githubData  Json?           // Store GitHub metadata
-    budget      Float?          // Budget du projet
-    estimatedHours Float?       // Estimation en heures
+    githubRepo  String?
+    githubData  Json?
+    budget      Float?
+    estimatedHours Float?
     createdAt   DateTime        @default(now())
     updatedAt   DateTime        @updatedAt
     members     ProjectMember[]
@@ -179,8 +180,9 @@ model Task {
     type            TaskType   @default(TASK)
     priority        Priority   @default(MEDIUM)
     assigneeId      String
+    createdById     String
     due_date        DateTime
-    estimatedHours  Float?     // Estimation en heures
+    estimatedHours  Float?
     milestoneId     String?
     sprintId        String?
     workflowStateId String?
@@ -189,6 +191,7 @@ model Task {
 
     project       Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
     assignee      User           @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: Cascade)
+    createdBy     User           @relation("TaskCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
     comments      Comment[]
     files         File[]
     timeEntries   TimeEntry[]
@@ -286,7 +289,7 @@ model ProjectTemplate {
     id          String   @id @default(uuid())
     name        String
     description String?
-    data        Json     // Structure du projet
+    data        Json
     createdById String
     isPublic    Boolean  @default(false)
     createdAt   DateTime @default(now())

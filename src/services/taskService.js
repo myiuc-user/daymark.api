@@ -33,7 +33,7 @@ export const taskService = {
         },
         comments: {
           include: {
-            author: {
+            user: {
               select: { id: true, name: true, email: true }
             }
           },
@@ -65,7 +65,8 @@ export const taskService = {
     return await prisma.task.create({
       data: {
         ...data,
-        dueDate: data.dueDate ? new Date(data.dueDate) : null
+        createdById: userId,
+        due_date: data.dueDate ? new Date(data.dueDate) : new Date()
       },
       include: {
         assignee: {
@@ -91,7 +92,7 @@ export const taskService = {
       },
       comments: {
         include: {
-          author: {
+          user: {
             select: { id: true, name: true, email: true }
           }
         },
@@ -101,7 +102,6 @@ export const taskService = {
 
     return await prisma.task.findUnique({
       where: { id },
-      ...options,
       include: options.include || defaultInclude
     });
   },
@@ -142,7 +142,7 @@ export const taskService = {
       where: { id },
       data: {
         ...data,
-        dueDate: data.dueDate ? new Date(data.dueDate) : null
+        due_date: data.dueDate ? new Date(data.dueDate) : undefined
       },
       include: {
         assignee: {
@@ -166,10 +166,10 @@ export const taskService = {
       data: {
         content,
         taskId,
-        authorId: userId
+        userId
       },
       include: {
-        author: {
+        user: {
           select: { id: true, name: true, email: true }
         }
       }

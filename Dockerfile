@@ -19,7 +19,7 @@ FROM node:20-slim
 
 WORKDIR /app
 
-RUN apk add --no-cache curl postgresql-client && npm install -g pnpm
+RUN apt-get update && apt-get install -y --no-install-recommends openssl postgresql-client && rm -rf /var/lib/apt/lists/* && npm install -g pnpm
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 COPY prisma ./prisma

@@ -13,4 +13,4 @@ RUN pnpm prisma generate
 
 EXPOSE 3001
 
-CMD ["sh", "-c", "sleep 10 && npm start"]
+CMD ["sh", "-c", "sleep 10 && pnpm prisma migrate deploy && npm start"]

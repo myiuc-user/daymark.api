@@ -56,29 +56,29 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/workspaces', workspaceRoutes);
-app.use('/api/invitations', invitationRouter);
-app.use('/api/projects', projectRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/files', fileRoutes);
-app.use('/api/notifications', notificationRoutes);
-app.use('/api/analytics', analyticsRoutes);
-app.use('/api/github', githubRoutes);
-app.use('/api/github-auth', githubAuthRoutes);
-app.use('/api/test', testRoutes);
-app.use('/api/milestones', milestoneRoutes);
-app.use('/api/sprints', sprintRoutes);
-app.use('/api/time-entries', timeTrackingRoutes);
-app.use('/api/templates', templateRoutes);
-app.use('/api/workflows', workflowRoutes);
-app.use('/api/collaboration', collaborationRoutes);
-app.use('/api/teams', teamRoutes);
+app.use('/auth', authRoutes);
+app.use('/users', userRoutes);
+app.use('/workspaces', workspaceRoutes);
+app.use('/invitations', invitationRouter);
+app.use('/projects', projectRoutes);
+app.use('/tasks', taskRoutes);
+app.use('/admin', adminRoutes);
+app.use('/files', fileRoutes);
+app.use('/notifications', notificationRoutes);
+app.use('/analytics', analyticsRoutes);
+app.use('/github', githubRoutes);
+app.use('/github-auth', githubAuthRoutes);
+app.use('/test', testRoutes);
+app.use('/milestones', milestoneRoutes);
+app.use('/sprints', sprintRoutes);
+app.use('/time-entries', timeTrackingRoutes);
+app.use('/templates', templateRoutes);
+app.use('/workflows', workflowRoutes);
+app.use('/collaboration', collaborationRoutes);
+app.use('/teams', teamRoutes);
 
 // Health check
-app.get('/api/health', (req, res) => {
+app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
@@ -108,7 +108,7 @@ async function startServer() {
     
     server.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📖 API docs: http://localhost:${PORT}/api/health`);
+      console.log(`📖 API docs: http://localhost:${PORT}/health`);
       console.log(`🔌 WebSocket enabled`);
     });
   } catch (error) {

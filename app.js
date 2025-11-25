@@ -3,16 +3,14 @@ import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-import { createServer } from 'http';
 import './src/config/database.js';
 import pkg from '@prisma/client';
 const { PrismaClient } = pkg;
 import { createRootAdmin } from './src/services/authService.js';
 import { createDatabaseIfNotExists } from './src/config/database.js';
-import { socketService } from './src/services/socketService.js';
+import { cronService } from './src/services/cronService.js';
 
 export const prisma = new PrismaClient();
-import { cronService } from './src/services/cronService.js';
 
 // Routes
 import authRoutes from './src/routes/authRoutes.js';
@@ -38,15 +36,16 @@ import teamRoutes from './src/routes/teamRoutes.js';
 dotenv.config();
 
 const app = express();
-const server = createServer(app);
 const PORT = process.env.PORT || 3001;
-
-// Initialize WebSocket
-socketService.initialize(server);
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  credentials: false,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -96,10 +95,9 @@ async function startServer() {
     // Start cron jobs
     cronService.start();
     
-    server.listen(PORT, () => {
+    app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📖 API docs: http://localhost:${PORT}/health`);
-      console.log(`🔌 WebSocket enabled`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);

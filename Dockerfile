@@ -25,7 +25,6 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/src/app.js ./src/
 COPY --from=builder /app/src/config ./src/config
-COPY --from=builder /app/src/controllers ./src/controllers
 COPY --from=builder /app/src/middleware ./src/middleware
 COPY --from=builder /app/src/routes ./src/routes
 COPY --from=builder /app/src/services ./src/services

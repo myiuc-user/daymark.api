@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends openssl postgre
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/src/app.js ./src/
+COPY --from=builder /app/src/app.js ./src/app.js
 COPY --from=builder /app/src/config ./src/config
 COPY --from=builder /app/src/middleware ./src/middleware
 COPY --from=builder /app/src/routes ./src/routes
@@ -32,6 +32,8 @@ COPY --from=builder /app/src/utils ./src/utils
 COPY --from=builder /app/scripts ./scripts
 
 RUN pnpm prisma generate
+
+RUN echo "Checking files..." && ls -la ./src/ && echo "Files copied successfully"
 
 COPY --from=builder /app/docker-entrypoint.sh ./docker-entrypoint.sh
 RUN chmod +x ./docker-entrypoint.sh

@@ -1,15 +1,15 @@
-FROM node:18-alpine
+FROM node:18-slim
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
+
+COPY package.json pnpm-lock.yaml ./
+RUN npm install -g pnpm && pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN npx prisma generate
-
-RUN apk add --no-cache postgresql-client
+RUN pnpm prisma generate
 
 EXPOSE 3001
 

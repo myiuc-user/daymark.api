@@ -1,6 +1,4 @@
 import express from 'express';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import './src/config/database.js';
 import pkg from '@prisma/client';
@@ -11,7 +9,6 @@ import { cronService } from './src/services/cronService.js';
 
 export const prisma = new PrismaClient();
 
-// Routes
 import authRoutes from './src/routes/authRoutes.js';
 import userRoutes from './src/routes/userRoutes.js';
 import workspaceRoutes, { invitationRouter } from './src/routes/workspaceRoutes.js';
@@ -37,12 +34,17 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(cookieParser());
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
 
-// Routes
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/workspaces', workspaceRoutes);
@@ -64,18 +66,15 @@ app.use('/workflows', workflowRoutes);
 app.use('/collaboration', collaborationRoutes);
 app.use('/teams', teamRoutes);
 
-// Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-// 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// Start server and create root admin
 async function startServer() {
   try {
     await createDatabaseIfNotExists();
@@ -85,12 +84,10 @@ async function startServer() {
     await createRootAdmin();
     console.log('✅ Root admin initialized');
     
-    // Start cron jobs
     cronService.start();
     
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📖 API docs: http://localhost:${PORT}/health`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);

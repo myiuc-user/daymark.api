@@ -22,12 +22,12 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends openssl postgresql-client && rm -rf /var/lib/apt/lists/* && npm install -g pnpm
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
-COPY prisma ./prisma
-COPY src ./src
-COPY scripts ./scripts
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/scripts ./scripts
 
 RUN pnpm prisma generate
 
 EXPOSE 3001
 
-CMD ["sh", "-c", "sleep 10 && pnpm prisma db push && node src/app.js"]
+CMD ["sh", "-c", "sleep 10 && pnpm prisma db push && pnpm run start"]

@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import dotenv from 'dotenv';
 import './src/config/database.js';
 import pkg from '@prisma/client';
@@ -34,16 +35,20 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  if (req.method === 'OPTIONS') return res.sendStatus(200);
-  next();
-});
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Request logging
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
 
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
@@ -66,12 +71,17 @@ app.use('/workflows', workflowRoutes);
 app.use('/collaboration', collaborationRoutes);
 app.use('/teams', teamRoutes);
 
+// Error logging
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+  console.error(`[ERROR] ${new Date().toISOString()} - ${req.method} ${req.path}`);
+  console.error(`Status: ${err.status || 500}`);
+  console.error(`Message: ${err.message}`);
+  console.error(`Stack: ${err.stack}`);
+  res.status(err.status || 500).json({ error: err.message || 'Something went wrong!' });
 });
 
 app.use('*', (req, res) => {
+  console.warn(`[404] ${req.method} ${req.path}`);
   res.status(404).json({ error: 'Route not found' });
 });
 

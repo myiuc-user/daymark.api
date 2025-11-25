@@ -5,11 +5,12 @@ import { workspaceController } from '../controllers/workspaceController.js';
 
 const router = express.Router();
 
-router.use(authenticateToken);
-
-// Routes without :id parameter (must be before /:id routes)
+// Public routes (no authentication required)
 router.get('/invitation/:token', workspaceController.getInvitationDetails);
 router.post('/accept-invitation/:token', workspaceController.acceptInvitation);
+
+// All other routes require authentication
+router.use(authenticateToken);
 
 // Main CRUD routes
 router.get('/', workspaceController.getWorkspaces);

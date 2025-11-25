@@ -23,9 +23,9 @@ services:
     container_name: daymark-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DATABASE_NAME}
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PWD}
+      POSTGRES_DB: daymark
+      POSTGRES_USER: daymark
+      POSTGRES_PASSWORD: DaymarkSecure2024Abc9
     ports:
       - "5433:5432"
     volumes:

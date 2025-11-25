@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import './src/config/database.js';
 import pkg from '@prisma/client';
@@ -12,7 +13,8 @@ export const prisma = new PrismaClient();
 
 import authRoutes from './src/routes/authRoutes.js';
 import userRoutes from './src/routes/userRoutes.js';
-import workspaceRoutes, { invitationRouter } from './src/routes/workspaceRoutes.js';
+import workspaceRoutes from './src/routes/workspaceRoutes.js';
+import invitationRoutes from './src/routes/invitationRoutes.js';
 import projectRoutes from './src/routes/projectRoutes.js';
 import taskRoutes from './src/routes/taskRoutes.js';
 import adminRoutes from './src/routes/adminRoutes.js';
@@ -21,7 +23,6 @@ import notificationRoutes from './src/routes/notificationRoutes.js';
 import analyticsRoutes from './src/routes/analyticsRoutes.js';
 import githubRoutes from './src/routes/githubRoutes.js';
 import githubAuthRoutes from './src/routes/githubAuthRoutes.js';
-import testRoutes from './src/routes/testRoutes.js';
 import milestoneRoutes from './src/routes/milestoneRoutes.js';
 import sprintRoutes from './src/routes/sprintRoutes.js';
 import timeTrackingRoutes from './src/routes/timeTrackingRoutes.js';
@@ -36,13 +37,14 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors({
-  origin: '*',
+  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Request logging
 app.use((req, res, next) => {
@@ -53,7 +55,7 @@ app.use((req, res, next) => {
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/workspaces', workspaceRoutes);
-app.use('/invitations', invitationRouter);
+app.use('/invitations', invitationRoutes);
 app.use('/projects', projectRoutes);
 app.use('/tasks', taskRoutes);
 app.use('/admin', adminRoutes);
@@ -62,7 +64,6 @@ app.use('/notifications', notificationRoutes);
 app.use('/analytics', analyticsRoutes);
 app.use('/github', githubRoutes);
 app.use('/github-auth', githubAuthRoutes);
-app.use('/test', testRoutes);
 app.use('/milestones', milestoneRoutes);
 app.use('/sprints', sprintRoutes);
 app.use('/time-entries', timeTrackingRoutes);
@@ -70,22 +71,6 @@ app.use('/templates', templateRoutes);
 app.use('/workflows', workflowRoutes);
 app.use('/collaboration', collaborationRoutes);
 app.use('/teams', teamRoutes);
-
-// Error logging
-app.use((err, req, res, next) => {
-  console.error(`[ERROR] ${new Date().toISOString()} - ${req.method} ${req.path}`);
-  console.error(`Status: ${err.status || 500}`);
-  console.error(`Message: ${err.message}`);
-  console.error(`Stack: ${err.stack}`);
-  res.status(err.status || 500).json({ error: err.message || 'Something went wrong!' });
-});
-
-app.use('*', (req, res) => {
-  console.warn(`[404] ${req.method} ${req.path}`);
-  res.status(404).json({ error: 'Route not found' });
-});
-
-//////// je suis ici
 
 async function startServer() {
   try {

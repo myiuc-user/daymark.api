@@ -1,123 +1,101 @@
-import { PrismaClient } from '@prisma/client';
-import { sendInvitationEmail } from './emailService.js';
-import crypto from 'crypto';
-
+import pkg from '@prisma/client';
+const { PrismaClient } = pkg;
 const prisma = new PrismaClient();
 
 export const teamService = {
-  // Inviter un membre dans un workspace
-  async inviteToWorkspace(workspaceId, email, role, invitedById) {
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 jours
-    
-    const invitation = await prisma.workspaceInvitation.create({
-      data: {
-        email,
-        token,
-        role,
-        workspaceId,
-        invitedById,
-        expiresAt
-      },
+  getTeams: async (workspaceId, userId) => {
+    const workspace = await prisma.workspace.findUnique({
+      where: { id: workspaceId },
+      include: { members: { where: { userId } } }
+    });
+
+    if (!workspace || (workspace.ownerId !== userId && workspace.members.length === 0)) {
+      throw new Error('Access denied');
+    }
+
+    return await prisma.team.findMany({
+      where: { workspaceId },
       include: {
-        workspace: true,
-        invitedBy: true
-      }
-    });
-    
-    // Envoyer l'email d'invitation
-    const inviteLink = `${process.env.FRONTEND_URL}/invite/${token}`;
-    await sendInvitationEmail(invitation.email, invitation.workspace.name, inviteLink);
-    
-    return invitation;
-  },
-
-  // Accepter une invitation
-  async acceptInvitation(token) {
-    const invitation = await prisma.workspaceInvitation.findUnique({
-      where: { token },
-      include: { workspace: true }
-    });
-    
-    if (!invitation || invitation.expiresAt < new Date()) {
-      throw new Error('Invitation invalide ou expirée');
-    }
-    
-    if (invitation.acceptedAt) {
-      throw new Error('Invitation déjà acceptée');
-    }
-    
-    // Vérifier si l'utilisateur existe
-    let user = await prisma.user.findUnique({
-      where: { email: invitation.email }
-    });
-    
-    if (!user) {
-      throw new Error('Utilisateur non trouvé');
-    }
-    
-    // Ajouter le membre au workspace
-    await prisma.workspaceMember.create({
-      data: {
-        userId: user.id,
-        workspaceId: invitation.workspaceId,
-        role: invitation.role
-      }
-    });
-    
-    // Marquer l'invitation comme acceptée
-    await prisma.workspaceInvitation.update({
-      where: { id: invitation.id },
-      data: { acceptedAt: new Date() }
-    });
-    
-    return { user, workspace: invitation.workspace };
-  },
-
-  // Gérer les rôles dans un projet
-  async assignProjectRole(projectId, userId, role) {
-    return await prisma.projectMember.upsert({
-      where: {
-        userId_projectId: { userId, projectId }
+        members: {
+          include: {
+            user: { select: { id: true, name: true, email: true } }
+          }
+        }
       },
-      update: { role },
-      create: { userId, projectId, role },
-      include: { user: true }
+      orderBy: { createdAt: 'desc' }
     });
   },
 
-  // Assigner multiple utilisateurs à une tâche
-  async assignMultipleToTask(taskId, userIds) {
-    // Pour l'instant, on garde un seul assigné mais on ajoute les autres comme watchers
-    const task = await prisma.task.findUnique({
-      where: { id: taskId }
+  createTeam: async (data, userId) => {
+    const workspace = await prisma.workspace.findUnique({
+      where: { id: data.workspaceId },
+      include: { members: { where: { userId } } }
     });
-    
-    if (userIds.length > 0) {
-      // Assigner le premier utilisateur
-      await prisma.task.update({
-        where: { id: taskId },
-        data: { assigneeId: userIds[0] }
-      });
-      
-      // Ajouter les autres comme watchers
-      for (let i = 1; i < userIds.length; i++) {
-        await prisma.taskWatcher.upsert({
-          where: {
-            userId_taskId: { userId: userIds[i], taskId }
-          },
-          update: {},
-          create: { userId: userIds[i], taskId }
-        });
-      }
+
+    if (!workspace || (workspace.ownerId !== userId && workspace.members.length === 0)) {
+      throw new Error('Access denied');
     }
-    
-    return await prisma.task.findUnique({
-      where: { id: taskId },
+
+    return await prisma.team.create({
+      data,
       include: {
-        assignee: true,
-        watchers: { include: { user: true } }
+        members: {
+          include: {
+            user: { select: { id: true, name: true, email: true } }
+          }
+        }
       }
+    });
+  },
+
+  getTeamById: async (id) => {
+    return await prisma.team.findUnique({
+      where: { id },
+      include: {
+        members: {
+          include: {
+            user: { select: { id: true, name: true, email: true } }
+          }
+        }
+      }
+    });
+  },
+
+  updateTeam: async (id, data, userId) => {
+    const team = await prisma.team.findUnique({
+      where: { id },
+      include: { workspace: { include: { members: { where: { userId } } } } }
+    });
+
+    if (!team || (team.workspace.ownerId !== userId && team.workspace.members.length === 0)) {
+      throw new Error('Access denied');
+    }
+
+    return await prisma.team.update({
+      where: { id },
+      data,
+      include: {
+        members: {
+          include: {
+            user: { select: { id: true, name: true, email: true } }
+          }
+        }
+      }
+    });
+  },
+
+  deleteTeam: async (id, userId) => {
+    const team = await prisma.team.findUnique({
+      where: { id },
+      include: { workspace: { include: { members: { where: { userId } } } } }
+    });
+
+    if (!team || (team.workspace.ownerId !== userId && team.workspace.members.length === 0)) {
+      throw new Error('Access denied');
+    }
+
+    return await prisma.team.delete({
+      where: { id }
     });
   }
 };

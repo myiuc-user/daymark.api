@@ -1,6 +1,8 @@
 import { Server } from 'socket.io';
 import jwt from 'jsonwebtoken';
-import { prisma } from '../app.js';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 class SocketService {
   constructor() {

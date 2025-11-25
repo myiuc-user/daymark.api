@@ -1,6 +1,8 @@
-import { prisma } from '../app.js';
+import { PrismaClient } from '@prisma/client';
 import { sendInvitationEmail } from './emailService.js';
 import crypto from 'crypto';
+
+const prisma = new PrismaClient();
 
 export const teamService = {
   // Inviter un membre dans un workspace

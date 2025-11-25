@@ -3,4 +3,4 @@
 set -e
 
 echo "Starting application..."
-node /src/app.js
+node app.js

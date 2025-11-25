@@ -4,40 +4,41 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
-import './config/database.js';
+import './src/config/database.js';
 import pkg from '@prisma/client';
 const { PrismaClient } = pkg;
-import { createRootAdmin } from './services/authService.js';
-import { createDatabaseIfNotExists } from './config/database.js';
-import { socketService } from './services/socketService.js';
-import { cronService } from './services/cronService.js';
+import { createRootAdmin } from './src/services/authService.js';
+import { createDatabaseIfNotExists } from './src/config/database.js';
+import { socketService } from './src/services/socketService.js';
+
+export const prisma = new PrismaClient();
+import { cronService } from './src/services/cronService.js';
 
 // Routes
-import authRoutes from './routes/authRoutes.js';
-import userRoutes from './routes/userRoutes.js';
-import workspaceRoutes, { invitationRouter } from './routes/workspaceRoutes.js';
-import projectRoutes from './routes/projectRoutes.js';
-import taskRoutes from './routes/taskRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
-import fileRoutes from './routes/fileRoutes.js';
-import notificationRoutes from './routes/notificationRoutes.js';
-import analyticsRoutes from './routes/analyticsRoutes.js';
-import githubRoutes from './routes/githubRoutes.js';
-import githubAuthRoutes from './routes/githubAuthRoutes.js';
-import testRoutes from './routes/testRoutes.js';
-import milestoneRoutes from './routes/milestoneRoutes.js';
-import sprintRoutes from './routes/sprintRoutes.js';
-import timeTrackingRoutes from './routes/timeTrackingRoutes.js';
-import templateRoutes from './routes/templateRoutes.js';
-import workflowRoutes from './routes/workflowRoutes.js';
-import collaborationRoutes from './routes/collaborationRoutes.js';
-import teamRoutes from './routes/teamRoutes.js';
+import authRoutes from './src/routes/authRoutes.js';
+import userRoutes from './src/routes/userRoutes.js';
+import workspaceRoutes, { invitationRouter } from './src/routes/workspaceRoutes.js';
+import projectRoutes from './src/routes/projectRoutes.js';
+import taskRoutes from './src/routes/taskRoutes.js';
+import adminRoutes from './src/routes/adminRoutes.js';
+import fileRoutes from './src/routes/fileRoutes.js';
+import notificationRoutes from './src/routes/notificationRoutes.js';
+import analyticsRoutes from './src/routes/analyticsRoutes.js';
+import githubRoutes from './src/routes/githubRoutes.js';
+import githubAuthRoutes from './src/routes/githubAuthRoutes.js';
+import testRoutes from './src/routes/testRoutes.js';
+import milestoneRoutes from './src/routes/milestoneRoutes.js';
+import sprintRoutes from './src/routes/sprintRoutes.js';
+import timeTrackingRoutes from './src/routes/timeTrackingRoutes.js';
+import templateRoutes from './src/routes/templateRoutes.js';
+import workflowRoutes from './src/routes/workflowRoutes.js';
+import collaborationRoutes from './src/routes/collaborationRoutes.js';
+import teamRoutes from './src/routes/teamRoutes.js';
 
 dotenv.config();
 
 const app = express();
 const server = createServer(app);
-const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3001;
 
 // Initialize WebSocket
@@ -117,5 +118,3 @@ async function startServer() {
 }
 
 startServer();
-
-export { prisma };

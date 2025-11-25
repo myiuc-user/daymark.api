@@ -1,6 +1,8 @@
 import { Octokit } from '@octokit/rest';
 import simpleGit from 'simple-git';
-import { prisma } from '../app.js';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 class GitHubService {
   constructor() {

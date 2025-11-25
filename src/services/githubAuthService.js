@@ -1,5 +1,7 @@
 import { Octokit } from '@octokit/rest';
-import { prisma } from '../app.js';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 class GitHubAuthService {
   constructor() {

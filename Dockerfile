@@ -23,12 +23,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends openssl postgre
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/src/app.js ./src/app.js
-COPY --from=builder /app/src/config ./src/config
-COPY --from=builder /app/src/middleware ./src/middleware
-COPY --from=builder /app/src/routes ./src/routes
-COPY --from=builder /app/src/services ./src/services
-COPY --from=builder /app/src/utils ./src/utils
+COPY --from=builder /app/app.js ./app.js
+COPY --from=builder /app/src ./src
 COPY --from=builder /app/scripts ./scripts
 
 RUN pnpm prisma generate

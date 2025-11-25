@@ -9,23 +9,8 @@ services:
     restart: unless-stopped
     ports:
       - "3001:3001"
-    environment:
-      DATABASE_URL: postgresql://daymark:DaymarkSecure2024!@%23@157.180.12.145:5433/daymark
-      DIRECT_URL: postgresql://daymark:DaymarkSecure2024!@%23@157.180.12.145:5433/daymark
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
-      ROOT_ADMIN_EMAIL: ${ROOT_ADMIN_EMAIL}
-      ROOT_ADMIN_PASSWORD: ${ROOT_ADMIN_PASSWORD}
-      PORT: 3001
-      NODE_ENV: ${NODE_ENV}
-      CORS_ORIGIN: ${CORS_ORIGIN}
-      FRONTEND_URL: ${FRONTEND_URL}
-      EMAIL_USER: ${EMAIL_USER}
-      EMAIL_PASS: ${EMAIL_PASS}
-      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
-      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
-      UPLOAD_DIR: ${UPLOAD_DIR}
-      MAX_FILE_SIZE: ${MAX_FILE_SIZE}
+    env_file:
+      - .env
     depends_on:
       - postgres
     volumes:
@@ -38,9 +23,9 @@ services:
     container_name: daymark-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: daymark
-      POSTGRES_USER: daymark
-      POSTGRES_PASSWORD: DaymarkSecure2024!@$
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PWD}
     ports:
       - "5433:5432"
     volumes:

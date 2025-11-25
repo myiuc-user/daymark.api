@@ -46,16 +46,9 @@ socketService.initialize(server);
 
 // Middleware
 app.use(helmet());
-const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173').split(',').map(origin => origin.trim());
-
+const allowedOrigins = process.env.CORS_ORIGIN || 'http://localhost:5173'
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json());
@@ -82,11 +75,6 @@ app.use('/templates', templateRoutes);
 app.use('/workflows', workflowRoutes);
 app.use('/collaboration', collaborationRoutes);
 app.use('/teams', teamRoutes);
-
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
 
 // Error handling
 app.use((err, req, res, next) => {

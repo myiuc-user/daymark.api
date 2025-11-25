@@ -9,6 +9,8 @@ COPY . .
 
 RUN npx prisma generate
 
+RUN apk add --no-cache postgresql-client
+
 EXPOSE 3001
 
-CMD ["npm", "start"]
+CMD ["sh", "-c", "sleep 10 && npm start"]

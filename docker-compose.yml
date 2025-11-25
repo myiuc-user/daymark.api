@@ -27,8 +27,7 @@ services:
       UPLOAD_DIR: ${UPLOAD_DIR}
       MAX_FILE_SIZE: ${MAX_FILE_SIZE}
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     volumes:
       - ./uploads:/app/uploads
     networks:
@@ -47,12 +46,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U daymark -d daymark"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+
     networks:
       - daymark-network
 

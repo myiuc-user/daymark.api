@@ -40,7 +40,7 @@ services:
     environment:
       POSTGRES_DB: daymark
       POSTGRES_USER: daymark
-      POSTGRES_PASSWORD: DaymarkSecure2024!@#
+      POSTGRES_PASSWORD: DaymarkSecure2024!@$
     ports:
       - "5433:5432"
     volumes:

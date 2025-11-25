@@ -5,7 +5,7 @@ const dbConfig = {
   host: process.env.DATABASE_HOST || '157.180.12.145',
   port: parseInt(process.env.DATABASE_PORT || '5433'),
   user: process.env.DATABASE_USER || 'daymark',
-  password: process.env.DATABASE_PWD?.replace(/"/g, '') || 'DaymarkSecure2024!@#',
+  password: process.env.DATABASE_PWD?.replace(/"/g, '') || 'DaymarkSecure2024!@$',
   database: process.env.DATABASE_NAME || 'daymark'
 };
 

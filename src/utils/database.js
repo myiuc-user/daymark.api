@@ -5,11 +5,11 @@ export async function createDatabaseIfNotExists() {
   
   // Connect to postgres database to create our target database
   const adminClient = new Client({
-    host: process.env.DATABASE_HOST,
-    port: parseInt(process.env.DATABASE_PORT || '5432'),
-    user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PWD?.replace(/"/g, ''),
-    database: 'postgres' // Connect to default postgres database
+    host: process.env.DATABASE_HOST || 'localhost',
+    port: parseInt(process.env.DATABASE_PORT || '5433'),
+    user: process.env.DATABASE_USER || 'daymark',
+    password: process.env.DATABASE_PWD?.replace(/"/g, '') || 'DaymarkSecure2024!@#',
+    database: 'postgres'
   });
 
   try {

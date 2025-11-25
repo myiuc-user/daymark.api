@@ -2,11 +2,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const dbConfig = {
-  host: process.env.DATABASE_HOST,
-  port: parseInt(process.env.DATABASE_PORT || '5432'),
-  user: process.env.DATABASE_USER,
-  password: process.env.DATABASE_PWD?.replace(/"/g, ''),
-  database: process.env.DATABASE_NAME
+  host: process.env.DATABASE_HOST || 'localhost',
+  port: parseInt(process.env.DATABASE_PORT || '5433'),
+  user: process.env.DATABASE_USER || 'daymark',
+  password: process.env.DATABASE_PWD?.replace(/"/g, '') || 'DaymarkSecure2024!@#',
+  database: process.env.DATABASE_NAME || 'daymark'
 };
 
 // Construct DATABASE_URL for Prisma

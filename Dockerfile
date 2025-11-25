@@ -9,8 +9,10 @@ RUN npm install -g pnpm && pnpm install
 
 COPY . .
 
+RUN ls -la /app/src/ || echo "src directory not found"
+
 RUN pnpm prisma generate
 
 EXPOSE 3001
 
-CMD ["sh", "-c", "sleep 10 && pnpm prisma db push && pnpm start"]
+CMD ["sh", "-c", "ls -la /app && sleep 10 && pnpm prisma db push && pnpm start"]

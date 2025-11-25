@@ -33,6 +33,9 @@ COPY --from=builder /app/scripts ./scripts
 
 RUN pnpm prisma generate
 
+COPY --from=builder /app/docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x ./docker-entrypoint.sh
+
 EXPOSE 3001
 
-CMD ["sh", "-c", "sleep 10 && pnpm prisma db push && pnpm run start"]
+CMD ["./docker-entrypoint.sh"]

@@ -1,33 +1,27 @@
-# Stage 1: Build
-FROM node:18-slim as builder
+# Stage 1: Build dependencies
+FROM node:18-alpine as builder
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
+COPY package.json pnpm-lock.yaml* ./
 
-COPY package*.json pnpm-lock.yaml* ./
-RUN npm install -g pnpm && pnpm install
+RUN npm install -g pnpm && pnpm install --frozen-lockfile
 
-COPY . .
+# Stage 2: Runtime
+FROM node:18-alpine
+
+WORKDIR /app
+
+RUN apk add --no-cache curl postgresql-client && npm install -g pnpm
+
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./
+COPY prisma ./prisma
+COPY src ./src
+COPY scripts ./scripts
 
 RUN pnpm prisma generate
 
-# Stage 2: Run
-FROM node:18-slim
-
-WORKDIR /app
-
-RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
-
-RUN npm install -g pnpm
-
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/src ./src
-COPY --from=builder /app/scripts ./scripts
-COPY --from=builder /app/.env.example ./
-
 EXPOSE 3001
 
-CMD ["sh", "-c", "sleep 10 && pnpm prisma db push && pnpm start"]
+CMD ["sh", "-c", "sleep 10 && pnpm prisma db push && node src/app.js"]

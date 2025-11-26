@@ -15,24 +15,6 @@ services:
       - postgres   # démarre seulement après PostgreSQL (sans healthcheck)
     networks:
       - daymark-network
-
-  postgres:
-    image: postgres:15-alpine
-    container_name: daymark-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${DATABASE_NAME}
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PWD}
-      PGDATA: /var/lib/postgresql/data/pgdata   # plus sûr pour upgrades
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
-    networks:
-      - daymark-network
-
 volumes:
   postgres_data:
     driver: local

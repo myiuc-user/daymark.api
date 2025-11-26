@@ -34,7 +34,11 @@ export const userController = {
 
   updateProfile: async (req, res) => {
     try {
-      const user = await userService.updateProfile(req.user.id, req.body);
+      const { id } = req.params;
+      if (id !== req.user.id) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
+      const user = await userService.updateProfile(id, req.body);
       res.json({ user });
     } catch (error) {
       console.error('Update profile error:', error);
@@ -44,11 +48,15 @@ export const userController = {
 
   updatePassword: async (req, res) => {
     try {
+      const { id } = req.params;
+      if (id !== req.user.id) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
       const { oldPassword, newPassword } = req.body;
       if (!oldPassword || !newPassword) {
         return res.status(400).json({ error: 'Old and new passwords are required' });
       }
-      await userService.updatePassword(req.user.id, oldPassword, newPassword);
+      await userService.updatePassword(id, oldPassword, newPassword);
       res.json({ message: 'Password updated successfully' });
     } catch (error) {
       console.error('Update password error:', error);

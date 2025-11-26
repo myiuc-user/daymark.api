@@ -8,7 +8,7 @@ router.use(authenticateToken);
 
 router.get('/search', userController.searchUsers);
 router.get('/:id', userController.getUser);
-router.put('/profile', userController.updateProfile);
-router.put('/password', userController.updatePassword);
+router.put('/:id', userController.updateProfile);
+router.put('/:id/password', userController.updatePassword);
 
 export default router;

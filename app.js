@@ -30,6 +30,7 @@ import templateRoutes from './src/routes/templateRoutes.js';
 import workflowRoutes from './src/routes/workflowRoutes.js';
 import collaborationRoutes from './src/routes/collaborationRoutes.js';
 import teamRoutes from './src/routes/teamRoutes.js';
+import searchRoutes from './src/routes/searchRoutes.js';
 
 dotenv.config();
 
@@ -70,6 +71,7 @@ app.use('/templates', templateRoutes);
 app.use('/workflows', workflowRoutes);
 app.use('/collaboration', collaborationRoutes);
 app.use('/teams', teamRoutes);
+app.use('/search', searchRoutes);
 
 async function startServer() {
   try {

@@ -15,6 +15,17 @@ export const fileController = {
     }
   },
 
+  listProjectFiles: async (req, res) => {
+    try {
+      const { projectId } = req.params;
+      const files = await fileService.listProjectFiles(projectId, req.user.id);
+      res.json({ files });
+    } catch (error) {
+      console.error('List files error:', error);
+      res.status(500).json({ error: error.message || 'Internal server error' });
+    }
+  },
+
   deleteFile: async (req, res) => {
     try {
       const { id } = req.params;

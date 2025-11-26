@@ -9,6 +9,7 @@ const upload = multer({ dest: 'uploads/' });
 router.use(authenticateToken);
 
 router.post('/upload', upload.single('file'), fileController.uploadFile);
+router.get('/list/project/:projectId', fileController.listProjectFiles);
 router.delete('/:id', fileController.deleteFile);
 
 export default router;

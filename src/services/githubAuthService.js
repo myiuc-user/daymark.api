@@ -19,7 +19,7 @@ class GitHubAuthService {
     return `https://github.com/login/oauth/authorize?${params}`;
   }
 
-  async exchangeCodeForToken(code) {
+  async getAccessToken(code) {
     const response = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: {
@@ -46,7 +46,7 @@ class GitHubAuthService {
     return data;
   }
 
-  async storeUserToken(userId, token, githubUser) {
+  async saveUserToken(userId, token, githubUser) {
     await prisma.user.update({
       where: { id: userId },
       data: {
@@ -79,6 +79,15 @@ class GitHubAuthService {
         githubData: null
       }
     });
+  }
+
+  getAuthUrl() {
+    const params = new URLSearchParams({
+      client_id: this.clientId,
+      redirect_uri: `${process.env.FRONTEND_URL}/auth/github/callback`,
+      scope: 'repo,user:email'
+    });
+    return `https://github.com/login/oauth/authorize?${params}`;
   }
 }
 

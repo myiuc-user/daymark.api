@@ -35,7 +35,7 @@ export const githubAuthController = {
       
       res.json({ 
         message: 'GitHub account connected successfully',
-        user 
+        user: { login: user.login, id: user.id, avatar_url: user.avatar_url }
       });
     } catch (error) {
       console.error('GitHub callback error:', error);

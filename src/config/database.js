@@ -7,11 +7,10 @@ const dbConfig = {
   host: process.env.DATABASE_HOST || '157.180.12.145',
   port: parseInt(process.env.DATABASE_PORT || '5433'),
   user: process.env.DATABASE_USER || 'daymark',
-  password: process.env.DATABASE_PWD?.replace(/"/g, '') || 'DaymarkSecure2024Abc9',
+  password: process.env.DATABASE_PWD?.replace(/\"/g, '') || 'DaymarkSecure2024Abc9',
   database: process.env.DATABASE_NAME || 'daymark'
 };
 
-// Construct DATABASE_URL for Prisma
 const encodedPassword = encodeURIComponent(dbConfig.password);
 process.env.DATABASE_URL = `postgresql://${dbConfig.user}:${encodedPassword}@${dbConfig.host}:${dbConfig.port}/${dbConfig.database}`;
 process.env.DIRECT_URL = process.env.DATABASE_URL;
@@ -27,6 +26,15 @@ export async function createDatabaseIfNotExists() {
 
   try {
     await adminClient.connect();
+    
+    // Terminate all connections to the target database
+    await adminClient.query(`
+      SELECT pg_terminate_backend(pg_stat_activity.pid)
+      FROM pg_stat_activity
+      WHERE pg_stat_activity.datname = $1
+      AND pid <> pg_backend_pid()
+    `, [dbConfig.database]);
+    
     const result = await adminClient.query(
       'SELECT 1 FROM pg_database WHERE datname = $1',
       [dbConfig.database]

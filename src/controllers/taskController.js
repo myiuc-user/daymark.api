@@ -135,5 +135,94 @@ export const taskController = {
       console.error('Add comment error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
+  },
+
+  getComments: async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const task = await taskService.getTaskById(id);
+      if (!task) {
+        return res.status(404).json({ error: 'Task not found' });
+      }
+
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      if (!hasAccess) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      const comments = await taskService.getComments(id);
+      res.json({ comments });
+    } catch (error) {
+      console.error('Get comments error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  getWatchers: async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const task = await taskService.getTaskById(id);
+      if (!task) {
+        return res.status(404).json({ error: 'Task not found' });
+      }
+
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      if (!hasAccess) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      const watchers = await taskService.getWatchers(id);
+      res.json({ watchers });
+    } catch (error) {
+      console.error('Get watchers error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  addWatcher: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { userId } = req.body;
+
+      const task = await taskService.getTaskById(id);
+      if (!task) {
+        return res.status(404).json({ error: 'Task not found' });
+      }
+
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      if (!hasAccess) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      await taskService.addWatcher(id, userId);
+      res.json({ message: 'Watcher added' });
+    } catch (error) {
+      console.error('Add watcher error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  removeWatcher: async (req, res) => {
+    try {
+      const { id, userId } = req.params;
+
+      const task = await taskService.getTaskById(id);
+      if (!task) {
+        return res.status(404).json({ error: 'Task not found' });
+      }
+
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      if (!hasAccess) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      await taskService.removeWatcher(id, userId);
+      res.json({ message: 'Watcher removed' });
+    } catch (error) {
+      console.error('Remove watcher error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
   }
 };

@@ -190,5 +190,41 @@ export const taskService = {
     }
 
     return comment;
+  },
+
+  getComments: async (taskId) => {
+    return await prisma.comment.findMany({
+      where: { taskId },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true }
+        }
+      },
+      orderBy: { createdAt: 'asc' }
+    });
+  },
+
+  getWatchers: async (taskId) => {
+    const watchers = await prisma.taskWatcher.findMany({
+      where: { taskId },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true }
+        }
+      }
+    });
+    return watchers.map(w => w.user);
+  },
+
+  addWatcher: async (taskId, userId) => {
+    return await prisma.taskWatcher.create({
+      data: { taskId, userId }
+    });
+  },
+
+  removeWatcher: async (taskId, userId) => {
+    return await prisma.taskWatcher.deleteMany({
+      where: { taskId, userId }
+    });
   }
 };

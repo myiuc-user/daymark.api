@@ -1,7 +1,5 @@
 import { Octokit } from '@octokit/rest';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../config/prisma.js';
 
 class GitHubAuthService {
   constructor() {
@@ -20,6 +18,7 @@ class GitHubAuthService {
   }
 
   async getAccessToken(code) {
+    console.log(`[GitHubAuthService] Exchanging code for token...`);
     const response = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: {
@@ -34,6 +33,8 @@ class GitHubAuthService {
     });
 
     const data = await response.json();
+    console.log(`[GitHubAuthService] Response:`, data);
+    
     if (data.error) {
       throw new Error(data.error_description || 'GitHub OAuth error');
     }
@@ -41,13 +42,18 @@ class GitHubAuthService {
   }
 
   async getUserInfo(token) {
+    console.log(`[GitHubAuthService] Fetching user info...`);
     const octokit = new Octokit({ auth: token });
     const { data } = await octokit.rest.users.getAuthenticated();
+    console.log(`[GitHubAuthService] User info:`, data);
     return data;
   }
 
   async saveUserToken(userId, token, githubUser) {
-    await prisma.user.update({
+    console.log(`[GitHubAuthService] Saving token for user: ${userId}`);
+    console.log(`[GitHubAuthService] GitHub user: ${githubUser.login}`);
+    
+    const updated = await prisma.user.update({
       where: { id: userId },
       data: {
         githubToken: token,
@@ -55,13 +61,21 @@ class GitHubAuthService {
         githubData: githubUser
       }
     });
+    
+    console.log(`[GitHubAuthService] User updated:`, {
+      id: updated.id,
+      githubUsername: updated.githubUsername,
+      githubToken: updated.githubToken ? 'SET' : 'NOT SET'
+    });
   }
 
   async getUserToken(userId) {
+    console.log(`[GitHubAuthService] Getting token for user: ${userId}`);
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { githubToken: true }
+      select: { githubToken: true, githubUsername: true }
     });
+    console.log(`[GitHubAuthService] User found:`, user);
     return user?.githubToken;
   }
 
@@ -71,6 +85,7 @@ class GitHubAuthService {
   }
 
   async removeUserToken(userId) {
+    console.log(`[GitHubAuthService] Removing token for user: ${userId}`);
     await prisma.user.update({
       where: { id: userId },
       data: {
@@ -79,15 +94,7 @@ class GitHubAuthService {
         githubData: null
       }
     });
-  }
-
-  getAuthUrl() {
-    const params = new URLSearchParams({
-      client_id: this.clientId,
-      redirect_uri: `${process.env.FRONTEND_URL}/auth/github/callback`,
-      scope: 'repo,user:email'
-    });
-    return `https://github.com/login/oauth/authorize?${params}`;
+    console.log(`[GitHubAuthService] Token removed`);
   }
 }
 

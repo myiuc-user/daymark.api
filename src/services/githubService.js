@@ -19,6 +19,28 @@ class GitHubService {
     });
   }
 
+  async getUserRepos(token) {
+    try {
+      const octokit = this.getOctokit(token);
+      const { data } = await octokit.rest.repos.listForAuthenticatedUser({ 
+        per_page: 100,
+        sort: 'updated'
+      });
+      return data.map(repo => ({
+        id: repo.id,
+        name: repo.name,
+        fullName: repo.full_name,
+        description: repo.description,
+        url: repo.html_url,
+        language: repo.language,
+        stars: repo.stargazers_count,
+        forks: repo.forks_count
+      }));
+    } catch (error) {
+      throw new Error(`Failed to fetch user repos: ${error.message}`);
+    }
+  }
+
   async getRepoInfo(owner, repo, token) {
     try {
       const octokit = this.getOctokit(token);

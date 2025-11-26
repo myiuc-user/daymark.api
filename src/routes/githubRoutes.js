@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.use(authenticateToken);
 
+router.get('/user-repos', githubController.getUserRepos);
 router.get('/repo-info', githubController.getRepoInfo);
 router.get('/code-metrics', githubController.getCodeMetrics);
 router.get('/search', githubController.searchRepos);

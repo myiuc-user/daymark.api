@@ -1,6 +1,22 @@
 import { githubService } from '../services/githubService.js';
+import { githubAuthService } from '../services/githubAuthService.js';
 
 export const githubController = {
+  getUserRepos: async (req, res) => {
+    try {
+      const token = await githubAuthService.getUserToken(req.user.id);
+      if (!token) {
+        return res.status(401).json({ error: 'GitHub not connected' });
+      }
+
+      const repos = await githubService.getUserRepos(token);
+      res.json({ repos });
+    } catch (error) {
+      console.error('Get user repos error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  },
+
   getRepoInfo: async (req, res) => {
     try {
       const { owner, repo } = req.query;

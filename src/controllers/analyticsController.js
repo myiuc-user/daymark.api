@@ -29,5 +29,16 @@ export const analyticsController = {
       console.error('Get project analytics error:', error);
       res.status(500).json({ error: error.message || 'Internal server error' });
     }
+  },
+
+  getDashboard: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const dashboard = await analyticsService.getDashboard(id, req.user.id);
+      res.json({ dashboard });
+    } catch (error) {
+      console.error('Get dashboard error:', error);
+      res.status(500).json({ error: error.message || 'Internal server error' });
+    }
   }
 };

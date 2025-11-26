@@ -8,5 +8,6 @@ router.use(authenticateToken);
 
 router.get('/workspace', analyticsController.getWorkspaceAnalytics);
 router.get('/project', analyticsController.getProjectAnalytics);
+router.get('/dashboard/:id', analyticsController.getDashboard);
 
 export default router;

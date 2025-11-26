@@ -70,5 +70,42 @@ export const analyticsService = {
       completionRate: Math.round(completionRate),
       teamSize: project.members.length
     };
+  },
+
+  getDashboard: async (id, userId) => {
+    const workspace = await prisma.workspace.findUnique({
+      where: { id },
+      include: {
+        members: {
+          where: { userId }
+        },
+        projects: {
+          include: {
+            tasks: true
+          }
+        }
+      }
+    });
+
+    if (!workspace || (workspace.ownerId !== userId && workspace.members.length === 0)) {
+      throw new Error('Access denied');
+    }
+
+    const totalProjects = workspace.projects.length;
+    const totalTasks = workspace.projects.reduce((sum, p) => sum + p.tasks.length, 0);
+    const completedTasks = workspace.projects.reduce((sum, p) => sum + p.tasks.filter(t => t.status === 'COMPLETED').length, 0);
+    const completionRate = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+    return {
+      workspace: {
+        id: workspace.id,
+        name: workspace.name
+      },
+      totalProjects,
+      totalTasks,
+      completedTasks,
+      completionRate: Math.round(completionRate),
+      teamSize: workspace.members.length + 1
+    };
   }
 };

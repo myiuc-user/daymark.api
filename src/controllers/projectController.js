@@ -119,7 +119,21 @@ export const projectController = {
         return res.status(400).json({ error: 'Email is required' });
       }
 
-      const project = await projectService.getProjectById(id, { include: { workspace: true } });
+      const project = await projectService.getProjectById(id, { 
+        include: { 
+          workspace: {
+            include: {
+              members: {
+                include: {
+                  user: {
+                    select: { id: true, name: true, email: true }
+                  }
+                }
+              }
+            }
+          }
+        } 
+      });
       if (!project) {
         return res.status(404).json({ error: 'Project not found' });
       }

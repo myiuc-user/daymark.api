@@ -4,6 +4,17 @@ const prisma = new PrismaClient();
 import { notificationService } from './notificationService.js';
 import { githubService } from './githubService.js';
 import { githubAuthService } from './githubAuthService.js';
+import nodemailer from 'nodemailer';
+
+const transporter = nodemailer.createTransport({
+  host: 'smtp.office365.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
 
 export const projectService = {
   getProjects: async (workspaceId, userId) => {
@@ -173,6 +184,27 @@ export const projectService = {
         projectId
       }
     });
+
+    // Send email notification
+    try {
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: `You've been added to project "${project.name}"`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #4f46e5;">Welcome to ${project.name}!</h2>
+            <p>You have been added to the project <strong>${project.name}</strong> in the workspace <strong>${project.workspace.name}</strong>.</p>
+            <p>You can now collaborate with your team on this project.</p>
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 12px;">
+              <p>© 2024 Daymark Project Management</p>
+            </div>
+          </div>
+        `
+      });
+    } catch (emailError) {
+      console.error('Failed to send email notification:', emailError);
+    }
 
     await notificationService.sendToUser(workspaceMember.userId, {
       type: 'success',

@@ -1,9 +1,7 @@
 #!/bin/sh
 
-set -e
-
 echo "Running migrations..."
-npm run db:migrate
+npm run db:migrate || true
 
 echo "Starting application..."
-node app.js
+npm start

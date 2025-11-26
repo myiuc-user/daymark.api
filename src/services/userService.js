@@ -32,5 +32,38 @@ export const userService = {
         createdAt: true
       }
     });
+  },
+
+  updateProfile: async (id, data) => {
+    const { name, image } = data;
+    return await prisma.user.update({
+      where: { id },
+      data: {
+        ...(name && { name }),
+        ...(image && { image })
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        image: true
+      }
+    });
+  },
+
+  updatePassword: async (id, oldPassword, newPassword) => {
+    const bcrypt = await import('bcryptjs');
+    const user = await prisma.user.findUnique({ where: { id } });
+    
+    const isValid = await bcrypt.default.compare(oldPassword, user.password);
+    if (!isValid) {
+      throw new Error('Invalid current password');
+    }
+
+    const hashedPassword = await bcrypt.default.hash(newPassword, 12);
+    await prisma.user.update({
+      where: { id },
+      data: { password: hashedPassword }
+    });
   }
 };

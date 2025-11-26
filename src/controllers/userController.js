@@ -30,5 +30,29 @@ export const userController = {
       console.error('Get user error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
+  },
+
+  updateProfile: async (req, res) => {
+    try {
+      const user = await userService.updateProfile(req.user.id, req.body);
+      res.json({ user });
+    } catch (error) {
+      console.error('Update profile error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  updatePassword: async (req, res) => {
+    try {
+      const { oldPassword, newPassword } = req.body;
+      if (!oldPassword || !newPassword) {
+        return res.status(400).json({ error: 'Old and new passwords are required' });
+      }
+      await userService.updatePassword(req.user.id, oldPassword, newPassword);
+      res.json({ message: 'Password updated successfully' });
+    } catch (error) {
+      console.error('Update password error:', error);
+      res.status(400).json({ error: error.message });
+    }
   }
 };

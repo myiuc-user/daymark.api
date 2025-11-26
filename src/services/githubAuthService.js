@@ -64,6 +64,22 @@ class GitHubAuthService {
     });
     return user?.githubToken;
   }
+
+  async hasUserToken(userId) {
+    const token = await this.getUserToken(userId);
+    return !!token;
+  }
+
+  async removeUserToken(userId) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        githubToken: null,
+        githubUsername: null,
+        githubData: null
+      }
+    });
+  }
 }
 
 export const githubAuthService = new GitHubAuthService();

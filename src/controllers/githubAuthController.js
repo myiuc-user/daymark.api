@@ -1,10 +1,20 @@
 import { githubAuthService } from '../services/githubAuthService.js';
 
 export const githubAuthController = {
+  getStatus: async (req, res) => {
+    try {
+      const connected = await githubAuthService.hasUserToken(req.user.id);
+      res.json({ connected });
+    } catch (error) {
+      console.error('Get status error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
   getAuthUrl: async (req, res) => {
     try {
       const url = githubAuthService.getAuthUrl();
-      res.json({ url });
+      res.json({ authUrl: url });
     } catch (error) {
       console.error('Get auth URL error:', error);
       res.status(500).json({ error: 'Internal server error' });
@@ -13,7 +23,7 @@ export const githubAuthController = {
 
   handleCallback: async (req, res) => {
     try {
-      const { code } = req.query;
+      const { code } = req.body;
       if (!code) {
         return res.status(400).json({ error: 'Authorization code is required' });
       }

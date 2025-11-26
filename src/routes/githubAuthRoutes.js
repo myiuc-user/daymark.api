@@ -4,8 +4,9 @@ import { githubAuthController } from '../controllers/githubAuthController.js';
 
 const router = express.Router();
 
+router.get('/status', authenticateToken, githubAuthController.getStatus);
 router.get('/auth-url', githubAuthController.getAuthUrl);
-router.get('/callback', authenticateToken, githubAuthController.handleCallback);
-router.post('/disconnect', authenticateToken, githubAuthController.disconnectGithub);
+router.post('/callback', authenticateToken, githubAuthController.handleCallback);
+router.delete('/disconnect', authenticateToken, githubAuthController.disconnectGithub);
 
 export default router;

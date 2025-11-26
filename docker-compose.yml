@@ -13,9 +13,6 @@ services:
       - .env
     networks:
       - daymark-network
-volumes:
-  postgres_data:
-    driver: local
 
 networks:
   daymark-network:

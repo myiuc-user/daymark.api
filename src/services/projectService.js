@@ -230,7 +230,7 @@ export const projectService = {
       data: { projectId, projectName: project.name }
     });
 
-    return await this.getProjectById(projectId);
+    return await projectService.getProjectById(projectId);
   },
 
   removeMember: async (projectId, userId) => {
@@ -267,7 +267,7 @@ export const projectService = {
       data: { projectId, projectName: project.name }
     });
 
-    return await this.getProjectById(projectId);
+    return await projectService.getProjectById(projectId);
   },
 
   connectGithub: async (projectId, githubRepo, userId) => {
@@ -348,6 +348,33 @@ export const projectService = {
       include: {
         owner: { select: { id: true, name: true, email: true } },
         workspace: { select: { id: true, name: true } }
+      }
+    });
+  },
+
+  getProjectMembers: async (projectId) => {
+    return await prisma.projectMember.findMany({
+      where: { projectId },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, image: true }
+        }
+      }
+    });
+  },
+
+  updateMemberPermissions: async (projectId, userId, permissions) => {
+    return await prisma.projectMember.update({
+      where: {
+        projectId_userId: { projectId, userId }
+      },
+      data: {
+        customPermissions: permissions
+      },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, image: true }
+        }
       }
     });
   }

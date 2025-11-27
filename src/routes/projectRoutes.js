@@ -15,8 +15,10 @@ router.put('/:id', validateRequest(createProjectSchema), projectController.updat
 router.delete('/:id', projectController.deleteProject);
 
 // Members routes
+router.get('/:id/members', projectController.getMembers);
 router.post('/:id/members', projectController.addMember);
 router.delete('/:id/members/:userId', projectController.removeMember);
+router.put('/:id/members/:userId/permissions', projectController.updateMemberPermissions);
 
 // GitHub routes
 router.post('/:id/github', projectController.connectGithub);

@@ -41,6 +41,53 @@ export const generateTokens = (userId) => {
   }
 };
 
+export const verifyRefreshToken = (token) => {
+  try {
+    return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+  } catch (error) {
+    throw new Error('Invalid refresh token');
+  }
+};
+
+export const authenticateUser = async (email, password) => {
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      password: true,
+      role: true,
+      isActive: true
+    }
+  });
+
+  if (!user || !user.isActive) {
+    throw new Error('Invalid credentials');
+  }
+
+  const isValidPassword = await comparePassword(password, user.password);
+  if (!isValidPassword) {
+    throw new Error('Invalid credentials');
+  }
+
+  return user;
+};
+
+export const getCurrentUser = async (userId) => {
+  return await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      image: true,
+      createdAt: true
+    }
+  });
+};
+
 export const createRootAdmin = async () => {
   try {
     const existingAdmin = await prisma.user.findFirst({

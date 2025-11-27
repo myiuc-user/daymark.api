@@ -19,6 +19,7 @@ import workflowRoutes from '../routes/workflowRoutes.js';
 import collaborationRoutes from '../routes/collaborationRoutes.js';
 import teamRoutes from '../routes/teamRoutes.js';
 import searchRoutes from '../routes/searchRoutes.js';
+import permissionRoutes from '../routes/permissionRoutes.js';
 
 export const routes = [
   { path: '/auth', router: authRoutes },
@@ -42,4 +43,5 @@ export const routes = [
   { path: '/collaboration', router: collaborationRoutes },
   { path: '/teams', router: teamRoutes },
   { path: '/search', router: searchRoutes },
+  { path: '/permissions', router: permissionRoutes },
 ];

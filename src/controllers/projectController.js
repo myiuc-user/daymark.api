@@ -147,7 +147,7 @@ export const projectController = {
       res.json({ project: updatedProject });
     } catch (error) {
       console.error('Add project member error:', error);
-      res.status(500).json({ error: error.message || 'Internal server error' });
+      res.status(400).json({ error: error.message || 'Internal server error' });
     }
   },
 
@@ -241,6 +241,30 @@ export const projectController = {
     } catch (error) {
       console.error('Sync GitHub error:', error);
       res.status(400).json({ error: error.message });
+    }
+  },
+
+  getMembers: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const members = await projectService.getProjectMembers(id);
+      res.json({ members });
+    } catch (error) {
+      console.error('Get project members error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  updateMemberPermissions: async (req, res) => {
+    try {
+      const { id, userId } = req.params;
+      const { permissions } = req.body;
+      
+      const updated = await projectService.updateMemberPermissions(id, userId, permissions);
+      res.json(updated);
+    } catch (error) {
+      console.error('Update member permissions error:', error);
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 };

@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser'
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -33,6 +34,21 @@ app.use(cors({
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+app.disable('strict routing');
+
+// Disable caching for API responses
+app.use((req, res, next) => {
+  if (req.path.startsWith('/uploads')) {
+    return next();
+  }
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  res.set('Content-Type', 'application/json; charset=utf-8');
+  next();
+});
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -45,7 +61,7 @@ app.use((req, res, next) => {
   res.on('finish', () => {
     const duration = Date.now() - startTime;
     const statusColor = res.statusCode >= 400 ? '🔴' : res.statusCode >= 300 ? '🟡' : '🟢';
-    console.log(`[${new Date().toLocaleTimeString()}] ${statusColor} ${req.method.padEnd(6)} ${req.path} | IP: ${ip} | User: ${userId} | ${res.statusCode} (${duration}ms)`);
+    console.log(`[${new Date().toLocaleTimeString()}] ${statusColor} ${req.method.padEnd(6)} ${req.path} | ${res.statusCode} (${duration}ms)`);
   });
 
   next();
@@ -61,8 +77,13 @@ app.use((err, req, res, next) => {
 });
 
 // Register all routes
-routes.forEach(({ path, router }) => {
-  app.use(path, router);
+routes.forEach(({ path: routePath, router }) => {
+  app.use(routePath, router);
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
 });
 
 async function startServer() {

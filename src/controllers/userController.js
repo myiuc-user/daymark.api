@@ -1,4 +1,6 @@
 import { userService } from '../services/userService.js';
+import { imageService } from '../services/imageService.js';
+import path from 'path';
 
 export const userController = {
   searchUsers: async (req, res) => {
@@ -61,6 +63,27 @@ export const userController = {
     } catch (error) {
       console.error('Update password error:', error);
       res.status(400).json({ error: error.message });
+    }
+  },
+
+  uploadProfilePhoto: async (req, res) => {
+    try {
+      const { id } = req.params;
+      if (id !== req.user.id) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+
+      const compressedPath = await imageService.compressProfilePhoto(req.file.path);
+      const photoUrl = `/uploads/profiles/${path.basename(compressedPath)}`;
+      
+      const user = await userService.updateProfilePhoto(id, photoUrl);
+      res.json({ user, message: 'Profile photo updated successfully' });
+    } catch (error) {
+      console.error('Upload profile photo error:', error);
+      res.status(500).json({ error: error.message || 'Failed to upload photo' });
     }
   }
 };

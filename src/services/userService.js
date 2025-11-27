@@ -65,5 +65,18 @@ export const userService = {
       where: { id },
       data: { password: hashedPassword }
     });
+  },
+
+  updateProfilePhoto: async (id, photoUrl) => {
+    return await prisma.user.update({
+      where: { id },
+      data: { image: photoUrl },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        image: true
+      }
+    });
   }
 };

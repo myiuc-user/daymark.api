@@ -77,7 +77,10 @@ export const userController = {
       }
 
       const compressedPath = await imageService.compressProfilePhoto(req.file.path);
-      const photoUrl = `/uploads/profiles/${path.basename(compressedPath)}`;
+      const fileName = path.basename(compressedPath);
+      const protocol = req.protocol;
+      const host = req.get('host');
+      const photoUrl = `${protocol}://${host}/uploads/profiles/${fileName}`;
       
       const user = await userService.updateProfilePhoto(id, photoUrl);
       res.json({ user, message: 'Profile photo updated successfully' });

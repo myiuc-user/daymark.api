@@ -11,14 +11,18 @@ export const imageService = {
     try {
       await fs.mkdir(uploadDir, { recursive: true });
       
-      const outputPath = filePath.replace(/\.jpg$/, '-compressed.jpg');
+      const fileName = path.basename(filePath);
+      const tempPath = path.join(uploadDir, `temp-${Date.now()}.jpg`);
+      const outputPath = path.join(uploadDir, fileName);
       
       await sharp(filePath)
         .resize(400, 400, { fit: 'cover' })
         .jpeg({ quality: 80, progressive: true })
-        .toFile(outputPath);
+        .toFile(tempPath);
 
       await fs.unlink(filePath);
+      await fs.rename(tempPath, outputPath);
+      
       return outputPath;
     } catch (error) {
       throw new Error(`Image compression failed: ${error.message}`);

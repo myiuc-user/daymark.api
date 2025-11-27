@@ -89,7 +89,7 @@ export const projectService = {
         select: { id: true, name: true, email: true }
       },
       workspace: {
-        select: { id: true, name: true, slug: true }
+        select: { id: true, name: true, slug: true, ownerId: true }
       },
       members: {
         include: {
@@ -157,7 +157,20 @@ export const projectService = {
   },
 
   addMember: async (projectId, email, project) => {
-    const workspaceMember = project.workspace.members.find(
+    const workspace = await prisma.workspace.findUnique({
+      where: { id: project.workspaceId },
+      include: {
+        members: {
+          include: {
+            user: {
+              select: { id: true, name: true, email: true }
+            }
+          }
+        }
+      }
+    });
+
+    const workspaceMember = workspace.members.find(
       member => member.user.email === email
     );
 
@@ -185,7 +198,6 @@ export const projectService = {
       }
     });
 
-    // Send email notification
     try {
       await transporter.sendMail({
         from: process.env.EMAIL_USER,
@@ -194,7 +206,7 @@ export const projectService = {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #4f46e5;">Welcome to ${project.name}!</h2>
-            <p>You have been added to the project <strong>${project.name}</strong> in the workspace <strong>${project.workspace.name}</strong>.</p>
+            <p>You have been added to the project <strong>${project.name}</strong> in the workspace <strong>${workspace.name}</strong>.</p>
             <p>You can now collaborate with your team on this project.</p>
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 12px;">
               <p>© 2024 Daymark Project Management</p>

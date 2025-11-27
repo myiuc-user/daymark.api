@@ -1,6 +1,4 @@
-import pkg from '@prisma/client';
-const { PrismaClient } = pkg;
-const prisma = new PrismaClient();
+import prisma from '../config/prisma.js';
 
 export const sprintService = {
   getSprints: async (projectId, userId) => {

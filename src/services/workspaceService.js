@@ -1,6 +1,4 @@
-import pkg from '@prisma/client';
-const { PrismaClient } = pkg;
-const prisma = new PrismaClient();
+import prisma from '../config/prisma.js';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { sendInvitationEmail } from './emailService.js';

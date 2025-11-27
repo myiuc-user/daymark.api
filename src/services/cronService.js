@@ -1,8 +1,6 @@
 import cron from 'node-cron';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../config/prisma.js';
 import { notificationService } from './notificationService.js';
-
-const prisma = new PrismaClient();
 
 class CronService {
   constructor() {

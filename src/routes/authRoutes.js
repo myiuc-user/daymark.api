@@ -1,7 +1,5 @@
 import express from 'express';
-import pkg from '@prisma/client';
-const { PrismaClient } = pkg;
-const prisma = new PrismaClient();
+import prisma from '../config/prisma.js';
 import { comparePassword, generateTokens } from '../services/authService.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { validateRequest, loginSchema } from '../utils/validation.js';

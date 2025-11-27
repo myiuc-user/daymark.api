@@ -1,11 +1,11 @@
 import express from 'express';
 import cors from 'cors';
-import bodyParser from 'body-parser';
+import bodyParser from 'body-parser'
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import './src/config/database.js';
-import prisma from './src/config/prisma.js';
+import prisma, { reconnectPrisma } from './src/config/prisma.js';
 import { createRootAdmin } from './src/services/authService.js';
 import { createDatabaseIfNotExists } from './src/config/database.js';
 import { cronService } from './src/services/cronService.js';
@@ -36,9 +36,28 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Request logging middleware
 app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  const startTime = Date.now();
+  const userId = req.user?.id || 'anonymous';
+  const ip = req.ip || req.connection.remoteAddress;
+
+  res.on('finish', () => {
+    const duration = Date.now() - startTime;
+    const statusColor = res.statusCode >= 400 ? '🔴' : res.statusCode >= 300 ? '🟡' : '🟢';
+    console.log(`[${new Date().toLocaleTimeString()}] ${statusColor} ${req.method.padEnd(6)} ${req.path} | IP: ${ip} | User: ${userId} | ${res.statusCode} (${duration}ms)`);
+  });
+
   next();
+});
+
+// Error handler middleware
+app.use((err, req, res, next) => {
+  if (err.message?.includes('connection') || err.message?.includes('closed')) {
+    reconnectPrisma();
+    return res.status(503).json({ error: 'Database temporarily unavailable' });
+  }
+  next(err);
 });
 
 // Register all routes

@@ -1,6 +1,4 @@
-import pkg from '@prisma/client';
-const { PrismaClient } = pkg;
-const prisma = new PrismaClient();
+import prisma from '../config/prisma.js';
 import { workspaceService } from '../services/workspaceService.js';
 
 export const workspaceController = {

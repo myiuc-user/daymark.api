@@ -1,6 +1,4 @@
-import pkg from '@prisma/client';
-const { PrismaClient } = pkg;
-const prisma = new PrismaClient();
+import prisma from '../config/prisma.js';
 import { notificationService } from './notificationService.js';
 import { githubService } from './githubService.js';
 import { githubAuthService } from './githubAuthService.js';

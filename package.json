@@ -7,7 +7,6 @@
   "scripts": {
     "dev": "nodemon ./app.js",
     "start": "node ./app.js",
-    "db:sync": "node scripts/sync-db.js",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",

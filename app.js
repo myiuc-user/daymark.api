@@ -23,6 +23,7 @@ console.log(`[Server] Frontend URL: ${process.env.FRONTEND_URL}`);
 app.use(cors({
   origin: [
     'https://daymark.myiuc.com',
+    'https://daymarkserver.myiuc.com',
     'http://localhost:5173'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],

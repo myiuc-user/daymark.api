@@ -28,6 +28,7 @@ import taskDependencyRoutes from '../routes/taskDependencyRoutes.js';
 import notificationPreferenceRoutes from '../routes/notificationPreferenceRoutes.js';
 import recurringTaskRoutes from '../routes/recurringTaskRoutes.js';
 import githubSyncRoutes from '../routes/githubSyncRoutes.js';
+import dataExportRoutes from '../routes/dataExportRoutes.js';
 
 export const routes = [
   { path: '/auth', router: authRoutes },
@@ -60,4 +61,5 @@ export const routes = [
   { path: '/notification-preferences', router: notificationPreferenceRoutes },
   { path: '/recurring-tasks', router: recurringTaskRoutes },
   { path: '/github-sync', router: githubSyncRoutes },
+  { path: '/settings', router: dataExportRoutes },
 ];

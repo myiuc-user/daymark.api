@@ -7,8 +7,8 @@
 - [ ] Conformité RGPD (droit à l'oubli, export de données)
 
 ## 📊 Audit & Historique
-- [ ] Journal d'audit des actions utilisateur
-- [ ] Historique des modifications (qui, quoi, quand)
+- [x] Journal d'audit des actions utilisateur
+- [x] Historique des modifications (qui, quoi, quand)
 - [ ] Versioning des tâches/projets
 
 ## 🔔 Notifications avancées
@@ -66,9 +66,9 @@
 - [ ] Indexation des recherches
 
 ## 🎯 Permissions granulaires
-- [ ] Contrôle d'accès détaillé par rôle
-- [ ] Permissions au niveau des tâches/projets
-- [ ] Délégation de permissions
+- [x] Contrôle d'accès détaillé par rôle
+- [x] Permissions au niveau des tâches/projets
+- [x] Délégation de permissions
 
 ---
 

@@ -6,6 +6,13 @@ import {
 } from '../services/authService.js';
 import { validateRequest, loginSchema } from '../utils/validation.js';
 
+const getCookieOptions = () => ({
+  httpOnly: true,
+  secure: true,
+  sameSite: 'none',
+  maxAge: 7 * 24 * 60 * 60 * 1000
+});
+
 export const authController = {
   login: async (req, res) => {
     try {
@@ -13,12 +20,7 @@ export const authController = {
       const user = await authenticateUser(email, password);
       const { accessToken, refreshToken } = generateTokens(user.id);
 
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000
-      });
+      res.cookie('refreshToken', refreshToken, getCookieOptions());
 
       res.json({
         user: {
@@ -27,7 +29,8 @@ export const authController = {
           name: user.name,
           role: user.role
         },
-        accessToken
+        accessToken,
+        refreshToken
       });
     } catch (error) {
       console.error('Login error:', error);
@@ -47,32 +50,31 @@ export const authController = {
 
   refresh: async (req, res) => {
     try {
-      const refreshToken = req.cookies.refreshToken;
+      let refreshToken = req.cookies.refreshToken;
       
       if (!refreshToken) {
-        return res.status(401).json({ error: 'No refresh token' });
+        refreshToken = req.body.refreshToken;
+      }
+      
+      if (!refreshToken) {
+        return res.status(401).json({ error: 'No refresh token', redirect: '/login' });
       }
 
       const decoded = verifyRefreshToken(refreshToken);
       const { accessToken, refreshToken: newRefreshToken } = generateTokens(decoded.userId);
 
-      res.cookie('refreshToken', newRefreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000
-      });
+      res.cookie('refreshToken', newRefreshToken, getCookieOptions());
 
-      res.json({ accessToken });
+      res.json({ accessToken, refreshToken: newRefreshToken });
     } catch (error) {
-      console.error('Refresh token error:', error);
-      res.status(401).json({ error: 'Invalid refresh token' });
+      console.error('Refresh token error:', error.message);
+      res.status(401).json({ error: 'Invalid refresh token', redirect: '/login' });
     }
   },
 
   logout: async (req, res) => {
     try {
-      res.clearCookie('refreshToken');
+      res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'none' });
       res.json({ message: 'Logged out successfully' });
     } catch (error) {
       console.error('Logout error:', error);

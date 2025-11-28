@@ -1,7 +1,7 @@
 import prisma from '../config/prisma.js';
 
 export const analyticsService = {
-  getWorkspaceAnalytics: async (workspaceId, userId) => {
+  getWorkspaceAnalytics: async (workspaceId, userId, userRole = '') => {
     const workspace = await prisma.workspace.findUnique({
       where: { id: workspaceId },
       include: {
@@ -11,7 +11,11 @@ export const analyticsService = {
       }
     });
 
-    if (!workspace || (workspace.ownerId !== userId && workspace.members.length === 0)) {
+    const isSuperAdmin = userRole === 'SUPER_ADMIN';
+    if (!workspace) {
+      throw new Error('Workspace not found');
+    }
+    if (!isSuperAdmin && workspace.ownerId !== userId && workspace.members.length === 0) {
       throw new Error('Access denied');
     }
 
@@ -36,7 +40,7 @@ export const analyticsService = {
     };
   },
 
-  getProjectAnalytics: async (projectId, userId) => {
+  getProjectAnalytics: async (projectId, userId, userRole = '') => {
     const project = await prisma.project.findUnique({
       where: { id: projectId },
       include: {
@@ -52,7 +56,11 @@ export const analyticsService = {
       }
     });
 
-    if (!project || (project.workspace.ownerId !== userId && project.workspace.members.length === 0 && project.team_lead !== userId)) {
+    const isSuperAdmin = userRole === 'SUPER_ADMIN';
+    if (!project) {
+      throw new Error('Project not found');
+    }
+    if (!isSuperAdmin && project.workspace.ownerId !== userId && project.workspace.members.length === 0 && project.team_lead !== userId) {
       throw new Error('Access denied');
     }
 
@@ -70,7 +78,7 @@ export const analyticsService = {
     };
   },
 
-  getDashboard: async (id, userId) => {
+  getDashboard: async (id, userId, userRole = '') => {
     const workspace = await prisma.workspace.findUnique({
       where: { id },
       include: {
@@ -85,7 +93,11 @@ export const analyticsService = {
       }
     });
 
-    if (!workspace || (workspace.ownerId !== userId && workspace.members.length === 0)) {
+    const isSuperAdmin = userRole === 'SUPER_ADMIN';
+    if (!workspace) {
+      throw new Error('Workspace not found');
+    }
+    if (!isSuperAdmin && workspace.ownerId !== userId && workspace.members.length === 0) {
       throw new Error('Access denied');
     }
 

@@ -7,19 +7,17 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import './src/config/database.js';
 import prisma, { reconnectPrisma } from './src/config/prisma.js';
-import { createRootAdmin } from './src/services/authService.js';
+import { createRootAdmin, resetAdminPassword } from './src/services/authService.js';
 import { createDatabaseIfNotExists } from './src/config/database.js';
 import { cronService } from './src/services/cronService.js';
 import { routes } from './src/config/routes.js';
+import { auditMiddleware } from './src/middleware/auditMiddleware.js';
 
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3001;
-
-console.log(`[Server] GitHub Client ID: ${process.env.GITHUB_CLIENT_ID}`);
-console.log(`[Server] Frontend URL: ${process.env.FRONTEND_URL}`);
 
 app.use(cors({
   origin: [
@@ -51,6 +49,9 @@ app.use((req, res, next) => {
 });
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Audit middleware
+app.use(auditMiddleware);
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -93,15 +94,18 @@ async function startServer() {
     console.log('✅ Database connected');
     
     await createRootAdmin();
+    await resetAdminPassword();
     console.log('✅ Root admin initialized');
     
     cronService.start();
+    console.log('✅ Cron service started');
     
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`📧 Admin email: ${process.env.ROOT_ADMIN_EMAIL}`);
     });
   } catch (error) {
-    console.error('❌ Failed to start server:', error);
+    console.error('❌ Failed to start server:', error.message);
     process.exit(1);
   }
 }

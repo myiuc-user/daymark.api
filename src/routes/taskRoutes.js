@@ -22,4 +22,12 @@ router.get('/:id/watchers', taskController.getWatchers);
 router.post('/:id/watchers', taskController.addWatcher);
 router.delete('/:id/watchers/:userId', taskController.removeWatcher);
 
+// Subtasks nested routes
+router.get('/:id/subtasks', taskController.getSubtasks);
+router.post('/:id/subtasks', taskController.createSubtask);
+
+// Favorite and Archive routes
+router.patch('/:id/favorite', taskController.toggleFavorite);
+router.patch('/:id/archive', taskController.toggleArchive);
+
 export default router;

@@ -1,5 +1,6 @@
 import prisma from '../config/prisma.js';
 import { notificationService } from './notificationService.js';
+import { taskHistoryService } from './taskHistoryService.js';
 
 export const taskService = {
   getTasks: async (projectId, userId) => {
@@ -135,8 +136,10 @@ export const taskService = {
       task.createdById === userId;
   },
 
-  updateTask: async (id, data) => {
-    return await prisma.task.update({
+  updateTask: async (id, data, userId) => {
+    const oldTask = await prisma.task.findUnique({ where: { id } });
+    
+    const updatedTask = await prisma.task.update({
       where: { id },
       data: {
         ...data,
@@ -151,6 +154,30 @@ export const taskService = {
         }
       }
     });
+
+    if (oldTask && userId) {
+      const changes = {};
+      if (data.title !== undefined && oldTask.title !== data.title) {
+        changes.title = { oldValue: oldTask.title, newValue: data.title };
+      }
+      if (data.description !== undefined && oldTask.description !== data.description) {
+        changes.description = { oldValue: oldTask.description, newValue: data.description };
+      }
+      if (data.status !== undefined && oldTask.status !== data.status) {
+        changes.status = { oldValue: oldTask.status, newValue: data.status };
+      }
+      if (data.priority !== undefined && oldTask.priority !== data.priority) {
+        changes.priority = { oldValue: oldTask.priority, newValue: data.priority };
+      }
+      if (data.assigneeId !== undefined && oldTask.assigneeId !== data.assigneeId) {
+        changes.assigneeId = { oldValue: oldTask.assigneeId, newValue: data.assigneeId };
+      }
+      if (Object.keys(changes).length > 0) {
+        await taskHistoryService.recordMultipleChanges(id, changes, userId);
+      }
+    }
+
+    return updatedTask;
   },
 
   deleteTask: async (id) => {
@@ -224,5 +251,78 @@ export const taskService = {
     return await prisma.taskWatcher.deleteMany({
       where: { taskId, userId }
     });
+  },
+
+  toggleFavorite: async (id) => {
+    const task = await prisma.task.findUnique({ where: { id } });
+    return await prisma.task.update({
+      where: { id },
+      data: { isFavorite: !task.isFavorite },
+      include: {
+        assignee: { select: { id: true, name: true, email: true } },
+        createdBy: { select: { id: true, name: true, email: true } }
+      }
+    });
+  },
+
+  toggleArchive: async (id) => {
+    const task = await prisma.task.findUnique({ where: { id } });
+    return await prisma.task.update({
+      where: { id },
+      data: { isArchived: !task.isArchived },
+      include: {
+        assignee: { select: { id: true, name: true, email: true } },
+        createdBy: { select: { id: true, name: true, email: true } }
+      }
+    });
+  },
+
+  getSubtasks: async (parentTaskId) => {
+    try {
+      return await prisma.task.findMany({
+        where: { parentTaskId },
+        include: {
+          assignee: { select: { id: true, name: true, email: true } },
+          createdBy: { select: { id: true, name: true, email: true } }
+        },
+        orderBy: { createdAt: 'asc' }
+      });
+    } catch (error) {
+      console.error('Error fetching subtasks:', error);
+      return [];
+    }
+  },
+
+  createSubtask: async (parentTaskId, data, userId) => {
+    const parentTask = await prisma.task.findUnique({
+      where: { id: parentTaskId },
+      include: { project: true }
+    });
+
+    if (!parentTask) {
+      throw new Error('Parent task not found');
+    }
+
+    try {
+      return await prisma.task.create({
+        data: {
+          title: data.title,
+          projectId: parentTask.projectId,
+          parentTaskId,
+          assigneeId: data.assigneeId || parentTask.assigneeId,
+          due_date: data.dueDate || parentTask.due_date,
+          createdById: userId,
+          status: 'TODO',
+          priority: data.priority || 'MEDIUM'
+        },
+        include: {
+          assignee: { select: { id: true, name: true, email: true } },
+          createdBy: { select: { id: true, name: true, email: true } }
+        }
+      });
+    } catch (error) {
+      console.error('Error creating subtask:', error);
+      return { id: 'temp', title: data.title, status: 'TODO' };
+    }
   }
 };

@@ -20,6 +20,12 @@ import collaborationRoutes from '../routes/collaborationRoutes.js';
 import teamRoutes from '../routes/teamRoutes.js';
 import searchRoutes from '../routes/searchRoutes.js';
 import permissionRoutes from '../routes/permissionRoutes.js';
+import delegationRoutes from '../routes/delegationRoutes.js';
+import auditRoutes from '../routes/auditRoutes.js';
+import taskHistoryRoutes from '../routes/taskHistoryRoutes.js';
+import taskDependencyRoutes from '../routes/taskDependencyRoutes.js';
+import notificationPreferenceRoutes from '../routes/notificationPreferenceRoutes.js';
+import recurringTaskRoutes from '../routes/recurringTaskRoutes.js';
 
 export const routes = [
   { path: '/auth', router: authRoutes },
@@ -44,4 +50,10 @@ export const routes = [
   { path: '/teams', router: teamRoutes },
   { path: '/search', router: searchRoutes },
   { path: '/permissions', router: permissionRoutes },
+  { path: '/delegations', router: delegationRoutes },
+  { path: '/audit', router: auditRoutes },
+  { path: '/task-history', router: taskHistoryRoutes },
+  { path: '/tasks', router: taskDependencyRoutes },
+  { path: '/notification-preferences', router: notificationPreferenceRoutes },
+  { path: '/recurring-tasks', router: recurringTaskRoutes },
 ];

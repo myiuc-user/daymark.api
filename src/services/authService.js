@@ -62,12 +62,19 @@ export const authenticateUser = async (email, password) => {
     }
   });
 
-  if (!user || !user.isActive) {
+  if (!user) {
+    console.log(`User not found: ${email}`);
+    throw new Error('Invalid credentials');
+  }
+
+  if (!user.isActive) {
+    console.log(`User inactive: ${email}`);
     throw new Error('Invalid credentials');
   }
 
   const isValidPassword = await comparePassword(password, user.password);
   if (!isValidPassword) {
+    console.log(`Invalid password for user: ${email}`);
     throw new Error('Invalid credentials');
   }
 
@@ -90,9 +97,18 @@ export const getCurrentUser = async (userId) => {
 
 export const createRootAdmin = async () => {
   try {
-    const existingAdmin = await prisma.user.findFirst({
-      where: { role: 'SUPER_ADMIN' }
-    });
+    let existingAdmin;
+    try {
+      existingAdmin = await prisma.user.findFirst({
+        where: { role: 'SUPER_ADMIN' }
+      });
+    } catch (error) {
+      if (error.code === 'P2022') {
+        console.log('Database schema not fully migrated, skipping root admin check');
+        return;
+      }
+      throw error;
+    }
 
     if (existingAdmin) {
       console.log('Root admin already exists');
@@ -113,6 +129,25 @@ export const createRootAdmin = async () => {
 
     console.log(`Root admin created: ${rootAdmin.email}`);
   } catch (error) {
-    console.error('Error creating root admin:', error);
+    console.error('Error creating root admin:', error.message);
+  }
+};
+
+export const resetAdminPassword = async () => {
+  try {
+    const hashedPassword = await hashPassword(process.env.ROOT_ADMIN_PASSWORD);
+    
+    const updated = await prisma.user.updateMany({
+      where: { email: process.env.ROOT_ADMIN_EMAIL },
+      data: { password: hashedPassword }
+    });
+
+    if (updated.count > 0) {
+      console.log(`Admin password reset for: ${process.env.ROOT_ADMIN_EMAIL}`);
+    } else {
+      console.log(`Admin user not found: ${process.env.ROOT_ADMIN_EMAIL}`);
+    }
+  } catch (error) {
+    console.error('Error resetting admin password:', error.message);
   }
 };

@@ -2,6 +2,7 @@ import prisma from '../config/prisma.js';
 import { notificationService } from './notificationService.js';
 import { githubService } from './githubService.js';
 import { githubAuthService } from './githubAuthService.js';
+import { projectProgressService } from './projectProgressService.js';
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
@@ -15,7 +16,7 @@ const transporter = nodemailer.createTransport({
 });
 
 export const projectService = {
-  getProjects: async (workspaceId, userId) => {
+  getProjects: async (workspaceId, userId, userRole = '') => {
     const workspace = await prisma.workspace.findUnique({
       where: { id: workspaceId },
       include: {
@@ -25,11 +26,19 @@ export const projectService = {
       }
     });
 
-    if (!workspace || (workspace.ownerId !== userId && workspace.members.length === 0)) {
+    if (!workspace) {
+      throw new Error('Workspace not found');
+    }
+
+    const isSuperAdmin = userRole?.toUpperCase?.() === 'SUPER_ADMIN';
+    const isOwner = workspace.ownerId === userId;
+    const isMember = workspace.members.length > 0;
+
+    if (!isSuperAdmin && !isOwner && !isMember) {
       throw new Error('Access denied');
     }
 
-    return await prisma.project.findMany({
+    const projects = await prisma.project.findMany({
       where: { workspaceId },
       include: {
         owner: {
@@ -48,9 +57,17 @@ export const projectService = {
       },
       orderBy: { createdAt: 'desc' }
     });
+
+    for (const project of projects) {
+      const stats = await projectProgressService.getProjectStats(project.id);
+      project.progress = stats.progress;
+      project.stats = stats;
+    }
+
+    return projects;
   },
 
-  createProject: async (data, userId) => {
+  createProject: async (data, userId, userRole = '') => {
     const workspace = await prisma.workspace.findUnique({
       where: { id: data.workspaceId },
       include: {
@@ -60,7 +77,8 @@ export const projectService = {
       }
     });
 
-    if (!workspace || (workspace.ownerId !== userId && workspace.members.length === 0)) {
+    const isSuperAdmin = userRole?.toUpperCase?.() === 'SUPER_ADMIN';
+    if (!workspace || (!isSuperAdmin && workspace.ownerId !== userId && workspace.members.length === 0)) {
       throw new Error('Access denied');
     }
 
@@ -106,11 +124,18 @@ export const projectService = {
       }
     };
 
-    return await prisma.project.findUnique({
+    const project = await prisma.project.findUnique({
       where: { id },
       ...options,
       include: options.include || defaultInclude
     });
+
+    if (project) {
+      const stats = await projectProgressService.getProjectStats(id);
+      return { ...project, progress: stats.progress, stats };
+    }
+
+    return project;
   },
 
   checkProjectAccess: async (project, userId) => {

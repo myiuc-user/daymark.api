@@ -8,11 +8,11 @@ export const projectController = {
         return res.status(400).json({ error: 'Workspace ID is required' });
       }
 
-      const projects = await projectService.getProjects(workspaceId, req.user.id);
+      const projects = await projectService.getProjects(workspaceId, req.user.id, req.user.role);
       res.json({ projects });
     } catch (error) {
       console.error('Get projects error:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(403).json({ error: error.message || 'Internal server error' });
     }
   },
 
@@ -28,7 +28,7 @@ export const projectController = {
         end_date,
         team_lead: req.user.id,
         workspaceId
-      }, req.user.id);
+      }, req.user.id, req.user.role);
       res.status(201).json({ project });
     } catch (error) {
       console.error('Create project error:', error);
@@ -67,7 +67,8 @@ export const projectController = {
         return res.status(404).json({ error: 'Project not found' });
       }
 
-      const canUpdate = project.team_lead === req.user.id || project.workspace.ownerId === req.user.id;
+      const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
+      const canUpdate = isSuperAdmin || project.team_lead === req.user.id || project.workspace.ownerId === req.user.id;
       if (!canUpdate) {
         return res.status(403).json({ error: 'Access denied' });
       }
@@ -97,7 +98,8 @@ export const projectController = {
         return res.status(404).json({ error: 'Project not found' });
       }
 
-      const canDelete = project.team_lead === req.user.id || project.workspace.ownerId === req.user.id;
+      const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
+      const canDelete = isSuperAdmin || project.team_lead === req.user.id || project.workspace.ownerId === req.user.id;
       if (!canDelete) {
         return res.status(403).json({ error: 'Access denied' });
       }
@@ -138,7 +140,8 @@ export const projectController = {
         return res.status(404).json({ error: 'Project not found' });
       }
 
-      const canAdd = project.team_lead === req.user.id || project.workspace.ownerId === req.user.id;
+      const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
+      const canAdd = isSuperAdmin || project.team_lead === req.user.id || project.workspace.ownerId === req.user.id;
       if (!canAdd) {
         return res.status(403).json({ error: 'Access denied' });
       }
@@ -160,7 +163,8 @@ export const projectController = {
         return res.status(404).json({ error: 'Project not found' });
       }
 
-      const canRemove = project.team_lead === req.user.id || project.workspace.ownerId === req.user.id;
+      const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
+      const canRemove = isSuperAdmin || project.team_lead === req.user.id || project.workspace.ownerId === req.user.id;
       if (!canRemove) {
         return res.status(403).json({ error: 'Access denied' });
       }
@@ -187,7 +191,8 @@ export const projectController = {
         return res.status(404).json({ error: 'Project not found' });
       }
 
-      const canConnect = project.team_lead === req.user.id || project.workspace.ownerId === req.user.id;
+      const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
+      const canConnect = isSuperAdmin || project.team_lead === req.user.id || project.workspace.ownerId === req.user.id;
       if (!canConnect) {
         return res.status(403).json({ error: 'Access denied' });
       }
@@ -209,7 +214,8 @@ export const projectController = {
         return res.status(404).json({ error: 'Project not found' });
       }
 
-      const canDisconnect = project.team_lead === req.user.id || project.workspace.ownerId === req.user.id;
+      const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
+      const canDisconnect = isSuperAdmin || project.team_lead === req.user.id || project.workspace.ownerId === req.user.id;
       if (!canDisconnect) {
         return res.status(403).json({ error: 'Access denied' });
       }
@@ -231,7 +237,8 @@ export const projectController = {
         return res.status(404).json({ error: 'Project or GitHub repository not found' });
       }
 
-      const canSync = project.team_lead === req.user.id || project.workspace.ownerId === req.user.id;
+      const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
+      const canSync = isSuperAdmin || project.team_lead === req.user.id || project.workspace.ownerId === req.user.id;
       if (!canSync) {
         return res.status(403).json({ error: 'Access denied' });
       }

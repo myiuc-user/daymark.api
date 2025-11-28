@@ -79,7 +79,7 @@ export const taskController = {
         status,
         dueDate,
         assigneeId
-      });
+      }, req.user.id);
 
       res.json({ task: updatedTask });
     } catch (error) {
@@ -222,6 +222,83 @@ export const taskController = {
       res.json({ message: 'Watcher removed' });
     } catch (error) {
       console.error('Remove watcher error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  getSubtasks: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const task = await taskService.getTaskById(id);
+      if (!task) {
+        return res.status(404).json({ error: 'Task not found' });
+      }
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      if (!hasAccess) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      const subtasks = await taskService.getSubtasks(id);
+      res.json({ subtasks });
+    } catch (error) {
+      console.error('Get subtasks error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  createSubtask: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { title, assigneeId, dueDate, priority } = req.body;
+      const task = await taskService.getTaskById(id);
+      if (!task) {
+        return res.status(404).json({ error: 'Task not found' });
+      }
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      if (!hasAccess) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      const subtask = await taskService.createSubtask(id, { title, assigneeId, dueDate, priority }, req.user.id);
+      res.status(201).json({ subtask });
+    } catch (error) {
+      console.error('Create subtask error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  toggleFavorite: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const task = await taskService.getTaskById(id);
+      if (!task) {
+        return res.status(404).json({ error: 'Task not found' });
+      }
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      if (!hasAccess) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      const updatedTask = await taskService.toggleFavorite(id);
+      res.json({ task: updatedTask });
+    } catch (error) {
+      console.error('Toggle favorite error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  toggleArchive: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const task = await taskService.getTaskById(id);
+      if (!task) {
+        return res.status(404).json({ error: 'Task not found' });
+      }
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      if (!hasAccess) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      const updatedTask = await taskService.toggleArchive(id);
+      res.json({ task: updatedTask });
+    } catch (error) {
+      console.error('Toggle archive error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   }

@@ -8,7 +8,7 @@ export const analyticsController = {
         return res.status(400).json({ error: 'Workspace ID is required' });
       }
 
-      const analytics = await analyticsService.getWorkspaceAnalytics(workspaceId, req.user.id);
+      const analytics = await analyticsService.getWorkspaceAnalytics(workspaceId, req.user.id, req.user.role);
       res.json({ analytics });
     } catch (error) {
       console.error('Get analytics error:', error);
@@ -23,7 +23,7 @@ export const analyticsController = {
         return res.status(400).json({ error: 'Project ID is required' });
       }
 
-      const analytics = await analyticsService.getProjectAnalytics(projectId, req.user.id);
+      const analytics = await analyticsService.getProjectAnalytics(projectId, req.user.id, req.user.role);
       res.json({ analytics });
     } catch (error) {
       console.error('Get project analytics error:', error);
@@ -34,7 +34,8 @@ export const analyticsController = {
   getDashboard: async (req, res) => {
     try {
       const { id } = req.params;
-      const dashboard = await analyticsService.getDashboard(id, req.user.id);
+      console.log('Dashboard request - userId:', req.user.id, 'role:', req.user.role);
+      const dashboard = await analyticsService.getDashboard(id, req.user.id, req.user.role);
       res.json({ dashboard });
     } catch (error) {
       console.error('Get dashboard error:', error);

@@ -143,10 +143,14 @@ model Task {
   updatedAt       DateTime       @updatedAt
   createdById     String
   estimatedHours  Float?
+  actualHours     Float?
+  storyPoints     Int?
   milestoneId     String?
   sprintId        String?
   workflowStateId String?
   parentTaskId    String?
+  isFavorite      Boolean        @default(false)
+  isArchived      Boolean        @default(false)
   comments        Comment[]
   files           File[]
   assignee        User           @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: Cascade)

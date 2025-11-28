@@ -44,16 +44,22 @@ export const githubCommitService = {
     const [owner, repo] = task.project.githubRepo.split('/');
     const octokit = new Octokit({ auth: user.githubToken });
 
-    await octokit.repos.updateCommitComment({
-      owner,
-      repo,
-      commit_sha: task.commitHash,
-      message: task.title
-    });
+    const newMessage = task.title;
+
+    try {
+      await octokit.repos.createCommitComment({
+        owner,
+        repo,
+        commit_sha: task.commitHash,
+        body: `Task: ${newMessage}`
+      });
+    } catch (error) {
+      console.error('Failed to add commit comment:', error);
+    }
 
     return await prisma.task.update({
       where: { id: taskId },
-      data: { commitMessage: task.title }
+      data: { commitMessage: newMessage }
     });
   },
 
@@ -62,5 +68,32 @@ export const githubCommitService = {
       where: { id: taskId },
       data: { commitHash: null, commitMessage: null }
     });
+  },
+
+  getProjectCommits: async (projectId, userId) => {
+    const project = await prisma.project.findUnique({
+      where: { id: projectId }
+    });
+
+    if (!project?.githubRepo) throw new Error('Project not linked to GitHub');
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user?.githubToken) throw new Error('GitHub token not found');
+
+    const [owner, repo] = project.githubRepo.split('/');
+    const octokit = new Octokit({ auth: user.githubToken });
+
+    const { data } = await octokit.repos.listCommits({
+      owner,
+      repo,
+      per_page: 50
+    });
+
+    return data.map(commit => ({
+      sha: commit.sha,
+      message: commit.commit.message,
+      author: commit.commit.author.name,
+      date: commit.commit.author.date
+    }));
   }
 };

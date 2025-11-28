@@ -32,5 +32,16 @@ export const githubCommitController = {
       console.error('Unlink task from commit error:', error);
       res.status(500).json({ error: error.message });
     }
+  },
+
+  getProjectCommits: async (req, res) => {
+    try {
+      const { projectId } = req.params;
+      const commits = await githubCommitService.getProjectCommits(projectId, req.user.id);
+      res.json({ commits });
+    } catch (error) {
+      console.error('Get project commits error:', error);
+      res.status(500).json({ error: error.message });
+    }
   }
 };

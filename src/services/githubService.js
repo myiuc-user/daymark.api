@@ -19,16 +19,12 @@ class GitHubService {
 
   async getUserRepos(token) {
     try {
-      console.log(`[GitHubService] Initializing Octokit...`);
       const octokit = this.getOctokit(token);
       
-      console.log(`[GitHubService] Fetching authenticated user repos...`);
       const { data } = await octokit.rest.repos.listForAuthenticatedUser({ 
         per_page: 100,
         sort: 'updated'
       });
-      
-      console.log(`[GitHubService] Raw data received: ${data.length} repos`);
       
       const mapped = data.map(repo => ({
         id: repo.id,
@@ -41,7 +37,6 @@ class GitHubService {
         forks: repo.forks_count
       }));
       
-      console.log(`[GitHubService] Mapped repos:`, JSON.stringify(mapped.slice(0, 2), null, 2));
       return mapped;
     } catch (error) {
       console.error(`[GitHubService] Error fetching repos:`, error);
@@ -51,7 +46,6 @@ class GitHubService {
 
   async getUserOrganizations(token) {
     try {
-      console.log(`[GitHubService] Fetching user organizations...`);
       const octokit = this.getOctokit(token);
       
       const { data: userOrgs } = await octokit.rest.orgs.listForAuthenticatedUser({ per_page: 100 });
@@ -75,7 +69,6 @@ class GitHubService {
         }))
       ];
       
-      console.log(`[GitHubService] Fetched ${orgs.length} organizations`);
       return orgs;
     } catch (error) {
       console.error(`[GitHubService] Error fetching organizations:`, error);
@@ -85,7 +78,6 @@ class GitHubService {
 
   async getOrganizationRepos(org, token) {
     try {
-      console.log(`[GitHubService] Fetching repos for organization: ${org}`);
       const octokit = this.getOctokit(token);
       
       const { data } = await octokit.rest.repos.listForOrg({
@@ -105,7 +97,6 @@ class GitHubService {
         forks: repo.forks_count
       }));
       
-      console.log(`[GitHubService] Fetched ${mapped.length} repos for org: ${org}`);
       return mapped;
     } catch (error) {
       console.error(`[GitHubService] Error fetching org repos:`, error);
@@ -115,7 +106,6 @@ class GitHubService {
 
   async getRepoInfo(owner, repo, token) {
     try {
-      console.log(`[GitHubService] Fetching repo info: ${owner}/${repo}`);
       const octokit = this.getOctokit(token);
       const { data } = await octokit.rest.repos.get({ owner, repo });
       
@@ -130,7 +120,6 @@ class GitHubService {
         openIssues: data.open_issues_count
       };
       
-      console.log(`[GitHubService] Repo info:`, JSON.stringify(info, null, 2));
       return info;
     } catch (error) {
       console.error(`[GitHubService] Error fetching repo info:`, error);
@@ -140,13 +129,11 @@ class GitHubService {
 
   async getCommits(owner, repo, token, since = null) {
     try {
-      console.log(`[GitHubService] Fetching commits: ${owner}/${repo}`);
       const octokit = this.getOctokit(token);
       const params = { owner, repo, per_page: 100 };
       if (since) params.since = since;
       
       const { data } = await octokit.rest.repos.listCommits(params);
-      console.log(`[GitHubService] Fetched ${data.length} commits`);
       
       return data.map(commit => ({
         sha: commit.sha,
@@ -165,11 +152,8 @@ class GitHubService {
 
   async getCodeMetrics(owner, repo, token) {
     try {
-      console.log(`[GitHubService] Fetching code metrics: ${owner}/${repo}`);
       const octokit = this.getOctokit(token);
       const { data: languages } = await octokit.rest.repos.listLanguages({ owner, repo });
-      
-      console.log(`[GitHubService] Languages:`, JSON.stringify(languages, null, 2));
       
       const totalBytes = Object.values(languages).reduce((sum, bytes) => sum + bytes, 0);
       const estimatedLOC = Math.round(totalBytes / 50);
@@ -181,7 +165,6 @@ class GitHubService {
         primaryLanguage: Object.keys(languages)[0] || 'Unknown'
       };
       
-      console.log(`[GitHubService] Metrics:`, JSON.stringify(metrics, null, 2));
       return metrics;
     } catch (error) {
       console.error(`[GitHubService] Error fetching code metrics:`, error);
@@ -191,11 +174,8 @@ class GitHubService {
 
   async searchRepos(q, token) {
     try {
-      console.log(`[GitHubService] Searching repos: ${q}`);
       const octokit = this.getOctokit(token);
       const { data } = await octokit.rest.search.repos({ q, per_page: 30 });
-      
-      console.log(`[GitHubService] Search returned ${data.items.length} items`);
       
       return data.items.map(repo => ({
         id: repo.id,

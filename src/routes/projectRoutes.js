@@ -22,6 +22,7 @@ router.put('/:id/members/:userId/permissions', projectController.updateMemberPer
 
 // GitHub routes
 router.post('/:id/github', projectController.connectGithub);
+router.post('/:id/connect-github', projectController.connectGithub);
 router.delete('/:id/github', projectController.disconnectGithub);
 router.post('/:id/github/sync', projectController.syncGithub);
 

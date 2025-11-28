@@ -100,34 +100,31 @@ export const projectService = {
   },
 
   getProjectById: async (id, options = {}) => {
-    const defaultInclude = {
-      owner: {
-        select: { id: true, name: true, email: true }
-      },
-      workspace: {
-        select: { id: true, name: true, slug: true, ownerId: true }
-      },
-      members: {
-        include: {
-          user: {
-            select: { id: true, name: true, email: true, image: true }
-          }
-        }
-      },
-      tasks: {
-        include: {
-          assignee: {
-            select: { id: true, name: true, email: true }
-          }
-        },
-        orderBy: { createdAt: 'desc' }
-      }
-    };
-
     const project = await prisma.project.findUnique({
       where: { id },
-      ...options,
-      include: options.include || defaultInclude
+      include: {
+        owner: {
+          select: { id: true, name: true, email: true }
+        },
+        workspace: {
+          select: { id: true, name: true, slug: true, ownerId: true }
+        },
+        members: {
+          include: {
+            user: {
+              select: { id: true, name: true, email: true, image: true }
+            }
+          }
+        },
+        tasks: {
+          include: {
+            assignee: {
+              select: { id: true, name: true, email: true }
+            }
+          },
+          orderBy: { createdAt: 'desc' }
+        }
+      }
     });
 
     if (project) {

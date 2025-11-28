@@ -265,6 +265,52 @@ export const taskController = {
     }
   },
 
+  toggleSubtaskStatus: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const subtask = await taskService.getTaskById(id);
+      if (!subtask) {
+        return res.status(404).json({ error: 'Subtask not found' });
+      }
+      const hasAccess = await taskService.checkTaskAccess(subtask, req.user.id);
+      if (!hasAccess) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      const updated = await taskService.toggleSubtaskStatus(id);
+      res.json({ subtask: updated });
+    } catch (error) {
+      console.error('Toggle subtask status error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  updateTaskStatus: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+
+      if (!status) {
+        return res.status(400).json({ error: 'Status is required' });
+      }
+
+      const task = await taskService.getTaskById(id);
+      if (!task) {
+        return res.status(404).json({ error: 'Task not found' });
+      }
+
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      if (!hasAccess) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      const updated = await taskService.updateTaskStatus(id, status);
+      res.json({ task: updated });
+    } catch (error) {
+      console.error('Update task status error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
   toggleFavorite: async (req, res) => {
     try {
       const { id } = req.params;

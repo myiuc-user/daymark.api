@@ -324,5 +324,29 @@ export const taskService = {
       console.error('Error creating subtask:', error);
       return { id: 'temp', title: data.title, status: 'TODO' };
     }
+  },
+
+  toggleSubtaskStatus: async (subtaskId) => {
+    const subtask = await prisma.task.findUnique({ where: { id: subtaskId } });
+    const newStatus = subtask.status === 'DONE' ? 'TODO' : 'DONE';
+    return await prisma.task.update({
+      where: { id: subtaskId },
+      data: { status: newStatus },
+      include: {
+        assignee: { select: { id: true, name: true, email: true } },
+        createdBy: { select: { id: true, name: true, email: true } }
+      }
+    });
+  },
+
+  updateTaskStatus: async (id, status) => {
+    return await prisma.task.update({
+      where: { id },
+      data: { status },
+      include: {
+        assignee: { select: { id: true, name: true, email: true } },
+        createdBy: { select: { id: true, name: true, email: true } }
+      }
+    });
   }
 };

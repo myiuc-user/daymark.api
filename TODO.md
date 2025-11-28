@@ -1,78 +1,52 @@
-# 📋 Daymark API - Fonctionnalités à implémenter
+# Daymark Backend - TODO
 
-## 🔐 Sécurité & Authentification
-- [ ] Authentification multi-facteurs (2FA/MFA)
-- [ ] SSO (SAML, OIDC)
-- [ ] Chiffrement des données sensibles
-- [ ] Conformité RGPD (droit à l'oubli, export de données)
+## ✅ Completed Features
+- [x] Authentication (JWT)
+- [x] User Management
+- [x] Workspace Management
+- [x] Project Management
+- [x] Task Management (CRUD)
+- [x] Subtasks (Create, Read, Delete, Toggle Status)
+- [x] Task Status Update (API endpoint)
+- [x] Comments & Mentions
+- [x] Task Watchers
+- [x] Favorites & Archive
+- [x] Story Points & Time Tracking (Data Model)
 
-## 📊 Audit & Historique
-- [x] Journal d'audit des actions utilisateur
-- [x] Historique des modifications (qui, quoi, quand)
-- [ ] Versioning des tâches/projets
+## 🚀 In Progress
+- [ ] Task Filtering & Search
 
-## 🔔 Notifications avancées
-- [ ] Préférences de notifications par utilisateur
-- [ ] Notifications par email
-- [ ] Notifications par SMS
-- [ ] Digest et résumés périodiques
+## 📋 Planned Features
 
-## 🔗 Dépendances entre tâches
-- [ ] Système de dépendances (tâche A bloque tâche B)
-- [ ] Chemin critique
-- [ ] Détection de cycles
+### High Priority
+- [ ] Task Filtering & Search (Advanced query)
+- [ ] Sprint Management (CRUD, Activate)
+- [ ] Bulk Task Assignment
+- [ ] Task Dependencies (CRUD)
 
-## 📄 Rapports & Exports
-- [ ] Export en PDF (backend)
-- [ ] Export en Excel (backend)
-- [ ] Rapports personnalisés
-- [ ] Génération de rapports automatisés
+### Medium Priority
+- [ ] Time Tracking (Log hours, Summary)
+- [ ] Analytics (Project stats, Team performance)
+- [ ] Project Templates (CRUD, Use template)
+- [ ] Workflow States (CRUD)
 
-## 🔌 Intégrations supplémentaires
-- [ ] GitLab
-- [ ] Jira
-- [ ] Slack
-- [ ] Microsoft Teams
-- [ ] Webhooks sortants
+### Low Priority
+- [ ] GitHub Integration (Sync issues)
+- [ ] Recurring Tasks (Create, Execute)
+- [ ] Notifications (Real-time with Socket.io)
+- [ ] Audit Logs (Track changes)
 
-## 👥 Gestion des ressources
-- [ ] Gestion de capacité d'équipe
-- [ ] Allocation de ressources
-- [ ] Charge de travail par membre
+## 🔧 Technical Debt
+- [ ] Add input validation with Zod
+- [ ] Add rate limiting
+- [ ] Improve error handling
+- [ ] Add comprehensive logging
 
-## ⏰ Récurrence & Automatisation
-- [ ] Tâches récurrentes
-- [ ] Règles d'automatisation (auto-assigner, auto-fermer)
-- [ ] Workflows automatisés
+## 🐛 Known Issues
+- None currently
 
-## 💰 Budgeting & Coûts
-- [ ] Gestion de budget projet
-- [ ] Suivi des coûts
-- [ ] Estimation des coûts
-
-## 🌿 Versioning & Branches
-- [ ] Gestion de versions de projet
-- [ ] Branches/variantes de projet
-- [ ] Snapshots de projet
-
-## 🤝 Collaboration avancée
-- [ ] Système de votes/approbations
-- [ ] Révisions et commentaires structurés
-
-## ⚡ Performance & Scalabilité
-- [ ] Cache distribué (Redis)
-- [ ] Pagination optimisée
-- [ ] Compression des données
-- [ ] Indexation des recherches
-
-## 🎯 Permissions granulaires
-- [x] Contrôle d'accès détaillé par rôle
-- [x] Permissions au niveau des tâches/projets
-- [x] Délégation de permissions
-
----
-
-**Légende:**
-- ✅ Complété
-- 🔄 En cours
-- ⏳ À faire
+## 📝 Notes
+- Use pnpm for package management
+- Follow existing code patterns
+- Keep services focused on business logic
+- Validate all inputs

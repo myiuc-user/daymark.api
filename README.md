@@ -87,6 +87,13 @@ On first startup, a super admin account is automatically created:
 - `PUT /tasks/:id` - Update task
 - `DELETE /tasks/:id` - Delete task
 - `POST /tasks/:id/comments` - Add comment
+- `PATCH /tasks/:id/favorite` - Toggle favorite
+- `PATCH /tasks/:id/archive` - Toggle archive
+
+### Subtasks
+- `GET /tasks/:id/subtasks` - List subtasks
+- `POST /tasks/:id/subtasks` - Create subtask
+- `PATCH /tasks/:id/subtasks/toggle-status` - Toggle subtask status (TODO/DONE)
 
 ### Team Management
 - `POST /teams/invite` - Invite member
@@ -163,7 +170,7 @@ src/
 - **User:** Users with roles (SUPER_ADMIN, ADMIN, MEMBER)
 - **Workspace:** Workspaces with members
 - **Project:** Projects within workspaces
-- **Task:** Tasks with assignments and subtasks
+- **Task:** Tasks with assignments, subtasks, story points, and time tracking
 - **Comment:** Task comments with mentions
 - **Sprint:** Agile sprints
 - **Milestone:** Project milestones

@@ -25,6 +25,10 @@ router.delete('/:id/watchers/:userId', taskController.removeWatcher);
 // Subtasks nested routes
 router.get('/:id/subtasks', taskController.getSubtasks);
 router.post('/:id/subtasks', taskController.createSubtask);
+router.patch('/:id/subtasks/toggle-status', taskController.toggleSubtaskStatus);
+
+// Task status
+router.patch('/:id/status', taskController.updateTaskStatus);
 
 // Favorite and Archive routes
 router.patch('/:id/favorite', taskController.toggleFavorite);

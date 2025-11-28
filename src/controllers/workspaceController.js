@@ -1,5 +1,6 @@
 import prisma from '../config/prisma.js';
 import { workspaceService } from '../services/workspaceService.js';
+import { hasRoleOrHigher } from '../utils/permissions.js';
 
 export const workspaceController = {
   getWorkspaces: async (req, res) => {
@@ -34,13 +35,15 @@ export const workspaceController = {
   getWorkspace: async (req, res) => {
     try {
       const { id } = req.params;
+      const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
+
       const workspace = await workspaceService.getWorkspaceById(id);
       
       if (!workspace) {
         return res.status(404).json({ error: 'Workspace not found' });
       }
 
-      const hasAccess = workspace.ownerId === req.user.id || 
+      const hasAccess = isSuperAdmin || workspace.ownerId === req.user.id || 
         workspace.members.some(member => member.userId === req.user.id);
 
       if (!hasAccess) {
@@ -58,10 +61,11 @@ export const workspaceController = {
     try {
       const { id } = req.params;
       const { name, description, slug } = req.body;
+      const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
 
       const workspace = await workspaceService.getWorkspaceById(id, { select: { ownerId: true } });
       
-      if (!workspace || workspace.ownerId !== req.user.id) {
+      if (!workspace || (!isSuperAdmin && workspace.ownerId !== req.user.id)) {
         return res.status(403).json({ error: 'Access denied' });
       }
 
@@ -81,10 +85,11 @@ export const workspaceController = {
   deleteWorkspace: async (req, res) => {
     try {
       const { id } = req.params;
+      const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
 
       const workspace = await workspaceService.getWorkspaceById(id, { select: { ownerId: true } });
       
-      if (!workspace || workspace.ownerId !== req.user.id) {
+      if (!workspace || (!isSuperAdmin && workspace.ownerId !== req.user.id)) {
         return res.status(403).json({ error: 'Access denied' });
       }
 
@@ -99,6 +104,7 @@ export const workspaceController = {
   getMembers: async (req, res) => {
     try {
       const { id } = req.params;
+      const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
 
       const workspace = await prisma.workspace.findUnique({
         where: { id },
@@ -109,7 +115,7 @@ export const workspaceController = {
         return res.status(404).json({ error: 'Workspace not found' });
       }
 
-      const hasAccess = workspace.ownerId === req.user.id || 
+      const hasAccess = isSuperAdmin || workspace.ownerId === req.user.id || 
         workspace.members.some(member => member.userId === req.user.id);
 
       if (!hasAccess) {
@@ -127,6 +133,7 @@ export const workspaceController = {
   getInvitations: async (req, res) => {
     try {
       const { id } = req.params;
+      const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
 
       const workspace = await prisma.workspace.findUnique({
         where: { id },
@@ -143,9 +150,10 @@ export const workspaceController = {
       }
 
       const isOwner = workspace.ownerId === req.user.id;
-      const isAdmin = workspace.members.some(m => m.role === 'ADMIN');
+      const userMember = workspace.members[0];
+      const isAdmin = userMember && hasRoleOrHigher(userMember.role, 'ADMIN');
 
-      if (!isOwner && !isAdmin) {
+      if (!isSuperAdmin && !isOwner && !isAdmin) {
         return res.status(403).json({ error: 'Access denied' });
       }
 
@@ -161,6 +169,7 @@ export const workspaceController = {
     try {
       const { id } = req.params;
       const { invitations } = req.body;
+      const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
 
       const workspace = await prisma.workspace.findUnique({
         where: { id },
@@ -177,9 +186,10 @@ export const workspaceController = {
       }
 
       const isOwner = workspace.ownerId === req.user.id;
-      const isAdmin = workspace.members.some(m => m.role === 'ADMIN');
+      const userMember = workspace.members[0];
+      const isAdmin = userMember && hasRoleOrHigher(userMember.role, 'ADMIN');
 
-      if (!isOwner && !isAdmin) {
+      if (!isSuperAdmin && !isOwner && !isAdmin) {
         return res.status(403).json({ error: 'Only workspace owners and admins can invite members' });
       }
 
@@ -187,6 +197,9 @@ export const workspaceController = {
       res.json({ message: 'Invitations sent successfully', invitations: results });
     } catch (error) {
       console.error('Send invitations error:', error);
+      if (error.message.includes('Invalid role')) {
+        return res.status(400).json({ error: error.message });
+      }
       res.status(500).json({ error: 'Failed to send invitations' });
     }
   },
@@ -242,6 +255,7 @@ export const workspaceController = {
     try {
       const { id, userId } = req.params;
       const { role } = req.body;
+      const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
 
       const workspace = await prisma.workspace.findUnique({
         where: { id },
@@ -258,9 +272,10 @@ export const workspaceController = {
       }
 
       const isOwner = workspace.ownerId === req.user.id;
-      const isAdmin = workspace.members.some(m => m.role === 'ADMIN');
+      const userMember = workspace.members[0];
+      const isAdmin = userMember && hasRoleOrHigher(userMember.role, 'ADMIN');
 
-      if (!isOwner && !isAdmin) {
+      if (!isSuperAdmin && !isOwner && !isAdmin) {
         return res.status(403).json({ error: 'Access denied' });
       }
 
@@ -268,6 +283,9 @@ export const workspaceController = {
       res.json({ member });
     } catch (error) {
       console.error('Update member role error:', error);
+      if (error.message.includes('Invalid role')) {
+        return res.status(400).json({ error: error.message });
+      }
       res.status(500).json({ error: 'Failed to update member role' });
     }
   },
@@ -275,6 +293,7 @@ export const workspaceController = {
   removeMember: async (req, res) => {
     try {
       const { id, userId } = req.params;
+      const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
 
       const workspace = await prisma.workspace.findUnique({
         where: { id },
@@ -291,9 +310,10 @@ export const workspaceController = {
       }
 
       const isOwner = workspace.ownerId === req.user.id;
-      const isAdmin = workspace.members.some(m => m.role === 'ADMIN');
+      const userMember = workspace.members[0];
+      const isAdmin = userMember && hasRoleOrHigher(userMember.role, 'ADMIN');
 
-      if (!isOwner && !isAdmin) {
+      if (!isSuperAdmin && !isOwner && !isAdmin) {
         return res.status(403).json({ error: 'Access denied' });
       }
 

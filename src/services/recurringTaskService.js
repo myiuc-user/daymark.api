@@ -1,8 +1,11 @@
 import prisma from '../config/prisma.js';
+import { taskService } from './taskService.js';
 import { addDays, addWeeks, addMonths } from 'date-fns';
 
 export const recurringTaskService = {
-  createRecurringTask: async (projectId, data) => {
+  createRecurringTask: async (projectId, data, userId) => {
+    const nextDueDate = new Date(data.nextDueDate);
+    
     return await prisma.recurringTask.create({
       data: {
         projectId,
@@ -11,69 +14,93 @@ export const recurringTaskService = {
         frequency: data.frequency,
         dayOfWeek: data.dayOfWeek,
         dayOfMonth: data.dayOfMonth,
-        nextDueDate: data.nextDueDate || new Date()
+        nextDueDate,
+        isActive: true
       }
     });
   },
 
   getRecurringTasks: async (projectId) => {
     return await prisma.recurringTask.findMany({
-      where: { projectId, isActive: true }
+      where: { projectId, isActive: true },
+      orderBy: { nextDueDate: 'asc' }
     });
   },
 
-  processRecurringTasks: async () => {
+  updateRecurringTask: async (recurringTaskId, data) => {
+    return await prisma.recurringTask.update({
+      where: { id: recurringTaskId },
+      data: {
+        title: data.title,
+        description: data.description,
+        frequency: data.frequency,
+        dayOfWeek: data.dayOfWeek,
+        dayOfMonth: data.dayOfMonth
+      }
+    });
+  },
+
+  deleteRecurringTask: async (recurringTaskId) => {
+    return await prisma.recurringTask.update({
+      where: { id: recurringTaskId },
+      data: { isActive: false }
+    });
+  },
+
+  executeRecurringTasks: async () => {
     const now = new Date();
-    const tasks = await prisma.recurringTask.findMany({
+    now.setHours(0, 0, 0, 0);
+    
+    const recurringTasks = await prisma.recurringTask.findMany({
       where: { isActive: true, nextDueDate: { lte: now } },
       include: { project: true }
     });
 
-    for (const recurring of tasks) {
-      await prisma.task.create({
-        data: {
-          projectId: recurring.projectId,
-          title: recurring.title,
-          description: recurring.description,
-          due_date: recurring.nextDueDate,
-          assigneeId: recurring.project.team_lead,
-          createdById: recurring.project.team_lead,
-          status: 'TODO'
-        }
-      });
+    for (const recurring of recurringTasks) {
+      try {
+        const nextDueDate = recurringTaskService.calculateNextDueDate(recurring);
+        
+        if (nextDueDate <= now) {
+          await taskService.createTask({
+            title: recurring.title,
+            description: recurring.description,
+            projectId: recurring.projectId,
+            dueDate: nextDueDate,
+            priority: 'MEDIUM',
+            status: 'TODO',
+            createdById: recurring.project.team_lead
+          }, recurring.project.team_lead);
 
-      const nextDate = calculateNextDate(recurring.nextDueDate, recurring.frequency, recurring.dayOfWeek, recurring.dayOfMonth);
-      await prisma.recurringTask.update({
-        where: { id: recurring.id },
-        data: { nextDueDate: nextDate }
-      });
+          await prisma.recurringTask.update({
+            where: { id: recurring.id },
+            data: { nextDueDate }
+          });
+        }
+      } catch (error) {
+        console.error(`Error executing recurring task ${recurring.id}:`, error);
+      }
     }
   },
 
-  updateRecurringTask: async (id, data) => {
-    return await prisma.recurringTask.update({
-      where: { id },
-      data
-    });
-  },
-
-  deleteRecurringTask: async (id) => {
-    return await prisma.recurringTask.update({
-      where: { id },
-      data: { isActive: false }
-    });
+  calculateNextDueDate: (recurring) => {
+    const current = new Date(recurring.nextDueDate);
+    current.setHours(0, 0, 0, 0);
+    
+    let next;
+    switch (recurring.frequency) {
+      case 'DAILY':
+        next = addDays(current, 1);
+        break;
+      case 'WEEKLY':
+        next = addWeeks(current, 1);
+        break;
+      case 'MONTHLY':
+        next = addMonths(current, 1);
+        break;
+      default:
+        next = addDays(current, 1);
+    }
+    next.setHours(0, 0, 0, 0);
+    return next;
   }
 };
-
-function calculateNextDate(currentDate, frequency, dayOfWeek, dayOfMonth) {
-  switch (frequency) {
-    case 'DAILY':
-      return addDays(currentDate, 1);
-    case 'WEEKLY':
-      return addWeeks(currentDate, 1);
-    case 'MONTHLY':
-      return addMonths(currentDate, 1);
-    default:
-      return addWeeks(currentDate, 1);
-  }
-}

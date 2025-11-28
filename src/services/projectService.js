@@ -3,6 +3,7 @@ import { notificationService } from './notificationService.js';
 import { githubService } from './githubService.js';
 import { githubAuthService } from './githubAuthService.js';
 import { projectProgressService } from './projectProgressService.js';
+import { VALID_PROJECT_ROLES } from '../utils/permissions.js';
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
@@ -173,6 +174,29 @@ export const projectService = {
   deleteProject: async (id) => {
     return await prisma.project.delete({
       where: { id }
+    });
+  },
+
+  getProjectMembers: async (projectId) => {
+    return await prisma.projectMember.findMany({
+      where: { projectId },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, image: true }
+        }
+      }
+    });
+  },
+
+  getProjectAssignees: async (projectId) => {
+    return await prisma.projectMember.findMany({
+      where: { projectId },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, image: true }
+        }
+      },
+      orderBy: { user: { name: 'asc' } }
     });
   },
 
@@ -374,17 +398,6 @@ export const projectService = {
     });
   },
 
-  getProjectMembers: async (projectId) => {
-    return await prisma.projectMember.findMany({
-      where: { projectId },
-      include: {
-        user: {
-          select: { id: true, name: true, email: true, image: true }
-        }
-      }
-    });
-  },
-
   updateMemberPermissions: async (projectId, userId, permissions) => {
     return await prisma.projectMember.update({
       where: {
@@ -393,6 +406,24 @@ export const projectService = {
       data: {
         customPermissions: permissions
       },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, image: true }
+        }
+      }
+    });
+  },
+
+  updateMemberRole: async (projectId, userId, role) => {
+    if (!VALID_PROJECT_ROLES.includes(role)) {
+      throw new Error(`Invalid role: ${role}. Valid roles are: ${VALID_PROJECT_ROLES.join(', ')}`);
+    }
+
+    return await prisma.projectMember.update({
+      where: {
+        projectId_userId: { projectId, userId }
+      },
+      data: { role },
       include: {
         user: {
           select: { id: true, name: true, email: true, image: true }

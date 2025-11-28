@@ -1,71 +1,51 @@
-import { permissionService } from '../services/permissionService.js';
-import { PERMISSIONS } from './permissions.js';
+import { ROLE_HIERARCHY, hasRoleOrHigher, PERMISSIONS } from './permissions.js';
 
-// Helper to check permission and throw error if not allowed
-export const requirePermission = async (userId, projectId, permission) => {
-  const hasPermission = await permissionService.hasProjectPermission(
-    userId,
-    projectId,
-    permission
-  );
+/**
+ * Permission system documentation:
+ * 
+ * ROLE HIERARCHY:
+ * - VIEWER (1): Read-only access
+ * - MEMBER (2): Can create and modify content
+ * - ADMIN (3): Can manage members and settings
+ * 
+ * EFFECTIVE ROLE:
+ * When a user has both workspace and project roles, the higher role is used.
+ * Example: VIEWER at workspace + ADMIN at project = ADMIN (effective)
+ * 
+ * PERMISSION CHECKS:
+ * 1. SUPER_ADMIN: Always has all permissions
+ * 2. Workspace/Project Owner: Always has all permissions
+ * 3. Team Lead: Always has all permissions
+ * 4. Assignee/Creator: Can access their own tasks
+ * 5. Role-based: Check effective role against required role
+ */
 
-  if (!hasPermission) {
-    const error = new Error('Insufficient permissions');
-    error.status = 403;
-    throw error;
-  }
+export const getEffectiveRole = (projectRole, workspaceRole) => {
+  const pRole = projectRole || 'VIEWER';
+  const wRole = workspaceRole || 'VIEWER';
+  return ROLE_HIERARCHY[pRole] >= ROLE_HIERARCHY[wRole] ? pRole : wRole;
 };
 
-// Helper to check workspace permission
-export const requireWorkspacePermission = async (userId, workspaceId, permission) => {
-  const hasPermission = await permissionService.hasWorkspacePermission(
-    userId,
-    workspaceId,
-    permission
-  );
-
-  if (!hasPermission) {
-    const error = new Error('Insufficient permissions');
-    error.status = 403;
-    throw error;
-  }
+export const canManageMembers = (userRole) => {
+  return hasRoleOrHigher(userRole, 'ADMIN');
 };
 
-// Helper to filter resources based on permissions
-export const filterByPermission = async (userId, projectId, resources, permission) => {
-  const hasPermission = await permissionService.hasProjectPermission(
-    userId,
-    projectId,
-    permission
-  );
-
-  return hasPermission ? resources : [];
+export const canCreateContent = (userRole) => {
+  return hasRoleOrHigher(userRole, 'MEMBER');
 };
 
-// Helper to check if user can perform action on resource
-export const canUserPerformAction = async (userId, projectId, action) => {
-  const permissionMap = {
-    'create_task': PERMISSIONS.TASK.CREATE,
-    'update_task': PERMISSIONS.TASK.UPDATE,
-    'delete_task': PERMISSIONS.TASK.DELETE,
-    'assign_task': PERMISSIONS.TASK.ASSIGN,
-    'comment_task': PERMISSIONS.TASK.COMMENT,
-    'create_sprint': PERMISSIONS.SPRINT.CREATE,
-    'update_sprint': PERMISSIONS.SPRINT.UPDATE,
-    'delete_sprint': PERMISSIONS.SPRINT.DELETE,
-    'activate_sprint': PERMISSIONS.SPRINT.ACTIVATE,
-    'manage_project': PERMISSIONS.PROJECT.MANAGE_SETTINGS,
-    'manage_members': PERMISSIONS.PROJECT.MANAGE_MEMBERS
-  };
-
-  const permission = permissionMap[action];
-  if (!permission) return false;
-
-  return await permissionService.hasProjectPermission(userId, projectId, permission);
+export const canReadContent = (userRole) => {
+  return hasRoleOrHigher(userRole, 'VIEWER');
 };
 
-// Helper to get user's effective role considering super admin
-export const getUserEffectiveRole = async (userId, projectId) => {
-  const role = await permissionService.getProjectRole(userId, projectId);
-  return role || 'VIEWER';
+export const canDeleteContent = (userRole) => {
+  return hasRoleOrHigher(userRole, 'ADMIN');
+};
+
+export const canUpdateContent = (userRole) => {
+  return hasRoleOrHigher(userRole, 'MEMBER');
+};
+
+export const canComment = (userRole) => {
+  return hasRoleOrHigher(userRole, 'VIEWER');
 };

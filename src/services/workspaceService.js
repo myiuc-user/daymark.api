@@ -2,6 +2,7 @@ import prisma from '../config/prisma.js';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { sendInvitationEmail } from './emailService.js';
+import { VALID_WORKSPACE_ROLES } from '../utils/permissions.js';
 
 export const workspaceService = {
   getUserWorkspaces: async (userId) => {
@@ -146,13 +147,18 @@ export const workspaceService = {
     
     for (const invitation of invitations) {
       const { email, role } = invitation;
+      
+      if (!VALID_WORKSPACE_ROLES.includes(role)) {
+        throw new Error(`Invalid role: ${role}. Valid roles are: ${VALID_WORKSPACE_ROLES.join(', ')}`);
+      }
+
       const inviteToken = crypto.randomBytes(32).toString('hex');
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
       const newInvitation = await prisma.workspaceInvitation.create({
         data: {
           email,
-          role: role === 'org:admin' ? 'ADMIN' : 'MEMBER',
+          role,
           token: inviteToken,
           expiresAt,
           workspaceId,
@@ -230,6 +236,10 @@ export const workspaceService = {
   },
 
   updateMemberRole: async (workspaceId, userId, role) => {
+    if (!VALID_WORKSPACE_ROLES.includes(role)) {
+      throw new Error(`Invalid role: ${role}. Valid roles are: ${VALID_WORKSPACE_ROLES.join(', ')}`);
+    }
+
     return await prisma.workspaceMember.update({
       where: {
         userId_workspaceId: {

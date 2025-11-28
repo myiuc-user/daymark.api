@@ -1,16 +1,27 @@
 import prisma from '../config/prisma.js';
+import { hasRoleOrHigher } from '../utils/permissions.js';
 
 export const checkProjectPermission = (requiredRole = 'MEMBER') => {
   return async (req, res, next) => {
     try {
+      if (req.user.role === 'SUPER_ADMIN') {
+        return next();
+      }
+
       const { id: projectId } = req.params;
       const userId = req.user.id;
 
-      // Check if user is project owner
       const project = await prisma.project.findUnique({
         where: { id: projectId },
         include: {
-          workspace: true,
+          workspace: {
+            include: {
+              members: {
+                where: { userId },
+                include: { user: true }
+              }
+            }
+          },
           members: {
             where: { userId },
             include: { user: true }
@@ -22,38 +33,24 @@ export const checkProjectPermission = (requiredRole = 'MEMBER') => {
         return res.status(404).json({ error: 'Project not found' });
       }
 
-      // Super admin can do anything
-      if (req.user.role === 'SUPER_ADMIN') {
+      if (project.workspace.ownerId === userId || project.team_lead === userId) {
         return next();
       }
 
-      // Workspace owner can do anything
-      if (project.workspace.ownerId === userId) {
-        return next();
-      }
-
-      // Project team lead can do anything
-      if (project.team_lead === userId) {
-        return next();
-      }
-
-      // Check project member role
       const projectMember = project.members[0];
-      if (!projectMember) {
-        return res.status(403).json({ error: 'Access denied' });
-      }
+      const workspaceMember = project.workspace.members[0];
 
-      const roleHierarchy = {
-        'VIEWER': 1,
-        'MEMBER': 2,
-        'ADMIN': 3
-      };
+      const projectRole = projectMember?.role || 'VIEWER';
+      const workspaceRole = workspaceMember?.role || 'VIEWER';
 
-      if (roleHierarchy[projectMember.role] < roleHierarchy[requiredRole]) {
+      const effectiveRole = projectRole >= workspaceRole ? projectRole : workspaceRole;
+
+      if (!hasRoleOrHigher(effectiveRole, requiredRole)) {
         return res.status(403).json({ error: 'Insufficient permissions' });
       }
 
       req.projectMember = projectMember;
+      req.workspaceMember = workspaceMember;
       next();
     } catch (error) {
       console.error('Permission check error:', error);
@@ -65,6 +62,10 @@ export const checkProjectPermission = (requiredRole = 'MEMBER') => {
 export const checkWorkspacePermission = (requiredRole = 'MEMBER') => {
   return async (req, res, next) => {
     try {
+      if (req.user.role === 'SUPER_ADMIN') {
+        return next();
+      }
+
       const { workspaceId } = req.query || req.body;
       const userId = req.user.id;
 
@@ -82,28 +83,16 @@ export const checkWorkspacePermission = (requiredRole = 'MEMBER') => {
         return res.status(404).json({ error: 'Workspace not found' });
       }
 
-      // Super admin can do anything
-      if (req.user.role === 'SUPER_ADMIN') {
-        return next();
-      }
-
-      // Workspace owner can do anything
       if (workspace.ownerId === userId) {
         return next();
       }
 
-      // Check workspace member role
       const workspaceMember = workspace.members[0];
       if (!workspaceMember) {
         return res.status(403).json({ error: 'Access denied' });
       }
 
-      const roleHierarchy = {
-        'MEMBER': 1,
-        'ADMIN': 2
-      };
-
-      if (roleHierarchy[workspaceMember.role] < roleHierarchy[requiredRole]) {
+      if (!hasRoleOrHigher(workspaceMember.role, requiredRole)) {
         return res.status(403).json({ error: 'Insufficient permissions' });
       }
 

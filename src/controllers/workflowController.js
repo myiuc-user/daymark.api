@@ -1,56 +1,48 @@
 import { workflowService } from '../services/workflowService.js';
 
 export const workflowController = {
-  getWorkflows: async (req, res) => {
+  createWorkflowState: async (req, res) => {
+    try {
+      const { projectId, name, color, order } = req.body;
+      const state = await workflowService.createWorkflowState(projectId, { name, color, order });
+      res.status(201).json({ workflowState: state });
+    } catch (error) {
+      console.error('Create workflow state error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  getWorkflowStates: async (req, res) => {
     try {
       const { projectId } = req.query;
-      if (!projectId) {
-        return res.status(400).json({ error: 'Project ID is required' });
-      }
-
-      const workflows = await workflowService.getWorkflows(projectId, req.user.id);
-      res.json({ workflows });
+      const states = await workflowService.getWorkflowStates(projectId);
+      res.json({ workflowStates: states });
     } catch (error) {
-      console.error('Get workflows error:', error);
-      res.status(500).json({ error: error.message || 'Internal server error' });
+      console.error('Get workflow states error:', error);
+      res.status(500).json({ error: error.message });
     }
   },
 
-  createWorkflow: async (req, res) => {
-    try {
-      const { name, stages, projectId } = req.body;
-      const workflow = await workflowService.createWorkflow({
-        name,
-        stages,
-        projectId
-      }, req.user.id);
-      res.status(201).json({ workflow });
-    } catch (error) {
-      console.error('Create workflow error:', error);
-      res.status(500).json({ error: error.message || 'Internal server error' });
-    }
-  },
-
-  updateWorkflow: async (req, res) => {
+  updateWorkflowState: async (req, res) => {
     try {
       const { id } = req.params;
-      const { name, stages } = req.body;
-      const workflow = await workflowService.updateWorkflow(id, { name, stages }, req.user.id);
-      res.json({ workflow });
+      const { name, color, order } = req.body;
+      const state = await workflowService.updateWorkflowState(id, { name, color, order });
+      res.json({ workflowState: state });
     } catch (error) {
-      console.error('Update workflow error:', error);
-      res.status(500).json({ error: error.message || 'Internal server error' });
+      console.error('Update workflow state error:', error);
+      res.status(500).json({ error: error.message });
     }
   },
 
-  deleteWorkflow: async (req, res) => {
+  deleteWorkflowState: async (req, res) => {
     try {
       const { id } = req.params;
-      await workflowService.deleteWorkflow(id, req.user.id);
-      res.json({ message: 'Workflow deleted' });
+      await workflowService.deleteWorkflowState(id);
+      res.json({ success: true });
     } catch (error) {
-      console.error('Delete workflow error:', error);
-      res.status(500).json({ error: error.message || 'Internal server error' });
+      console.error('Delete workflow state error:', error);
+      res.status(500).json({ error: error.message });
     }
   }
 };

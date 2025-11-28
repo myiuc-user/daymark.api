@@ -1,65 +1,106 @@
 import prisma from '../config/prisma.js';
 
 export const workflowService = {
-  getWorkflows: async (projectId, userId) => {
-    const project = await prisma.project.findUnique({
-      where: { id: projectId },
-      include: { workspace: { include: { members: { where: { userId } } } } }
+  createWorkflowState: async (projectId, data) => {
+    return await prisma.workflowState.create({
+      data: {
+        projectId,
+        name: data.name,
+        color: data.color || '#gray',
+        order: data.order || 0
+      }
     });
+  },
 
-    if (!project || (project.workspace.ownerId !== userId && project.workspace.members.length === 0 && project.team_lead !== userId)) {
-      throw new Error('Access denied');
-    }
-
-    return await prisma.workflow.findMany({
+  getWorkflowStates: async (projectId) => {
+    return await prisma.workflowState.findMany({
       where: { projectId },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { order: 'asc' }
     });
   },
 
-  createWorkflow: async (data, userId) => {
-    const project = await prisma.project.findUnique({
-      where: { id: data.projectId },
-      include: { workspace: { include: { members: { where: { userId } } } } }
-    });
-
-    if (!project || (project.workspace.ownerId !== userId && project.workspace.members.length === 0 && project.team_lead !== userId)) {
-      throw new Error('Access denied');
-    }
-
-    return await prisma.workflow.create({
-      data
+  updateWorkflowState: async (stateId, data) => {
+    return await prisma.workflowState.update({
+      where: { id: stateId },
+      data: {
+        name: data.name,
+        color: data.color,
+        order: data.order
+      }
     });
   },
 
-  updateWorkflow: async (id, data, userId) => {
-    const workflow = await prisma.workflow.findUnique({
-      where: { id },
-      include: { project: { include: { workspace: { include: { members: { where: { userId } } } } } } }
+  deleteWorkflowState: async (stateId) => {
+    const state = await prisma.workflowState.findUnique({
+      where: { id: stateId },
+      include: { tasks: true }
     });
 
-    if (!workflow || (workflow.project.workspace.ownerId !== userId && workflow.project.workspace.members.length === 0 && workflow.project.team_lead !== userId)) {
-      throw new Error('Access denied');
+    if (state?.tasks.length > 0) {
+      await prisma.task.updateMany({
+        where: { workflowStateId: stateId },
+        data: { workflowStateId: null }
+      });
     }
 
-    return await prisma.workflow.update({
-      where: { id },
-      data
+    return await prisma.workflowState.delete({
+      where: { id: stateId }
     });
   },
 
-  deleteWorkflow: async (id, userId) => {
-    const workflow = await prisma.workflow.findUnique({
-      where: { id },
-      include: { project: { include: { workspace: { include: { members: { where: { userId } } } } } } }
+  updateTaskWorkflowState: async (taskId, workflowStateId) => {
+    const state = await prisma.workflowState.findUnique({
+      where: { id: workflowStateId }
     });
 
-    if (!workflow || (workflow.project.workspace.ownerId !== userId && workflow.project.workspace.members.length === 0 && workflow.project.team_lead !== userId)) {
-      throw new Error('Access denied');
+    if (!state) throw new Error('Workflow state not found');
+
+    const task = await prisma.task.update({
+      where: { id: taskId },
+      data: { workflowStateId }
+    });
+
+    return task;
+  },
+
+  initializeProjectWorkflow: async (projectId) => {
+    const defaultStates = [
+      { name: 'TODO', color: '#gray', order: 0 },
+      { name: 'IN_PROGRESS', color: '#blue', order: 1 },
+      { name: 'DONE', color: '#green', order: 2 }
+    ];
+
+    for (const state of defaultStates) {
+      await prisma.workflowState.create({
+        data: {
+          projectId,
+          ...state
+        }
+      });
+    }
+  },
+
+  getTaskWorkflowState: async (taskId) => {
+    const task = await prisma.task.findUnique({
+      where: { id: taskId },
+      include: { workflowState: true }
+    });
+
+    return task?.workflowState || null;
+  },
+
+  isTaskCompleted: async (taskId) => {
+    const task = await prisma.task.findUnique({
+      where: { id: taskId },
+      include: { workflowState: true }
+    });
+
+    if (!task) return false;
+
+    if (task.workflowState) {
+      return task.workflowState.name.toUpperCase() === 'DONE';
     }
 
-    return await prisma.workflow.delete({
-      where: { id }
-    });
+    return task.status === 'DONE';
   }
 };

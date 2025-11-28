@@ -1,4 +1,6 @@
 import { commentService } from '../services/commentService.js';
+import { notificationService } from '../services/notificationService.js';
+import prisma from '../config/prisma.js';
 
 export const commentController = {
   getComment: async (req, res) => {
@@ -60,6 +62,33 @@ export const commentController = {
       res.json({ message: 'Comment deleted successfully' });
     } catch (error) {
       console.error('Delete comment error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  createMention: async (req, res) => {
+    try {
+      const { commentId, mentionedUserIds } = req.body;
+
+      const comment = await commentService.getCommentById(commentId);
+      if (!comment) {
+        return res.status(404).json({ error: 'Comment not found' });
+      }
+
+      const task = await prisma.task.findUnique({ where: { id: comment.taskId } });
+      if (!task) {
+        return res.status(404).json({ error: 'Task not found' });
+      }
+
+      for (const userId of mentionedUserIds) {
+        if (userId !== req.user.id) {
+          await notificationService.notifyMention(userId, req.user.id, task.id, task.title);
+        }
+      }
+
+      res.json({ message: 'Mentions created' });
+    } catch (error) {
+      console.error('Create mention error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   }

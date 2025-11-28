@@ -1,7 +1,10 @@
 import prisma from '../config/prisma.js';
+import { hasRoleOrHigher } from '../utils/permissions.js';
 
 export const invitationService = {
-  cancelInvitation: async (id, userId) => {
+  cancelInvitation: async (id, userId, userRole = '') => {
+    const isSuperAdmin = userRole?.toUpperCase?.() === 'SUPER_ADMIN';
+
     const invitation = await prisma.workspaceInvitation.findUnique({
       where: { id },
       include: { workspace: true }
@@ -9,6 +12,12 @@ export const invitationService = {
 
     if (!invitation) {
       throw new Error('Invitation not found');
+    }
+
+    if (isSuperAdmin) {
+      return await prisma.workspaceInvitation.delete({
+        where: { id }
+      });
     }
 
     const workspace = await prisma.workspace.findUnique({
@@ -22,7 +31,8 @@ export const invitationService = {
     });
 
     const isOwner = workspace.ownerId === userId;
-    const isAdmin = workspace.members.some(m => m.role === 'ADMIN');
+    const userMember = workspace.members[0];
+    const isAdmin = userMember && hasRoleOrHigher(userMember.role, 'ADMIN');
 
     if (!isOwner && !isAdmin) {
       throw new Error('Access denied');

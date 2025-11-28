@@ -12,29 +12,23 @@
 - [x] Task Watchers
 - [x] Favorites & Archive
 - [x] Story Points & Time Tracking (Data Model)
+- [x] Audit Logs (Track changes)
+- [x] Task Filtering & Search (Advanced query)
+- [x] Notifications (Real-time with Socket.io)
+- [x] GitHub Integration (Sync issues)
+- [x] Recurring Tasks (Create, Execute)
+- [x] Time Tracking (Log hours, Summary)
+- [x] Analytics (Project stats, Team performance)
+- [x] Workflow States (CRUD)
+- [x] Project Templates (CRUD, Use template)
 
 ## 🚀 In Progress
-- [ ] Task Filtering & Search
+- [ ] Sprint Management (CRUD, Activate) - PAUSED
 
 ## 📋 Planned Features
 
 ### High Priority
-- [ ] Task Filtering & Search (Advanced query)
-- [ ] Sprint Management (CRUD, Activate)
-- [ ] Bulk Task Assignment
-- [ ] Task Dependencies (CRUD)
-
-### Medium Priority
-- [ ] Time Tracking (Log hours, Summary)
-- [ ] Analytics (Project stats, Team performance)
-- [ ] Project Templates (CRUD, Use template)
-- [ ] Workflow States (CRUD)
-
-### Low Priority
-- [ ] GitHub Integration (Sync issues)
-- [ ] Recurring Tasks (Create, Execute)
-- [ ] Notifications (Real-time with Socket.io)
-- [ ] Audit Logs (Track changes)
+- [ ] Sprint Management (CRUD, Activate) - PAUSED
 
 ## 🔧 Technical Debt
 - [ ] Add input validation with Zod

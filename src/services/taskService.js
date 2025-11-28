@@ -1,113 +1,30 @@
 import prisma from '../config/prisma.js';
 import { notificationService } from './notificationService.js';
 import { taskHistoryService } from './taskHistoryService.js';
+import { ROLE_HIERARCHY, hasRoleOrHigher } from '../utils/permissions.js';
+
+const getEffectiveRole = (projectRole, workspaceRole) => {
+  const pRole = projectRole || 'VIEWER';
+  const wRole = workspaceRole || 'VIEWER';
+  return ROLE_HIERARCHY[pRole] >= ROLE_HIERARCHY[wRole] ? pRole : wRole;
+};
+
+const validateAssigneeIsMember = async (projectId, assigneeId) => {
+  const isMember = await prisma.projectMember.findUnique({
+    where: {
+      userId_projectId: { userId: assigneeId, projectId }
+    }
+  });
+
+  if (!isMember) {
+    throw new Error('Assignee must be a project member');
+  }
+};
 
 export const taskService = {
   getTasks: async (projectId, userId) => {
     const project = await prisma.project.findUnique({
       where: { id: projectId },
-      include: {
-        workspace: {
-          include: {
-            members: {
-              where: { userId }
-            }
-          }
-        }
-      }
-    });
-
-    if (!project || (project.workspace.ownerId !== userId && project.workspace.members.length === 0 && project.team_lead !== userId)) {
-      throw new Error('Access denied');
-    }
-
-    return await prisma.task.findMany({
-      where: { projectId },
-      include: {
-        assignee: {
-          select: { id: true, name: true, email: true }
-        },
-        createdBy: {
-          select: { id: true, name: true, email: true }
-        },
-        comments: {
-          include: {
-            user: {
-              select: { id: true, name: true, email: true }
-            }
-          },
-          orderBy: { createdAt: 'desc' }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
-  },
-
-  createTask: async (data, userId) => {
-    const project = await prisma.project.findUnique({
-      where: { id: data.projectId },
-      include: {
-        workspace: {
-          include: {
-            members: {
-              where: { userId }
-            }
-          }
-        }
-      }
-    });
-
-    if (!project || (project.workspace.ownerId !== userId && project.workspace.members.length === 0 && project.team_lead !== userId)) {
-      throw new Error('Access denied');
-    }
-
-    return await prisma.task.create({
-      data: {
-        ...data,
-        createdById: userId,
-        due_date: data.dueDate ? new Date(data.dueDate) : new Date()
-      },
-      include: {
-        assignee: {
-          select: { id: true, name: true, email: true }
-        },
-        createdBy: {
-          select: { id: true, name: true, email: true }
-        }
-      }
-    });
-  },
-
-  getTaskById: async (id, options = {}) => {
-    const defaultInclude = {
-      assignee: {
-        select: { id: true, name: true, email: true }
-      },
-      createdBy: {
-        select: { id: true, name: true, email: true }
-      },
-      project: {
-        select: { id: true, name: true }
-      },
-      comments: {
-        include: {
-          user: {
-            select: { id: true, name: true, email: true }
-          }
-        },
-        orderBy: { createdAt: 'desc' }
-      }
-    };
-
-    return await prisma.task.findUnique({
-      where: { id },
-      include: options.include || defaultInclude
-    });
-  },
-
-  checkTaskAccess: async (task, userId) => {
-    const project = await prisma.project.findUnique({
-      where: { id: task.projectId },
       include: {
         workspace: {
           include: {
@@ -122,23 +39,184 @@ export const taskService = {
       }
     });
 
-    return project.workspace.ownerId === userId || 
-      project.workspace.members.length > 0 ||
-      project.team_lead === userId ||
-      project.members.length > 0 ||
-      task.assigneeId === userId;
+    if (!project) throw new Error('Project not found');
+
+    const isOwner = project.workspace.ownerId === userId;
+    const isTeamLead = project.team_lead === userId;
+    const workspaceMember = project.workspace.members[0];
+    const projectMember = project.members[0];
+
+    if (!isOwner && !isTeamLead && !workspaceMember && !projectMember) {
+      throw new Error('Access denied');
+    }
+
+    return await prisma.task.findMany({
+      where: { projectId },
+      include: {
+        assignee: { select: { id: true, name: true, email: true } },
+        createdBy: { select: { id: true, name: true, email: true } },
+        comments: {
+          include: { user: { select: { id: true, name: true, email: true } } },
+          orderBy: { createdAt: 'desc' }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
   },
 
-  checkTaskUpdateAccess: async (task, userId) => {
-    const project = task.project;
-    return project.workspace.ownerId === userId || 
-      project.team_lead === userId ||
-      task.createdById === userId;
+  createTask: async (data, userId, userRole = '') => {
+    const isSuperAdmin = userRole?.toUpperCase?.() === 'SUPER_ADMIN';
+    
+    const assigneeId = data.assigneeId || userId;
+    
+    if (isSuperAdmin) {
+      await validateAssigneeIsMember(data.projectId, assigneeId);
+      return await prisma.task.create({
+        data: {
+          ...data,
+          assigneeId,
+          createdById: userId,
+          due_date: data.dueDate ? new Date(data.dueDate) : new Date()
+        },
+        include: {
+          assignee: { select: { id: true, name: true, email: true } },
+          createdBy: { select: { id: true, name: true, email: true } }
+        }
+      });
+    }
+
+    const project = await prisma.project.findUnique({
+      where: { id: data.projectId },
+      include: {
+        workspace: {
+          include: {
+            members: { where: { userId } }
+          }
+        },
+        members: { where: { userId } }
+      }
+    });
+
+    if (!project) throw new Error('Project not found');
+
+    const isOwner = project.workspace.ownerId === userId;
+    const isTeamLead = project.team_lead === userId;
+    const workspaceMember = project.workspace.members[0];
+    const projectMember = project.members[0];
+
+    if (!isOwner && !isTeamLead && !workspaceMember && !projectMember) {
+      throw new Error('Access denied');
+    }
+
+    const effectiveRole = getEffectiveRole(projectMember?.role, workspaceMember?.role);
+    if (!hasRoleOrHigher(effectiveRole, 'MEMBER')) {
+      throw new Error('Insufficient permissions');
+    }
+
+    await validateAssigneeIsMember(data.projectId, assigneeId);
+
+    return await prisma.task.create({
+      data: {
+        ...data,
+        assigneeId,
+        createdById: userId,
+        due_date: data.dueDate ? new Date(data.dueDate) : new Date()
+      },
+      include: {
+        assignee: { select: { id: true, name: true, email: true } },
+        createdBy: { select: { id: true, name: true, email: true } }
+      }
+    });
+  },
+
+  getTaskById: async (id, options = {}) => {
+    const defaultInclude = {
+      assignee: { select: { id: true, name: true, email: true } },
+      createdBy: { select: { id: true, name: true, email: true } },
+      project: { select: { id: true, name: true } },
+      comments: {
+        include: { user: { select: { id: true, name: true, email: true } } },
+        orderBy: { createdAt: 'desc' }
+      }
+    };
+
+    return await prisma.task.findUnique({
+      where: { id },
+      include: options.include || defaultInclude
+    });
+  },
+
+  checkTaskAccess: async (task, userId, userRole = '', requiredRole = 'VIEWER') => {
+    const isSuperAdmin = userRole?.toUpperCase?.() === 'SUPER_ADMIN';
+    if (isSuperAdmin) return true;
+
+    const project = await prisma.project.findUnique({
+      where: { id: task.projectId },
+      include: {
+        workspace: {
+          include: {
+            members: { where: { userId } }
+          }
+        },
+        members: { where: { userId } }
+      }
+    });
+
+    if (!project) return false;
+
+    const isOwner = project.workspace.ownerId === userId;
+    const isTeamLead = project.team_lead === userId;
+    const isAssignee = task.assigneeId === userId;
+    const isCreator = task.createdById === userId;
+
+    if (isOwner || isTeamLead || isAssignee || isCreator) return true;
+
+    const workspaceMember = project.workspace.members[0];
+    const projectMember = project.members[0];
+
+    if (!workspaceMember && !projectMember) return false;
+
+    const effectiveRole = getEffectiveRole(projectMember?.role, workspaceMember?.role);
+    return hasRoleOrHigher(effectiveRole, requiredRole);
+  },
+
+  checkTaskUpdateAccess: async (task, userId, userRole = '') => {
+    const isSuperAdmin = userRole?.toUpperCase?.() === 'SUPER_ADMIN';
+    if (isSuperAdmin) return true;
+
+    const project = await prisma.project.findUnique({
+      where: { id: task.projectId },
+      include: {
+        workspace: { include: { members: { where: { userId } } } },
+        members: { where: { userId } }
+      }
+    });
+
+    if (!project) return false;
+
+    const isOwner = project.workspace.ownerId === userId;
+    const isTeamLead = project.team_lead === userId;
+    const isAssignee = task.assigneeId === userId;
+    const isCreator = task.createdById === userId;
+
+    if (isOwner || isTeamLead || isAssignee || isCreator) return true;
+
+    const workspaceMember = project.workspace.members[0];
+    const projectMember = project.members[0];
+
+    if (!workspaceMember && !projectMember) return false;
+
+    const effectiveRole = getEffectiveRole(projectMember?.role, workspaceMember?.role);
+    return hasRoleOrHigher(effectiveRole, 'MEMBER');
   },
 
   updateTask: async (id, data, userId) => {
     const oldTask = await prisma.task.findUnique({ where: { id } });
-    
+
+    if (data.assigneeId && data.assigneeId !== oldTask.assigneeId) {
+      await validateAssigneeIsMember(oldTask.projectId, data.assigneeId);
+    }
+
     const updatedTask = await prisma.task.update({
       where: { id },
       data: {
@@ -146,12 +224,8 @@ export const taskService = {
         due_date: data.dueDate ? new Date(data.dueDate) : undefined
       },
       include: {
-        assignee: {
-          select: { id: true, name: true, email: true }
-        },
-        createdBy: {
-          select: { id: true, name: true, email: true }
-        }
+        assignee: { select: { id: true, name: true, email: true } },
+        createdBy: { select: { id: true, name: true, email: true } }
       }
     });
 
@@ -181,23 +255,13 @@ export const taskService = {
   },
 
   deleteTask: async (id) => {
-    return await prisma.task.delete({
-      where: { id }
-    });
+    return await prisma.task.delete({ where: { id } });
   },
 
   addComment: async (taskId, content, userId) => {
     const comment = await prisma.comment.create({
-      data: {
-        content,
-        taskId,
-        userId
-      },
-      include: {
-        user: {
-          select: { id: true, name: true, email: true }
-        }
-      }
+      data: { content, taskId, userId },
+      include: { user: { select: { id: true, name: true, email: true } } }
     });
 
     const task = await prisma.task.findUnique({
@@ -220,11 +284,7 @@ export const taskService = {
   getComments: async (taskId) => {
     return await prisma.comment.findMany({
       where: { taskId },
-      include: {
-        user: {
-          select: { id: true, name: true, email: true }
-        }
-      },
+      include: { user: { select: { id: true, name: true, email: true } } },
       orderBy: { createdAt: 'asc' }
     });
   },
@@ -232,25 +292,17 @@ export const taskService = {
   getWatchers: async (taskId) => {
     const watchers = await prisma.taskWatcher.findMany({
       where: { taskId },
-      include: {
-        user: {
-          select: { id: true, name: true, email: true }
-        }
-      }
+      include: { user: { select: { id: true, name: true, email: true } } }
     });
     return watchers.map(w => w.user);
   },
 
   addWatcher: async (taskId, userId) => {
-    return await prisma.taskWatcher.create({
-      data: { taskId, userId }
-    });
+    return await prisma.taskWatcher.create({ data: { taskId, userId } });
   },
 
   removeWatcher: async (taskId, userId) => {
-    return await prisma.taskWatcher.deleteMany({
-      where: { taskId, userId }
-    });
+    return await prisma.taskWatcher.deleteMany({ where: { taskId, userId } });
   },
 
   toggleFavorite: async (id) => {
@@ -299,9 +351,7 @@ export const taskService = {
       include: { project: true }
     });
 
-    if (!parentTask) {
-      throw new Error('Parent task not found');
-    }
+    if (!parentTask) throw new Error('Parent task not found');
 
     try {
       return await prisma.task.create({

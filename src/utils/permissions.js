@@ -1,3 +1,10 @@
+// Role hierarchy
+export const ROLE_HIERARCHY = { 'VIEWER': 1, 'MEMBER': 2, 'ADMIN': 3, 'SUPER_ADMIN': 4 };
+
+// Valid roles
+export const VALID_WORKSPACE_ROLES = ['VIEWER', 'MEMBER', 'ADMIN'];
+export const VALID_PROJECT_ROLES = ['VIEWER', 'MEMBER', 'ADMIN'];
+
 // Permission definitions by role and context
 export const PERMISSIONS = {
   WORKSPACE: {
@@ -118,4 +125,8 @@ export const hasAnyPermission = (userRole, permissions) => {
 
 export const hasAllPermissions = (userRole, permissions) => {
   return permissions.every(perm => hasPermission(userRole, perm));
+};
+
+export const hasRoleOrHigher = (userRole, requiredRole) => {
+  return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
 };

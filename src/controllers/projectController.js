@@ -1,4 +1,5 @@
 import { projectService } from '../services/projectService.js';
+import { ROLE_HIERARCHY } from '../utils/permissions.js';
 
 export const projectController = {
   getProjects: async (req, res) => {
@@ -32,6 +33,9 @@ export const projectController = {
       res.status(201).json({ project });
     } catch (error) {
       console.error('Create project error:', error);
+      if (error.message === 'Access denied') {
+        return res.status(403).json({ error: error.message });
+      }
       res.status(500).json({ error: 'Internal server error' });
     }
   },
@@ -108,6 +112,28 @@ export const projectController = {
       res.json({ message: 'Project deleted successfully' });
     } catch (error) {
       console.error('Delete project error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  getMembers: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const members = await projectService.getProjectMembers(id);
+      res.json({ members });
+    } catch (error) {
+      console.error('Get project members error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  getAssignees: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const assignees = await projectService.getProjectAssignees(id);
+      res.json({ assignees });
+    } catch (error) {
+      console.error('Get assignees error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   },
@@ -251,17 +277,6 @@ export const projectController = {
     }
   },
 
-  getMembers: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const members = await projectService.getProjectMembers(id);
-      res.json({ members });
-    } catch (error) {
-      console.error('Get project members error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  },
-
   updateMemberPermissions: async (req, res) => {
     try {
       const { id, userId } = req.params;
@@ -271,6 +286,33 @@ export const projectController = {
       res.json(updated);
     } catch (error) {
       console.error('Update member permissions error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  updateMemberRole: async (req, res) => {
+    try {
+      const { id, userId } = req.params;
+      const { role } = req.body;
+
+      const project = await projectService.getProjectById(id, { include: { workspace: true } });
+      if (!project) {
+        return res.status(404).json({ error: 'Project not found' });
+      }
+
+      const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
+      const canUpdate = isSuperAdmin || project.team_lead === req.user.id || project.workspace.ownerId === req.user.id;
+      if (!canUpdate) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      const member = await projectService.updateMemberRole(id, userId, role);
+      res.json({ member });
+    } catch (error) {
+      console.error('Update member role error:', error);
+      if (error.message.includes('Invalid role')) {
+        return res.status(400).json({ error: error.message });
+      }
       res.status(500).json({ error: 'Internal server error' });
     }
   }

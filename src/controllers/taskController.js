@@ -1,4 +1,6 @@
 import { taskService } from '../services/taskService.js';
+import { notificationService } from '../services/notificationService.js';
+import { workflowService } from '../services/workflowService.js';
 
 export const taskController = {
   getTasks: async (req, res) => {
@@ -28,7 +30,12 @@ export const taskController = {
         projectId,
         assigneeId,
         createdById: req.user.id
-      }, req.user.id);
+      }, req.user.id, req.user.role);
+
+      if (assigneeId && assigneeId !== req.user.id) {
+        await notificationService.notifyTaskAssignment(task.id, assigneeId, req.user.id);
+      }
+
       res.status(201).json({ task });
     } catch (error) {
       console.error('Create task error:', error);
@@ -40,12 +47,12 @@ export const taskController = {
     try {
       const { id } = req.params;
       const task = await taskService.getTaskById(id);
-      
+
       if (!task) {
         return res.status(404).json({ error: 'Task not found' });
       }
 
-      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id, req.user.role);
       if (!hasAccess) {
         return res.status(403).json({ error: 'Access denied' });
       }
@@ -67,9 +74,19 @@ export const taskController = {
         return res.status(404).json({ error: 'Task not found' });
       }
 
-      const canUpdate = await taskService.checkTaskUpdateAccess(task, req.user.id);
+      const canUpdate = await taskService.checkTaskUpdateAccess(task, req.user.id, req.user.role);
       if (!canUpdate) {
         return res.status(403).json({ error: 'Access denied' });
+      }
+
+      const changes = {};
+      if (title && title !== task.title) changes.title = title;
+      if (priority && priority !== task.priority) changes.priority = priority;
+      if (status && status !== task.status) changes.status = status;
+      if (dueDate && dueDate !== task.due_date) changes.dueDate = dueDate;
+      if (assigneeId && assigneeId !== task.assigneeId) {
+        changes.assigneeId = assigneeId;
+        await notificationService.notifyTaskAssignment(id, assigneeId, req.user.id);
       }
 
       const updatedTask = await taskService.updateTask(id, {
@@ -80,6 +97,10 @@ export const taskController = {
         dueDate,
         assigneeId
       }, req.user.id);
+
+      if (Object.keys(changes).length > 0) {
+        await notificationService.notifyTaskUpdate(id, req.user.id, changes);
+      }
 
       res.json({ task: updatedTask });
     } catch (error) {
@@ -97,7 +118,7 @@ export const taskController = {
         return res.status(404).json({ error: 'Task not found' });
       }
 
-      const canDelete = await taskService.checkTaskUpdateAccess(task, req.user.id);
+      const canDelete = await taskService.checkTaskUpdateAccess(task, req.user.id, req.user.role);
       if (!canDelete) {
         return res.status(403).json({ error: 'Access denied' });
       }
@@ -124,12 +145,17 @@ export const taskController = {
         return res.status(404).json({ error: 'Task not found' });
       }
 
-      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id, req.user.role);
       if (!hasAccess) {
         return res.status(403).json({ error: 'Access denied' });
       }
 
       const comment = await taskService.addComment(id, content, req.user.id);
+
+      if (task.createdById !== req.user.id) {
+        await notificationService.notifyTaskComment(id, req.user.id, task.createdById);
+      }
+
       res.status(201).json({ comment });
     } catch (error) {
       console.error('Add comment error:', error);
@@ -146,7 +172,7 @@ export const taskController = {
         return res.status(404).json({ error: 'Task not found' });
       }
 
-      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id, req.user.role);
       if (!hasAccess) {
         return res.status(403).json({ error: 'Access denied' });
       }
@@ -168,7 +194,7 @@ export const taskController = {
         return res.status(404).json({ error: 'Task not found' });
       }
 
-      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id, req.user.role);
       if (!hasAccess) {
         return res.status(403).json({ error: 'Access denied' });
       }
@@ -191,7 +217,7 @@ export const taskController = {
         return res.status(404).json({ error: 'Task not found' });
       }
 
-      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id, req.user.role);
       if (!hasAccess) {
         return res.status(403).json({ error: 'Access denied' });
       }
@@ -213,7 +239,7 @@ export const taskController = {
         return res.status(404).json({ error: 'Task not found' });
       }
 
-      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id, req.user.role);
       if (!hasAccess) {
         return res.status(403).json({ error: 'Access denied' });
       }
@@ -233,7 +259,7 @@ export const taskController = {
       if (!task) {
         return res.status(404).json({ error: 'Task not found' });
       }
-      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id, req.user.role);
       if (!hasAccess) {
         return res.status(403).json({ error: 'Access denied' });
       }
@@ -253,7 +279,7 @@ export const taskController = {
       if (!task) {
         return res.status(404).json({ error: 'Task not found' });
       }
-      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id, req.user.role);
       if (!hasAccess) {
         return res.status(403).json({ error: 'Access denied' });
       }
@@ -272,7 +298,7 @@ export const taskController = {
       if (!subtask) {
         return res.status(404).json({ error: 'Subtask not found' });
       }
-      const hasAccess = await taskService.checkTaskAccess(subtask, req.user.id);
+      const hasAccess = await taskService.checkTaskAccess(subtask, req.user.id, req.user.role);
       if (!hasAccess) {
         return res.status(403).json({ error: 'Access denied' });
       }
@@ -298,12 +324,18 @@ export const taskController = {
         return res.status(404).json({ error: 'Task not found' });
       }
 
-      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id, req.user.role);
       if (!hasAccess) {
         return res.status(403).json({ error: 'Access denied' });
       }
 
       const updated = await taskService.updateTaskStatus(id, status);
+
+      const isCompleted = await workflowService.isTaskCompleted(id);
+      if (isCompleted) {
+        await notificationService.notifyTaskCompleted(id, req.user.id);
+      }
+
       res.json({ task: updated });
     } catch (error) {
       console.error('Update task status error:', error);
@@ -318,7 +350,7 @@ export const taskController = {
       if (!task) {
         return res.status(404).json({ error: 'Task not found' });
       }
-      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id, req.user.role);
       if (!hasAccess) {
         return res.status(403).json({ error: 'Access denied' });
       }
@@ -337,7 +369,7 @@ export const taskController = {
       if (!task) {
         return res.status(404).json({ error: 'Task not found' });
       }
-      const hasAccess = await taskService.checkTaskAccess(task, req.user.id);
+      const hasAccess = await taskService.checkTaskAccess(task, req.user.id, req.user.role);
       if (!hasAccess) {
         return res.status(403).json({ error: 'Access denied' });
       }

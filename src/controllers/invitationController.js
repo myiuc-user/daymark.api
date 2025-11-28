@@ -4,7 +4,7 @@ export const invitationController = {
   cancelInvitation: async (req, res) => {
     try {
       const { id } = req.params;
-      await invitationService.cancelInvitation(id, req.user.id);
+      await invitationService.cancelInvitation(id, req.user.id, req.user.role);
       res.json({ message: 'Invitation cancelled successfully' });
     } catch (error) {
       console.error('Cancel invitation error:', error);

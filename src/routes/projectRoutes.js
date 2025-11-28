@@ -16,8 +16,10 @@ router.delete('/:id', projectController.deleteProject);
 
 // Members routes
 router.get('/:id/members', projectController.getMembers);
+router.get('/:id/assignees', projectController.getAssignees);
 router.post('/:id/members', projectController.addMember);
 router.delete('/:id/members/:userId', projectController.removeMember);
+router.put('/:id/members/:userId/role', projectController.updateMemberRole);
 router.put('/:id/members/:userId/permissions', projectController.updateMemberPermissions);
 
 // GitHub routes

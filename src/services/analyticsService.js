@@ -1,121 +1,63 @@
 import prisma from '../config/prisma.js';
 
 export const analyticsService = {
-  getWorkspaceAnalytics: async (workspaceId, userId, userRole = '') => {
-    const workspace = await prisma.workspace.findUnique({
-      where: { id: workspaceId },
-      include: {
-        members: {
-          where: { userId }
-        }
-      }
+  getProjectAnalytics: async (projectId) => {
+    const tasks = await prisma.task.findMany({
+      where: { projectId },
+      include: { assignee: true, timeEntries: true }
     });
 
-    const isSuperAdmin = userRole === 'SUPER_ADMIN';
-    if (!workspace) {
-      throw new Error('Workspace not found');
-    }
-    if (!isSuperAdmin && workspace.ownerId !== userId && workspace.members.length === 0) {
-      throw new Error('Access denied');
-    }
+    const completed = tasks.filter(t => t.status === 'DONE').length;
+    const inProgress = tasks.filter(t => t.status === 'IN_PROGRESS').length;
+    const todo = tasks.filter(t => t.status === 'TODO').length;
+    const totalHours = tasks.reduce((sum, t) => sum + (t.actualHours || 0), 0);
+    const estimatedHours = tasks.reduce((sum, t) => sum + (t.estimatedHours || 0), 0);
 
+    return {
+      totalTasks: tasks.length,
+      completed,
+      inProgress,
+      todo,
+      completionRate: tasks.length > 0 ? Math.round((completed / tasks.length) * 100) : 0,
+      totalHours,
+      estimatedHours,
+      efficiency: estimatedHours > 0 ? Math.round((estimatedHours / totalHours) * 100) : 0,
+      byAssignee: tasks.reduce((acc, task) => {
+        if (task.assignee) {
+          if (!acc[task.assignee.name]) {
+            acc[task.assignee.name] = { completed: 0, total: 0 };
+          }
+          acc[task.assignee.name].total++;
+          if (task.status === 'DONE') acc[task.assignee.name].completed++;
+        }
+        return acc;
+      }, {})
+    };
+  },
+
+  getTeamAnalytics: async (workspaceId) => {
     const projects = await prisma.project.findMany({
       where: { workspaceId },
-      include: {
-        tasks: true
-      }
+      include: { tasks: { include: { assignee: true } } }
     });
 
-    const totalProjects = projects.length;
-    const totalTasks = projects.reduce((sum, p) => sum + p.tasks.length, 0);
-    const completedTasks = projects.reduce((sum, p) => sum + p.tasks.filter(t => t.status === 'COMPLETED').length, 0);
-    const completionRate = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-
-    return {
-      totalProjects,
-      totalTasks,
-      completedTasks,
-      completionRate: Math.round(completionRate),
-      teamSize: workspace.members.length + 1
-    };
-  },
-
-  getProjectAnalytics: async (projectId, userId, userRole = '') => {
-    const project = await prisma.project.findUnique({
-      where: { id: projectId },
-      include: {
-        workspace: {
-          include: {
-            members: {
-              where: { userId }
-            }
-          }
-        },
-        tasks: true,
-        members: true
-      }
+    const allTasks = projects.flatMap(p => p.tasks);
+    const completed = allTasks.filter(t => t.status === 'DONE').length;
+    const users = await prisma.user.findMany({
+      where: { workspaces: { some: { workspaceId } } }
     });
 
-    const isSuperAdmin = userRole === 'SUPER_ADMIN';
-    if (!project) {
-      throw new Error('Project not found');
-    }
-    if (!isSuperAdmin && project.workspace.ownerId !== userId && project.workspace.members.length === 0 && project.team_lead !== userId) {
-      throw new Error('Access denied');
-    }
-
-    const totalTasks = project.tasks.length;
-    const completedTasks = project.tasks.filter(t => t.status === 'COMPLETED').length;
-    const inProgressTasks = project.tasks.filter(t => t.status === 'IN_PROGRESS').length;
-    const completionRate = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-
     return {
-      totalTasks,
-      completedTasks,
-      inProgressTasks,
-      completionRate: Math.round(completionRate),
-      teamSize: project.members.length
-    };
-  },
-
-  getDashboard: async (id, userId, userRole = '') => {
-    const workspace = await prisma.workspace.findUnique({
-      where: { id },
-      include: {
-        members: {
-          where: { userId }
-        },
-        projects: {
-          include: {
-            tasks: true
-          }
-        }
-      }
-    });
-
-    const isSuperAdmin = userRole === 'SUPER_ADMIN';
-    if (!workspace) {
-      throw new Error('Workspace not found');
-    }
-    if (!isSuperAdmin && workspace.ownerId !== userId && workspace.members.length === 0) {
-      throw new Error('Access denied');
-    }
-
-    const totalProjects = workspace.projects.length;
-    const totalTasks = workspace.projects.reduce((sum, p) => sum + p.tasks.length, 0);
-    const completedTasks = workspace.projects.reduce((sum, p) => sum + p.tasks.filter(t => t.status === 'COMPLETED').length, 0);
-    const completionRate = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-
-    return {
-      workspace: {
-        id: workspace.id,
-        name: workspace.name
-      },
-      totalProjects,
-      totalTasks,
-      completedTasks,
-      completionRate: Math.round(completionRate),
-      teamSize: workspace.members.length + 1
+      totalProjects: projects.length,
+      totalTasks: allTasks.length,
+      completedTasks: completed,
+      completionRate: allTasks.length > 0 ? Math.round((completed / allTasks.length) * 100) : 0,
+      teamSize: users.length,
+      projectStats: projects.map(p => ({
+        name: p.name,
+        tasks: p.tasks.length,
+        completed: p.tasks.filter(t => t.status === 'DONE').length
+      }))
     };
   }
 };

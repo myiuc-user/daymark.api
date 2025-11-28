@@ -43,7 +43,7 @@ class SocketService {
     });
 
     this.io.on('connection', (socket) => {
-      console.log(`User ${socket.user.name} connected`);
+      console.log(`User ${socket.user.name} connected with socket ${socket.id}`);
       
       // Store user connection
       this.connectedUsers.set(socket.userId, {
@@ -54,6 +54,7 @@ class SocketService {
 
       // Join user to their personal room
       socket.join(`user:${socket.userId}`);
+      console.log(`User ${socket.userId} joined room user:${socket.userId}`);
 
       // Handle joining project rooms
       socket.on('join-project', async (projectId) => {
@@ -173,11 +174,20 @@ class SocketService {
 
   // Send notification to specific user
   sendNotification(userId, notification) {
+    if (!this.io) {
+      console.warn('Socket.io not initialized');
+      return;
+    }
+    console.log(`Sending notification to user ${userId}:`, notification);
     this.io.to(`user:${userId}`).emit('notification', notification);
   }
 
   // Send update to project room
   sendProjectUpdate(projectId, event, data) {
+    if (!this.io) {
+      console.warn('Socket.io not initialized');
+      return;
+    }
     this.io.to(`project:${projectId}`).emit(event, data);
   }
 
@@ -190,6 +200,11 @@ class SocketService {
   // Check if user is online
   isUserOnline(userId) {
     return this.connectedUsers.has(userId);
+  }
+
+  // Get all connected users
+  getConnectedUsers() {
+    return Array.from(this.connectedUsers.values());
   }
 }
 

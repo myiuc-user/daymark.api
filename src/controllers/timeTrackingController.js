@@ -1,45 +1,52 @@
 import { timeTrackingService } from '../services/timeTrackingService.js';
 
 export const timeTrackingController = {
-  getTimeEntries: async (req, res) => {
+  logTime: async (req, res) => {
     try {
-      const { taskId } = req.query;
-      if (!taskId) {
-        return res.status(400).json({ error: 'Task ID is required' });
-      }
-
-      const entries = await timeTrackingService.getTimeEntries(taskId, req.user.id);
-      res.json({ entries });
+      const { taskId, hours, description, date } = req.body;
+      const entry = await timeTrackingService.logTime(taskId, {
+        hours,
+        description,
+        date: date ? new Date(date) : new Date(),
+        userId: req.user.id
+      });
+      res.status(201).json({ timeEntry: entry });
     } catch (error) {
-      console.error('Get time entries error:', error);
-      res.status(500).json({ error: error.message || 'Internal server error' });
+      console.error('Log time error:', error);
+      res.status(500).json({ error: error.message });
     }
   },
 
-  createTimeEntry: async (req, res) => {
+  getTimeEntries: async (req, res) => {
     try {
-      const { taskId, hours, description } = req.body;
-      const entry = await timeTrackingService.createTimeEntry({
-        taskId,
-        hours,
-        description,
-        userId: req.user.id
-      });
-      res.status(201).json({ entry });
+      const { taskId, projectId } = req.query;
+      const entries = await timeTrackingService.getTimeEntries(taskId, projectId);
+      res.json({ timeEntries: entries });
     } catch (error) {
-      console.error('Create time entry error:', error);
-      res.status(500).json({ error: error.message || 'Internal server error' });
+      console.error('Get time entries error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  getSummary: async (req, res) => {
+    try {
+      const { projectId } = req.query;
+      const summary = await timeTrackingService.getSummary(projectId);
+      res.json({ summary });
+    } catch (error) {
+      console.error('Get summary error:', error);
+      res.status(500).json({ error: error.message });
     }
   },
 
   deleteTimeEntry: async (req, res) => {
     try {
       const { id } = req.params;
-      await timeTrackingService.deleteTimeEntry(id, req.user.id);
-      res.json({ message: 'Time entry deleted' });
+      await timeTrackingService.deleteTimeEntry(id);
+      res.json({ success: true });
     } catch (error) {
       console.error('Delete time entry error:', error);
-      res.status(500).json({ error: error.message || 'Internal server error' });
+      res.status(500).json({ error: error.message });
     }
   }
 };

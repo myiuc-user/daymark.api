@@ -1,14 +1,14 @@
 import express from 'express';
-import { authenticateToken } from '../middleware/auth.js';
 import { workflowController } from '../controllers/workflowController.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
 router.use(authenticateToken);
 
-router.get('/', workflowController.getWorkflows);
-router.post('/', workflowController.createWorkflow);
-router.put('/:id', workflowController.updateWorkflow);
-router.delete('/:id', workflowController.deleteWorkflow);
+router.post('/', workflowController.createWorkflowState);
+router.get('/', workflowController.getWorkflowStates);
+router.put('/:id', workflowController.updateWorkflowState);
+router.delete('/:id', workflowController.deleteWorkflowState);
 
 export default router;

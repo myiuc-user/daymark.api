@@ -1,13 +1,13 @@
 import express from 'express';
-import { authenticateToken } from '../middleware/auth.js';
 import { analyticsController } from '../controllers/analyticsController.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
 router.use(authenticateToken);
 
-router.get('/workspace', analyticsController.getWorkspaceAnalytics);
-router.get('/project', analyticsController.getProjectAnalytics);
-router.get('/dashboard/:id', analyticsController.getDashboard);
+router.get('/project/:projectId', analyticsController.getProjectAnalytics);
+router.get('/dashboard/:workspaceId', analyticsController.getTeamAnalytics);
+router.get('/team', analyticsController.getTeamAnalytics);
 
 export default router;

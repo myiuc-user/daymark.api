@@ -10,9 +10,9 @@ import prisma, { reconnectPrisma } from './src/config/prisma.js';
 import { createRootAdmin, resetAdminPassword } from './src/services/authService.js';
 import { createDatabaseIfNotExists } from './src/config/database.js';
 import { cronService } from './src/services/cronService.js';
+import { socketService } from './src/services/socketService.js';
 import { routes } from './src/config/routes.js';
 import { auditMiddleware } from './src/middleware/auditMiddleware.js';
-
 import { errorHandler } from './src/middleware/errorHandler.js';
 
 dotenv.config();
@@ -74,8 +74,6 @@ app.use((req, res, next) => {
   next();
 });
 
-
-
 // Register all routes
 routes.forEach(({ path: routePath, router }) => {
   app.use(routePath, router);
@@ -102,10 +100,13 @@ async function startServer() {
     cronService.start();
     console.log('✅ Cron service started');
     
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📧 Admin email: ${process.env.ROOT_ADMIN_EMAIL}`);
     });
+    
+    socketService.initialize(server);
+    console.log('✅ Socket.io initialized');
   } catch (error) {
     console.error('❌ Failed to start server:', error.message);
     process.exit(1);

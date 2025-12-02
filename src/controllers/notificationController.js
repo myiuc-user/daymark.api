@@ -1,11 +1,13 @@
 import { notificationService } from '../services/notificationService.js';
+import { notificationPreferenceService } from '../services/notificationPreferenceService.js';
 
 export const notificationController = {
   getNotifications: async (req, res) => {
     try {
       const limit = parseInt(req.query.limit) || 50;
-      const notifications = await notificationService.getNotifications(req.user.id, limit);
-      res.json({ notifications });
+      const offset = parseInt(req.query.offset) || 0;
+      const { notifications, total } = await notificationService.getNotifications(req.user.id, limit, offset);
+      res.json({ notifications, total, limit, offset });
     } catch (error) {
       console.error('Get notifications error:', error);
       res.status(500).json({ error: error.message });
@@ -18,6 +20,26 @@ export const notificationController = {
       res.json({ notifications });
     } catch (error) {
       console.error('Load notifications error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  getPreferences: async (req, res) => {
+    try {
+      const prefs = await notificationPreferenceService.getPreferences(req.user.id);
+      res.json({ preferences: prefs });
+    } catch (error) {
+      console.error('Get preferences error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  updatePreferences: async (req, res) => {
+    try {
+      const prefs = await notificationPreferenceService.updatePreferences(req.user.id, req.body);
+      res.json({ preferences: prefs });
+    } catch (error) {
+      console.error('Update preferences error:', error);
       res.status(500).json({ error: error.message });
     }
   },
@@ -50,6 +72,22 @@ export const notificationController = {
       res.json({ success: true });
     } catch (error) {
       console.error('Delete notification error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  sendTestNotification: async (req, res) => {
+    try {
+      const notification = await notificationService.createNotification(req.user.id, {
+        type: 'test',
+        title: 'Test Notification',
+        message: 'This is a test notification from Daymark',
+        relatedId: null,
+        relatedType: null
+      });
+      res.json({ notification });
+    } catch (error) {
+      console.error('Send test notification error:', error);
       res.status(500).json({ error: error.message });
     }
   }

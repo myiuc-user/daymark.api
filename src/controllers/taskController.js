@@ -151,10 +151,7 @@ export const taskController = {
       }
 
       const comment = await taskService.addComment(id, content, req.user.id);
-
-      if (task.createdById !== req.user.id) {
-        await notificationService.notifyTaskComment(id, req.user.id, task.createdById);
-      }
+      await notificationService.notifyTaskComment(id, req.user.id, task.createdById);
 
       res.status(201).json({ comment });
     } catch (error) {

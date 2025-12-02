@@ -6,10 +6,14 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+  throw new Error('EMAIL_USER and EMAIL_PASS environment variables are required');
+}
+
 const transporter = nodemailer.createTransport({
-  host: 'smtp.office365.com',
-  port: 587,
-  secure: false,
+  host: process.env.EMAIL_HOST || 'smtp.office365.com',
+  port: process.env.EMAIL_PORT || 587,
+  secure: process.env.EMAIL_SECURE === 'true' || false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
@@ -18,9 +22,14 @@ const transporter = nodemailer.createTransport({
 
 // Load and compile templates
 const loadTemplate = (templateName) => {
-  const templatePath = path.join(__dirname, '../views/emails', `${templateName}.hbs`);
-  const templateContent = fs.readFileSync(templatePath, 'utf-8');
-  return Handlebars.compile(templateContent);
+  try {
+    const templatePath = path.join(__dirname, '../views/emails', `${templateName}.hbs`);
+    const templateContent = fs.readFileSync(templatePath, 'utf-8');
+    return Handlebars.compile(templateContent);
+  } catch (error) {
+    console.error(`Failed to load template ${templateName}:`, error);
+    throw error;
+  }
 };
 
 const compiledTemplates = {

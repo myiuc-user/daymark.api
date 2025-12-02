@@ -25,7 +25,6 @@ import delegationRoutes from '../routes/delegationRoutes.js';
 import auditRoutes from '../routes/auditRoutes.js';
 import taskHistoryRoutes from '../routes/taskHistoryRoutes.js';
 import taskDependencyRoutes from '../routes/taskDependencyRoutes.js';
-import notificationPreferenceRoutes from '../routes/notificationPreferenceRoutes.js';
 import recurringTaskRoutes from '../routes/recurringTaskRoutes.js';
 import githubSyncRoutes from '../routes/githubSyncRoutes.js';
 import dataExportRoutes from '../routes/dataExportRoutes.js';
@@ -58,7 +57,6 @@ export const routes = [
   { path: '/audit', router: auditRoutes },
   { path: '/task-history', router: taskHistoryRoutes },
   { path: '/tasks', router: taskDependencyRoutes },
-  { path: '/notification-preferences', router: notificationPreferenceRoutes },
   { path: '/recurring-tasks', router: recurringTaskRoutes },
   { path: '/github-sync', router: githubSyncRoutes },
   { path: '/settings', router: dataExportRoutes },

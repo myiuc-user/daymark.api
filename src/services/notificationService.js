@@ -1,17 +1,17 @@
 import prisma from '../config/prisma.js';
 import { socketService } from './socketService.js';
+import { sendTaskAssignmentEmail, sendProjectUpdateEmail } from './emailService.js';
 
 export const notificationService = {
   createNotification: async (userId, data) => {
     try {
-      const prefs = await prisma.notificationPreference.findUnique({
+      let prefs = await prisma.notificationPreference.findUnique({
         where: { userId }
       });
 
-      if (prefs && !prefs.inAppNotifications) return null;
       if (!prefs) {
-        await prisma.notificationPreference.create({
-          data: { userId, inAppNotifications: true }
+        prefs = await prisma.notificationPreference.create({
+          data: { userId, inAppNotifications: true, emailNotifications: true }
         });
       }
 
@@ -26,7 +26,7 @@ export const notificationService = {
         }
       });
 
-      if (socketService.io) {
+      if (prefs.inAppNotifications && socketService.io) {
         socketService.sendNotification(userId, {
           id: notification.id,
           type: notification.type,
@@ -37,6 +37,12 @@ export const notificationService = {
         });
       }
 
+      if (prefs.emailNotifications && data.emailData) {
+        notificationService.sendEmailAsync(userId, data.emailData).catch(err => 
+          console.error('Email send error:', err)
+        );
+      }
+
       return notification;
     } catch (error) {
       console.error('Error creating notification:', error);
@@ -44,11 +50,29 @@ export const notificationService = {
     }
   },
 
+  sendEmailAsync: async (userId, emailData) => {
+    try {
+      const user = await prisma.user.findUnique({ where: { id: userId } });
+      if (!user) return;
+
+      if (emailData.type === 'task_assignment') {
+        await sendTaskAssignmentEmail(user.email, emailData);
+      } else if (emailData.type === 'project_update') {
+        await sendProjectUpdateEmail(user.email, emailData);
+      }
+    } catch (error) {
+      console.error('Error sending email:', error);
+    }
+  },
+
   notifyTaskAssignment: async (taskId, assigneeId, assignedBy) => {
     if (assigneeId === assignedBy) return null;
     
     try {
-      const task = await prisma.task.findUnique({ where: { id: taskId } });
+      const task = await prisma.task.findUnique({ 
+        where: { id: taskId },
+        include: { project: true }
+      });
       const assigner = await prisma.user.findUnique({ where: { id: assignedBy } });
 
       return notificationService.createNotification(assigneeId, {
@@ -56,7 +80,16 @@ export const notificationService = {
         title: 'Task Assigned',
         message: `${assigner.name} assigned you "${task.title}"`,
         relatedId: taskId,
-        relatedType: 'task'
+        relatedType: 'task',
+        emailData: {
+          type: 'task_assignment',
+          title: task.title,
+          description: task.description,
+          projectName: task.project.name,
+          priority: task.priority,
+          dueDate: task.due_date,
+          taskLink: `${process.env.FRONTEND_URL}/tasks/${taskId}`
+        }
       });
     } catch (error) {
       console.error('Error notifying task assignment:', error);
@@ -65,22 +98,40 @@ export const notificationService = {
   },
 
   notifyTaskComment: async (taskId, commenterId, taskOwnerId) => {
-    if (commenterId === taskOwnerId) return;
+    if (commenterId === taskOwnerId) return null;
 
     try {
-      const task = await prisma.task.findUnique({ where: { id: taskId } });
+      const task = await prisma.task.findUnique({ 
+        where: { id: taskId },
+        include: { watchers: true, project: true }
+      });
       const commenter = await prisma.user.findUnique({ where: { id: commenterId } });
 
-      return notificationService.createNotification(taskOwnerId, {
-        type: 'comment',
-        title: 'New Comment',
-        message: `${commenter.name} commented on "${task.title}"`,
-        relatedId: taskId,
-        relatedType: 'task'
-      });
+      const notifyUsers = new Set([
+        taskOwnerId,
+        ...task.watchers.map(w => w.userId)
+      ].filter(id => id !== commenterId));
+
+      for (const userId of notifyUsers) {
+        await notificationService.createNotification(userId, {
+          type: 'comment',
+          title: 'New Comment',
+          message: `${commenter.name} commented on "${task.title}"`,
+          relatedId: taskId,
+          relatedType: 'task',
+          emailData: {
+            type: 'task_assignment',
+            title: `New comment on ${task.title}`,
+            description: `${commenter.name} commented on your task`,
+            projectName: task.project.name,
+            priority: task.priority,
+            dueDate: task.due_date,
+            taskLink: `${process.env.FRONTEND_URL}/tasks/${taskId}`
+          }
+        });
+      }
     } catch (error) {
       console.error('Error notifying task comment:', error);
-      return null;
     }
   },
 
@@ -97,7 +148,6 @@ export const notificationService = {
       });
     } catch (error) {
       console.error('Error notifying mention:', error);
-      return null;
     }
   },
 
@@ -105,13 +155,14 @@ export const notificationService = {
     try {
       const task = await prisma.task.findUnique({
         where: { id: taskId },
-        include: { watchers: true, assignee: true }
+        include: { watchers: true, assignee: true, project: true }
       });
 
       const updater = await prisma.user.findUnique({ where: { id: updatedBy } });
       const changeText = Object.keys(changes).join(', ');
 
       const notifyUsers = new Set([
+        task.createdById,
         task.assigneeId,
         ...task.watchers.map(w => w.userId)
       ].filter(Boolean));
@@ -136,12 +187,13 @@ export const notificationService = {
     try {
       const task = await prisma.task.findUnique({
         where: { id: taskId },
-        include: { watchers: true, assignee: true }
+        include: { watchers: true, assignee: true, project: true }
       });
 
       const completer = await prisma.user.findUnique({ where: { id: completedBy } });
 
       const notifyUsers = new Set([
+        task.createdById,
         task.assigneeId,
         ...task.watchers.map(w => w.userId)
       ].filter(Boolean));
@@ -162,30 +214,23 @@ export const notificationService = {
     }
   },
 
-  getNotifications: async (userId, limit = 50) => {
+  getNotifications: async (userId, limit = 50, offset = 0) => {
     const notifications = await prisma.notification.findMany({
-      where: { userId, read: false },
+      where: { userId },
       orderBy: { createdAt: 'desc' },
-      take: limit
+      take: limit,
+      skip: offset
     });
 
-    return notifications;
+    const total = await prisma.notification.count({ where: { userId } });
+    return { notifications, total };
   },
 
   loadNotificationsForUser: async (userId) => {
-    const notifications = await notificationService.getNotifications(userId);
+    const { notifications } = await notificationService.getNotifications(userId, 50, 0);
     
     if (socketService.io) {
-      notifications.forEach(notification => {
-        socketService.sendNotification(userId, {
-          id: notification.id,
-          type: notification.type,
-          title: notification.title,
-          message: notification.message,
-          timestamp: notification.createdAt,
-          read: false
-        });
-      });
+      socketService.io.to(`user:${userId}`).emit('notifications-batch', notifications);
     }
 
     return notifications;
@@ -193,7 +238,7 @@ export const notificationService = {
 
   markAsRead: async (notificationId, userId) => {
     const notification = await prisma.notification.update({
-      where: { id: notificationId },
+      where: { id: notificationId, userId },
       data: { read: true }
     });
 
@@ -216,7 +261,7 @@ export const notificationService = {
 
   deleteNotification: async (notificationId, userId) => {
     await prisma.notification.delete({
-      where: { id: notificationId }
+      where: { id: notificationId, userId }
     });
 
     if (socketService.io) {

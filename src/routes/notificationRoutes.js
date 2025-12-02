@@ -8,10 +8,13 @@ router.use(authenticateToken);
 
 router.get('/', notificationController.getNotifications);
 router.get('/load', notificationController.loadNotifications);
+router.get('/preferences', notificationController.getPreferences);
+router.put('/preferences', notificationController.updatePreferences);
 router.patch('/:id/read', notificationController.markAsRead);
 router.put('/:id/read', notificationController.markAsRead);
 router.patch('/read-all', notificationController.markAllAsRead);
 router.put('/read-all', notificationController.markAllAsRead);
 router.delete('/:id', notificationController.deleteNotification);
+router.post('/test', notificationController.sendTestNotification);
 
 export default router;

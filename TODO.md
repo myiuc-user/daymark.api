@@ -21,14 +21,13 @@
 - [x] Analytics (Project stats, Team performance)
 - [x] Workflow States (CRUD)
 - [x] Project Templates (CRUD, Use template)
+- [x] Sprint Management (CRUD, Activate)
 
 ## 🚀 In Progress
-- [ ] Sprint Management (CRUD, Activate) - PAUSED
 
 ## 📋 Planned Features
 
 ### High Priority
-- [ ] Sprint Management (CRUD, Activate) - PAUSED
 
 ## 🔧 Technical Debt
 - [ ] Add input validation with Zod

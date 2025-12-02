@@ -223,17 +223,17 @@ model Milestone {
 }
 
 model Sprint {
-  id        String   @id @default(uuid())
+  id        String       @id @default(uuid())
   name      String
   goal      String?
   startDate DateTime
   endDate   DateTime
   projectId String
-  active    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  tasks     Task[]   @relation("TaskSprint")
+  status    SprintStatus @default(PLANNED)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  project   Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks     Task[]       @relation("TaskSprint")
 }
 
 model TimeEntry {
@@ -405,4 +405,10 @@ enum Priority {
   LOW
   MEDIUM
   HIGH
+}
+
+enum SprintStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
 }

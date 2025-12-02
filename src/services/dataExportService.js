@@ -38,13 +38,16 @@ export const dataExportService = {
       throw new Error('User not found');
     }
 
+    // Ensure SUPER_ADMIN role is preserved in export
+    const userRole = user.role === 'SUPER_ADMIN' ? 'SUPER_ADMIN' : user.role;
+
     return {
       exportDate: new Date().toISOString(),
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
-        role: user.role,
+        role: userRole,
         createdAt: user.createdAt,
       },
       data: {

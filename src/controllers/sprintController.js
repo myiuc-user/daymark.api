@@ -9,7 +9,7 @@ export const sprintController = {
       }
 
       const sprints = await sprintService.getSprints(projectId, req.user.id);
-      res.json({ sprints });
+      res.json(sprints);
     } catch (error) {
       console.error('Get sprints error:', error);
       res.status(500).json({ error: error.message || 'Internal server error' });
@@ -18,14 +18,15 @@ export const sprintController = {
 
   createSprint: async (req, res) => {
     try {
-      const { name, startDate, endDate, projectId } = req.body;
+      const { name, goal, startDate, endDate, projectId } = req.body;
       const sprint = await sprintService.createSprint({
         name,
+        goal,
         startDate,
         endDate,
         projectId
       }, req.user.id);
-      res.status(201).json({ sprint });
+      res.status(201).json(sprint);
     } catch (error) {
       console.error('Create sprint error:', error);
       res.status(500).json({ error: error.message || 'Internal server error' });
@@ -35,14 +36,15 @@ export const sprintController = {
   updateSprint: async (req, res) => {
     try {
       const { id } = req.params;
-      const { name, startDate, endDate, status } = req.body;
+      const { name, goal, startDate, endDate, status } = req.body;
       const sprint = await sprintService.updateSprint(id, {
         name,
+        goal,
         startDate,
         endDate,
         status
       }, req.user.id);
-      res.json({ sprint });
+      res.json(sprint);
     } catch (error) {
       console.error('Update sprint error:', error);
       res.status(500).json({ error: error.message || 'Internal server error' });
@@ -56,6 +58,17 @@ export const sprintController = {
       res.json({ message: 'Sprint deleted' });
     } catch (error) {
       console.error('Delete sprint error:', error);
+      res.status(500).json({ error: error.message || 'Internal server error' });
+    }
+  },
+
+  activateSprint: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const sprint = await sprintService.activateSprint(id, req.user.id);
+      res.json(sprint);
+    } catch (error) {
+      console.error('Activate sprint error:', error);
       res.status(500).json({ error: error.message || 'Internal server error' });
     }
   }

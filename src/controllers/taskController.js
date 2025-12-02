@@ -20,13 +20,13 @@ export const taskController = {
 
   createTask: async (req, res) => {
     try {
-      const { title, description, priority, status, dueDate, projectId, assigneeId } = req.body;
+      const { title, description, priority, status, due_date, projectId, assigneeId } = req.body;
       const task = await taskService.createTask({
         title,
         description,
         priority,
         status,
-        dueDate,
+        due_date,
         projectId,
         assigneeId,
         createdById: req.user.id
@@ -67,7 +67,7 @@ export const taskController = {
   updateTask: async (req, res) => {
     try {
       const { id } = req.params;
-      const { title, description, priority, status, dueDate, assigneeId } = req.body;
+      const { title, description, priority, status, due_date, assigneeId } = req.body;
 
       const task = await taskService.getTaskById(id, { include: { project: { include: { workspace: true } } } });
       if (!task) {
@@ -83,7 +83,7 @@ export const taskController = {
       if (title && title !== task.title) changes.title = title;
       if (priority && priority !== task.priority) changes.priority = priority;
       if (status && status !== task.status) changes.status = status;
-      if (dueDate && dueDate !== task.due_date) changes.dueDate = dueDate;
+      if (due_date && due_date !== task.due_date) changes.due_date = due_date;
       if (assigneeId && assigneeId !== task.assigneeId) {
         changes.assigneeId = assigneeId;
         await notificationService.notifyTaskAssignment(id, assigneeId, req.user.id);
@@ -94,7 +94,7 @@ export const taskController = {
         description,
         priority,
         status,
-        dueDate,
+        due_date,
         assigneeId
       }, req.user.id);
 
@@ -274,7 +274,7 @@ export const taskController = {
   createSubtask: async (req, res) => {
     try {
       const { id } = req.params;
-      const { title, assigneeId, dueDate, priority } = req.body;
+      const { title, assigneeId, due_date, priority } = req.body;
       const task = await taskService.getTaskById(id);
       if (!task) {
         return res.status(404).json({ error: 'Task not found' });
@@ -283,7 +283,7 @@ export const taskController = {
       if (!hasAccess) {
         return res.status(403).json({ error: 'Access denied' });
       }
-      const subtask = await taskService.createSubtask(id, { title, assigneeId, dueDate, priority }, req.user.id);
+      const subtask = await taskService.createSubtask(id, { title, assigneeId, due_date, priority }, req.user.id);
       res.status(201).json({ subtask });
     } catch (error) {
       console.error('Create subtask error:', error);

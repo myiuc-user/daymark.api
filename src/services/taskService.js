@@ -76,7 +76,7 @@ export const taskService = {
           ...data,
           assigneeId,
           createdById: userId,
-          due_date: data.dueDate ? new Date(data.dueDate) : new Date()
+          due_date: data.due_date ? new Date(data.due_date) : new Date()
         },
         include: {
           assignee: { select: { id: true, name: true, email: true } },
@@ -120,7 +120,7 @@ export const taskService = {
         ...data,
         assigneeId,
         createdById: userId,
-        due_date: data.dueDate ? new Date(data.dueDate) : new Date()
+        due_date: data.due_date ? new Date(data.due_date) : new Date()
       },
       include: {
         assignee: { select: { id: true, name: true, email: true } },
@@ -219,10 +219,7 @@ export const taskService = {
 
     const updatedTask = await prisma.task.update({
       where: { id },
-      data: {
-        ...data,
-        due_date: data.dueDate ? new Date(data.dueDate) : undefined
-      },
+      data: data,
       include: {
         assignee: { select: { id: true, name: true, email: true } },
         createdBy: { select: { id: true, name: true, email: true } }
@@ -242,6 +239,9 @@ export const taskService = {
       }
       if (data.priority !== undefined && oldTask.priority !== data.priority) {
         changes.priority = { oldValue: oldTask.priority, newValue: data.priority };
+      }
+      if (data.due_date !== undefined && oldTask.due_date !== data.due_date) {
+        changes.due_date = { oldValue: oldTask.due_date, newValue: data.due_date };
       }
       if (data.assigneeId !== undefined && oldTask.assigneeId !== data.assigneeId) {
         changes.assigneeId = { oldValue: oldTask.assigneeId, newValue: data.assigneeId };
@@ -360,7 +360,7 @@ export const taskService = {
           projectId: parentTask.projectId,
           parentTaskId,
           assigneeId: data.assigneeId || parentTask.assigneeId,
-          due_date: data.dueDate || parentTask.due_date,
+          due_date: data.due_date || parentTask.due_date,
           createdById: userId,
           status: 'TODO',
           priority: data.priority || 'MEDIUM'

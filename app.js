@@ -12,7 +12,7 @@ import { createDatabaseIfNotExists } from './src/config/database.js';
 import { cronService } from './src/services/cronService.js';
 import { routes } from './src/config/routes.js';
 import { auditMiddleware } from './src/middleware/auditMiddleware.js';
-import { rateLimiter } from './src/middleware/rateLimiter.js';
+
 import { errorHandler } from './src/middleware/errorHandler.js';
 
 dotenv.config();
@@ -39,7 +39,6 @@ app.options('*', cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(rateLimiter);
 
 app.disable('strict routing');
 

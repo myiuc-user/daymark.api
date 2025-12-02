@@ -114,6 +114,96 @@ export const workspaceService = {
     });
   },
 
+  duplicateWorkspace: async (id, userId) => {
+    const workspace = await prisma.workspace.findUnique({
+      where: { id },
+      include: {
+        projects: {
+          include: {
+            tasks: {
+              include: {
+                subtasks: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    if (!workspace) {
+      throw new Error('Workspace not found');
+    }
+
+    const newSlug = `${workspace.slug}-copy-${Date.now()}`;
+    const newWorkspace = await prisma.workspace.create({
+      data: {
+        name: `${workspace.name} (Copy)`,
+        description: workspace.description,
+        slug: newSlug,
+        ownerId: userId,
+        members: {
+          create: {
+            userId,
+            role: 'ADMIN'
+          }
+        }
+      },
+      include: {
+        owner: {
+          select: { id: true, name: true, email: true }
+        }
+      }
+    });
+
+    // Duplicate projects
+    for (const project of workspace.projects) {
+      const newProject = await prisma.project.create({
+        data: {
+          name: project.name,
+          description: project.description,
+          workspaceId: newWorkspace.id,
+          status: project.status,
+          team_lead: userId
+        }
+      });
+
+      // Duplicate tasks
+      for (const task of project.tasks) {
+        const newTask = await prisma.task.create({
+          data: {
+            title: task.title,
+            description: task.description,
+            projectId: newProject.id,
+            status: task.status,
+            priority: task.priority,
+            storyPoints: task.storyPoints,
+            due_date: task.due_date,
+            assigneeId: userId,
+            createdById: userId
+          }
+        });
+
+        // Duplicate subtasks
+        for (const subtask of task.subtasks) {
+          await prisma.task.create({
+            data: {
+              title: subtask.title,
+              projectId: newProject.id,
+              status: subtask.status,
+              priority: subtask.priority,
+              due_date: subtask.due_date,
+              assigneeId: userId,
+              createdById: userId,
+              parentTaskId: newTask.id
+            }
+          });
+        }
+      }
+    }
+
+    return newWorkspace;
+  },
+
   getMembers: async (workspaceId) => {
     return await prisma.workspaceMember.findMany({
       where: { workspaceId },

@@ -12,6 +12,8 @@ import { createDatabaseIfNotExists } from './src/config/database.js';
 import { cronService } from './src/services/cronService.js';
 import { routes } from './src/config/routes.js';
 import { auditMiddleware } from './src/middleware/auditMiddleware.js';
+import { rateLimiter } from './src/middleware/rateLimiter.js';
+import { errorHandler } from './src/middleware/errorHandler.js';
 
 dotenv.config();
 
@@ -33,6 +35,7 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(rateLimiter);
 
 app.disable('strict routing');
 
@@ -68,14 +71,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Error handler middleware
-app.use((err, req, res, next) => {
-  if (err.message?.includes('connection') || err.message?.includes('closed')) {
-    reconnectPrisma();
-    return res.status(503).json({ error: 'Database temporarily unavailable' });
-  }
-  next(err);
-});
+
 
 // Register all routes
 routes.forEach(({ path: routePath, router }) => {
@@ -84,8 +80,11 @@ routes.forEach(({ path: routePath, router }) => {
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+  res.status(404).json({ error: 'Route not found', code: 'NOT_FOUND', statusCode: 404 });
 });
+
+// Error handler (must be last)
+app.use(errorHandler);
 
 async function startServer() {
   try {

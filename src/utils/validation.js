@@ -9,7 +9,19 @@ export const createUserSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email format'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  role: z.enum(['ADMIN', 'MEMBER']).optional().default('MEMBER')
+  role: z.enum(['SUPER_ADMIN', 'ADMIN', 'MEMBER']).optional().default('MEMBER')
+});
+
+export const workspaceMemberSchema = z.object({
+  userId: z.string().uuid('Invalid user ID'),
+  workspaceId: z.string().uuid('Invalid workspace ID'),
+  role: z.enum(['ADMIN', 'MEMBER', 'VIEWER']).optional().default('MEMBER')
+});
+
+export const projectMemberSchema = z.object({
+  userId: z.string().uuid('Invalid user ID'),
+  projectId: z.string().uuid('Invalid project ID'),
+  role: z.enum(['ADMIN', 'MEMBER', 'VIEWER']).optional().default('MEMBER')
 });
 
 export const createWorkspaceSchema = z.object({
@@ -23,8 +35,8 @@ export const createProjectSchema = z.object({
   description: z.string().optional(),
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH']).optional().default('MEDIUM'),
   status: z.enum(['ACTIVE', 'PLANNING', 'COMPLETED', 'ON_HOLD', 'CANCELLED']).optional().default('ACTIVE'),
-  start_date: z.string().datetime().optional(),
-  end_date: z.string().datetime().optional(),
+  start_date: z.string().datetime().nullable().optional(),
+  end_date: z.string().datetime().nullable().optional(),
   workspaceId: z.string().uuid('Invalid workspace ID')
 });
 

@@ -78,6 +78,19 @@ export const dataExportService = {
       if (importData.data?.workspaces?.length) {
         for (const workspace of importData.data.workspaces) {
           try {
+            // Check if workspace already exists
+            const existingWorkspace = await prisma.workspace.findFirst({
+              where: {
+                name: workspace.name,
+                ownerId: userId,
+              },
+            });
+
+            if (existingWorkspace) {
+              results.errors.push(`Workspace "${workspace.name}" already exists, skipping`);
+              continue;
+            }
+
             const newWorkspace = await prisma.workspace.create({
               data: {
                 name: workspace.name,
@@ -92,6 +105,32 @@ export const dataExportService = {
                 },
               },
             });
+
+            // Import workspace members, skipping those that already exist
+            if (workspace.members?.length) {
+              for (const member of workspace.members) {
+                try {
+                  const existingMember = await prisma.workspaceMember.findFirst({
+                    where: {
+                      workspaceId: newWorkspace.id,
+                      userId: member.userId,
+                    },
+                  });
+
+                  if (!existingMember && member.userId !== userId) {
+                    await prisma.workspaceMember.create({
+                      data: {
+                        workspaceId: newWorkspace.id,
+                        userId: member.userId,
+                        role: member.role || 'MEMBER',
+                      },
+                    });
+                  }
+                } catch (error) {
+                  results.errors.push(`Failed to import workspace member: ${error.message}`);
+                }
+              }
+            }
 
             if (workspace.projects?.length) {
               for (const project of workspace.projects) {

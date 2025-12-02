@@ -28,4 +28,7 @@ router.delete('/:id/members/:userId', workspaceController.removeMember);
 router.get('/:id/invitations', workspaceController.getInvitations);
 router.post('/:id/invitations', workspaceController.sendInvitations);
 
+// Duplicate route
+router.post('/:id/duplicate', workspaceController.duplicateWorkspace);
+
 export default router;

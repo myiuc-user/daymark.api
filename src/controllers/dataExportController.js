@@ -18,10 +18,17 @@ export const dataExportController = {
   importData: async (req, res) => {
     try {
       const userId = req.user.id;
+      const userRole = req.user.role;
       const importData = req.body;
 
       if (!importData || !importData.data) {
         return res.status(400).json({ error: 'Invalid import data format' });
+      }
+
+      // Preserve SUPER_ADMIN role - never downgrade it during import
+      if (userRole === 'SUPER_ADMIN' && importData.user?.role !== 'SUPER_ADMIN') {
+        importData.user = importData.user || {};
+        importData.user.role = 'SUPER_ADMIN';
       }
 
       const results = await dataExportService.importUserData(userId, importData);

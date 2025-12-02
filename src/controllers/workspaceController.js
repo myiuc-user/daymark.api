@@ -60,7 +60,7 @@ export const workspaceController = {
   updateWorkspace: async (req, res) => {
     try {
       const { id } = req.params;
-      const { name, description, slug } = req.body;
+      const { name, description } = req.body;
       const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
 
       const workspace = await workspaceService.getWorkspaceById(id, { select: { ownerId: true } });
@@ -71,8 +71,7 @@ export const workspaceController = {
 
       const updatedWorkspace = await workspaceService.updateWorkspace(id, {
         name,
-        description,
-        slug
+        description
       });
 
       res.json({ workspace: updatedWorkspace });
@@ -98,6 +97,29 @@ export const workspaceController = {
     } catch (error) {
       console.error('Delete workspace error:', error);
       res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  duplicateWorkspace: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
+
+      const workspace = await workspaceService.getWorkspaceById(id);
+      
+      if (!workspace) {
+        return res.status(404).json({ error: 'Workspace not found' });
+      }
+
+      if (!isSuperAdmin && workspace.ownerId !== req.user.id) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      const duplicated = await workspaceService.duplicateWorkspace(id, req.user.id);
+      res.status(201).json({ workspace: duplicated });
+    } catch (error) {
+      console.error('Duplicate workspace error:', error);
+      res.status(500).json({ error: 'Failed to duplicate workspace' });
     }
   },
 

@@ -1,5 +1,4 @@
 import { notificationService } from '../services/notificationService.js';
-import { notificationPreferenceService } from '../services/notificationPreferenceService.js';
 
 export const notificationController = {
   getNotifications: async (req, res) => {
@@ -26,7 +25,7 @@ export const notificationController = {
 
   getPreferences: async (req, res) => {
     try {
-      const prefs = await notificationPreferenceService.getPreferences(req.user.id);
+      const prefs = await notificationService.getPreferences(req.user.id);
       res.json({ preferences: prefs });
     } catch (error) {
       console.error('Get preferences error:', error);
@@ -36,7 +35,7 @@ export const notificationController = {
 
   updatePreferences: async (req, res) => {
     try {
-      const prefs = await notificationPreferenceService.updatePreferences(req.user.id, req.body);
+      const prefs = await notificationService.updatePreferences(req.user.id, req.body);
       res.json({ preferences: prefs });
     } catch (error) {
       console.error('Update preferences error:', error);

@@ -71,7 +71,7 @@ export const taskService = {
     
     if (isSuperAdmin) {
       await validateAssigneeIsMember(data.projectId, assigneeId);
-      return await prisma.task.create({
+      const task = await prisma.task.create({
         data: {
           ...data,
           assigneeId,
@@ -83,6 +83,9 @@ export const taskService = {
           createdBy: { select: { id: true, name: true, email: true } }
         }
       });
+
+      await notificationService.notifyProjectMembers(task, userId);
+      return task;
     }
 
     const project = await prisma.project.findUnique({
@@ -115,7 +118,7 @@ export const taskService = {
 
     await validateAssigneeIsMember(data.projectId, assigneeId);
 
-    return await prisma.task.create({
+    const task = await prisma.task.create({
       data: {
         ...data,
         assigneeId,
@@ -127,6 +130,9 @@ export const taskService = {
         createdBy: { select: { id: true, name: true, email: true } }
       }
     });
+
+    await notificationService.notifyProjectMembers(task, userId);
+    return task;
   },
 
   getTaskById: async (id, options = {}) => {

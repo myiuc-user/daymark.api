@@ -141,7 +141,7 @@ export const projectController = {
   addMember: async (req, res) => {
     try {
       const { id } = req.params;
-      const { email } = req.body;
+      const { email, role = 'MEMBER' } = req.body;
 
       if (!email) {
         return res.status(400).json({ error: 'Email is required' });
@@ -172,7 +172,7 @@ export const projectController = {
         return res.status(403).json({ error: 'Access denied' });
       }
 
-      const updatedProject = await projectService.addMember(id, email, project);
+      const updatedProject = await projectService.addMember(id, email, project, role);
       res.json({ project: updatedProject });
     } catch (error) {
       console.error('Add project member error:', error);

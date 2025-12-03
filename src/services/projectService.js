@@ -200,7 +200,7 @@ export const projectService = {
     });
   },
 
-  addMember: async (projectId, email, project) => {
+  addMember: async (projectId, email, project, role = 'MEMBER') => {
     const workspace = await prisma.workspace.findUnique({
       where: { id: project.workspaceId },
       include: {
@@ -238,7 +238,8 @@ export const projectService = {
     await prisma.projectMember.create({
       data: {
         userId: workspaceMember.userId,
-        projectId
+        projectId,
+        role
       }
     });
 

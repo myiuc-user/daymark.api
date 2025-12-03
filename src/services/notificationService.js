@@ -3,6 +3,30 @@ import { socketService } from './socketService.js';
 import { sendTaskAssignmentEmail, sendProjectUpdateEmail } from './emailService.js';
 
 export const notificationService = {
+  // Notification Preference Methods
+  getPreferences: async (userId) => {
+    let prefs = await prisma.notificationPreference.findUnique({
+      where: { userId }
+    });
+
+    if (!prefs) {
+      prefs = await prisma.notificationPreference.create({
+        data: { userId }
+      });
+    }
+
+    return prefs;
+  },
+
+  updatePreferences: async (userId, data) => {
+    return await prisma.notificationPreference.upsert({
+      where: { userId },
+      update: data,
+      create: { userId, ...data }
+    });
+  },
+
+  // Notification Methods
   createNotification: async (userId, data) => {
     try {
       let prefs = await prisma.notificationPreference.findUnique({
@@ -211,6 +235,44 @@ export const notificationService = {
       }
     } catch (error) {
       console.error('Error notifying task completion:', error);
+    }
+  },
+
+  notifyProjectMembers: async (task, creatorId) => {
+    try {
+      const project = await prisma.project.findUnique({
+        where: { id: task.projectId },
+        include: { members: { select: { userId: true } } }
+      });
+
+      if (!project) return;
+
+      const creator = await prisma.user.findUnique({ where: { id: creatorId } });
+      const projectLead = project.team_lead;
+
+      const notifyUsers = new Set();
+      
+      if (projectLead && projectLead !== creatorId) {
+        notifyUsers.add(projectLead);
+      }
+
+      project.members.forEach(member => {
+        if (member.userId !== creatorId) {
+          notifyUsers.add(member.userId);
+        }
+      });
+
+      for (const userId of notifyUsers) {
+        await notificationService.createNotification(userId, {
+          type: 'task_created',
+          title: 'New Task Created',
+          message: `${creator.name} created task "${task.title}"`,
+          relatedId: task.id,
+          relatedType: 'task'
+        });
+      }
+    } catch (error) {
+      console.error('Error notifying project members:', error);
     }
   },
 

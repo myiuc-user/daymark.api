@@ -171,7 +171,6 @@ class SocketService {
       console.warn('Socket.io not initialized');
       return;
     }
-    console.log(`Sending notification to user ${userId}:`, notification);
     this.io.to(`user:${userId}`).emit('notification', notification);
   }
 

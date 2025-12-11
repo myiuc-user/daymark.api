@@ -131,7 +131,6 @@ export const userService = {
     }
   },
 
-  // Permission methods
   getProjectPermissions: async (userId, projectId) => {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -379,59 +378,70 @@ export const userService = {
   exportUserData: async (userId) => {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      include: {
-        ownedWorkspaces: {
-          include: {
-            members: true,
-            projects: {
-              include: {
-                tasks: {
-                  include: {
-                    subtasks: true,
-                    comments: true,
-                    timeEntries: true,
-                    watchers: true,
-                  },
-                },
-                sprints: true,
-                milestones: true,
-                workflowStates: true,
-              },
-            },
-          },
-        },
-        comments: true,
-        mentions: true,
-        watchedTasks: true,
-        timeEntries: true,
-        notifications: true,
-        notificationPreference: true,
-      },
+      select: { role: true }
     });
 
     if (!user) {
       throw new Error('User not found');
     }
 
-    const userRole = user.role === 'SUPER_ADMIN' ? 'SUPER_ADMIN' : user.role;
+    if (user.role !== 'SUPER_ADMIN') {
+      throw new Error('Only SUPER_ADMIN can export all data');
+    }
+
+    const [users, workspaces, projects, tasks, comments, files, notifications, milestones, sprints, timeEntries, templates, workflowStates, taskWatchers, mentions, projectMembers, workspaceMembers, workspaceInvitations, permissionDelegations, auditLogs, taskHistories, taskDependencies, notificationPreferences, recurringTasks] = await Promise.all([
+      prisma.user.findMany(),
+      prisma.workspace.findMany({ include: { members: true, projects: true } }),
+      prisma.project.findMany({ include: { members: true, tasks: true } }),
+      prisma.task.findMany({ include: { subtasks: true, comments: true, timeEntries: true, watchers: true } }),
+      prisma.comment.findMany(),
+      prisma.file.findMany(),
+      prisma.notification.findMany(),
+      prisma.milestone.findMany(),
+      prisma.sprint.findMany(),
+      prisma.timeEntry.findMany(),
+      prisma.projectTemplate.findMany(),
+      prisma.workflowState.findMany(),
+      prisma.taskWatcher.findMany(),
+      prisma.mention.findMany(),
+      prisma.projectMember.findMany(),
+      prisma.workspaceMember.findMany(),
+      prisma.workspaceInvitation.findMany(),
+      prisma.permissionDelegation.findMany(),
+      prisma.auditLog.findMany(),
+      prisma.taskHistory.findMany(),
+      prisma.taskDependency.findMany(),
+      prisma.notificationPreference.findMany(),
+      prisma.recurringTask.findMany(),
+    ]);
 
     return {
       exportDate: new Date().toISOString(),
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: userRole,
-        createdAt: user.createdAt,
-      },
+      exportedBy: userId,
       data: {
-        workspaces: user.ownedWorkspaces,
-        comments: user.comments,
-        mentions: user.mentions,
-        watchedTasks: user.watchedTasks,
-        timeEntries: user.timeEntries,
-        notifications: user.notifications,
-        notificationPreference: user.notificationPreference,
+        users,
+        workspaces,
+        projects,
+        tasks,
+        comments,
+        files,
+        notifications,
+        milestones,
+        sprints,
+        timeEntries,
+        templates,
+        workflowStates,
+        taskWatchers,
+        mentions,
+        projectMembers,
+        workspaceMembers,
+        workspaceInvitations,
+        permissionDelegations,
+        auditLogs,
+        taskHistories,
+        taskDependencies,
+        notificationPreferences,
+        recurringTasks,
       },
     };
   },
@@ -449,8 +459,8 @@ export const userService = {
     };
 
     try {
-      if (importData.data?.workspaces?.length) {
-        for (const workspace of importData.data.workspaces) {
+      if (importData.data?.ownedWorkspaces?.length) {
+        for (const workspace of importData.data.ownedWorkspaces) {
           try {
             const existingWorkspace = await prisma.workspace.findFirst({
               where: {
@@ -571,6 +581,39 @@ export const userService = {
           } catch (error) {
             results.failed++;
             results.errors.push(`Failed to import workspace: ${error.message}`);
+          }
+        }
+      }
+
+      if (importData.data?.memberWorkspaces?.length) {
+        for (const memberWorkspace of importData.data.memberWorkspaces) {
+          try {
+            const workspace = await prisma.workspace.findUnique({
+              where: { id: memberWorkspace.workspaceId }
+            });
+
+            if (workspace) {
+              const existingMember = await prisma.workspaceMember.findFirst({
+                where: {
+                  workspaceId: workspace.id,
+                  userId: userId,
+                }
+              });
+
+              if (!existingMember) {
+                await prisma.workspaceMember.create({
+                  data: {
+                    workspaceId: workspace.id,
+                    userId: userId,
+                    role: memberWorkspace.role || 'MEMBER',
+                  },
+                });
+                results.imported++;
+              }
+            }
+          } catch (error) {
+            results.failed++;
+            results.errors.push(`Failed to import member workspace: ${error.message}`);
           }
         }
       }

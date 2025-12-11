@@ -1,5 +1,5 @@
 import prisma from '../config/prisma.js';
-import { hasRoleOrHigher } from '../utils/permissions.js';
+import { hasRoleOrHigher } from '../utils/permissionHelpers.js';
 
 export const invitationService = {
   cancelInvitation: async (id, userId, userRole = '') => {

@@ -1,7 +1,7 @@
 import cron from 'node-cron';
 import prisma from '../config/prisma.js';
 import { notificationService } from './notificationService.js';
-import { recurringTaskService } from './recurringTaskService.js';
+import { taskService } from './taskService.js';
 
 class CronService {
   constructor() {
@@ -128,7 +128,7 @@ class CronService {
   }
 
   async executeRecurringTasks() {
-    await recurringTaskService.executeRecurringTasks();
+    await taskService.executeRecurringTasks();
     console.log('Executed recurring tasks');
   }
 

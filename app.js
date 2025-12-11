@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import bodyParser from 'body-parser'
-import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
+
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -10,8 +10,29 @@ import prisma, { reconnectPrisma } from './src/config/prisma.js';
 import { createRootAdmin, resetAdminPassword } from './src/services/authService.js';
 import { createDatabaseIfNotExists } from './src/config/database.js';
 import { cronService } from './src/services/cronService.js';
-import { socketService } from './src/services/socketService.js';
-import { routes } from './src/config/routes.js';
+import { notificationService } from './src/services/notificationService.js';
+import authRoutes from './src/routes/authRoutes.js';
+import userRoutes from './src/routes/userRoutes.js';
+import workspaceRoutes from './src/routes/workspaceRoutes.js';
+import invitationRoutes from './src/routes/invitationRoutes.js';
+import projectRoutes from './src/routes/projectRoutes.js';
+import taskRoutes from './src/routes/taskRoutes.js';
+import commentRoutes from './src/routes/commentRoutes.js';
+import adminRoutes from './src/routes/adminRoutes.js';
+import fileRoutes from './src/routes/fileRoutes.js';
+import notificationRoutes from './src/routes/notificationRoutes.js';
+import analyticsRoutes from './src/routes/analyticsRoutes.js';
+import githubRoutes from './src/routes/githubRoutes.js';
+import milestoneRoutes from './src/routes/milestoneRoutes.js';
+import sprintRoutes from './src/routes/sprintRoutes.js';
+import timeTrackingRoutes from './src/routes/timeTrackingRoutes.js';
+import templateRoutes from './src/routes/templateRoutes.js';
+import workflowRoutes from './src/routes/workflowRoutes.js';
+import collaborationRoutes from './src/routes/collaborationRoutes.js';
+import teamRoutes from './src/routes/teamRoutes.js';
+import searchRoutes from './src/routes/searchRoutes.js';
+import delegationRoutes from './src/routes/delegationRoutes.js';
+import auditRoutes from './src/routes/auditRoutes.js';
 import { auditMiddleware } from './src/middleware/auditMiddleware.js';
 import { errorHandler } from './src/middleware/errorHandler.js';
 
@@ -21,27 +42,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-const corsOptions = {
-  origin: [
-    'https://daymark.myiuc.com',
-    'https://daymarkserver.myiuc.com',
-    'http://localhost:5173',
-    process.env.CORS_ORIGIN
-  ].filter(Boolean),
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+const corsOrigins = ['http://localhost:5173', process.env.CORS_ORIGIN]
+app.use(cors({
+  origin: corsOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  maxAge: 86400
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+  credentials: true
+}));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
-
-app.disable('strict routing');
 
 // Disable caching for API responses
 app.use((req, res, next) => {
@@ -56,9 +66,6 @@ app.use((req, res, next) => {
 });
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Audit middleware
-app.use(auditMiddleware);
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -75,10 +82,34 @@ app.use((req, res, next) => {
   next();
 });
 
-// Register all routes
-routes.forEach(({ path: routePath, router }) => {
-  app.use(routePath, router);
-});
+// Auth routes (no audit middleware)
+app.use('/auth', authRoutes);
+
+// Audit middleware (for authenticated routes only)
+app.use(auditMiddleware);
+
+// Register all other routes
+app.use('/users', userRoutes);
+app.use('/workspaces', workspaceRoutes);
+app.use('/invitations', invitationRoutes);
+app.use('/projects', projectRoutes);
+app.use('/tasks', taskRoutes);
+app.use('/comments', commentRoutes);
+app.use('/admin', adminRoutes);
+app.use('/files', fileRoutes);
+app.use('/notifications', notificationRoutes);
+app.use('/analytics', analyticsRoutes);
+app.use('/github', githubRoutes);
+app.use('/milestones', milestoneRoutes);
+app.use('/sprints', sprintRoutes);
+app.use('/time-entries', timeTrackingRoutes);
+app.use('/templates', templateRoutes);
+app.use('/workflows', workflowRoutes);
+app.use('/collaboration', collaborationRoutes);
+app.use('/teams', teamRoutes);
+app.use('/search', searchRoutes);
+app.use('/delegations', delegationRoutes);
+app.use('/audit', auditRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -106,7 +137,7 @@ async function startServer() {
       console.log(`📧 Admin email: ${process.env.ROOT_ADMIN_EMAIL}`);
     });
     
-    socketService.initialize(server);
+    notificationService.socketService.initialize(server);
     console.log('✅ Socket.io initialized');
   } catch (error) {
     console.error('❌ Failed to start server:', error.message);

@@ -382,7 +382,10 @@ enum ProjectRole {
 enum TaskStatus {
   TODO
   IN_PROGRESS
+  IN_REVIEW
+  VALIDATED
   DONE
+  CANCELLED
 }
 
 enum TaskType {

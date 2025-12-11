@@ -1,18 +1,9 @@
 import { 
   authenticateUser, 
   generateTokens, 
-  getCurrentUser, 
-  verifyRefreshToken 
+  getCurrentUser
 } from '../services/authService.js';
-import { validateRequest, loginSchema } from '../utils/validation.js';
 import { AppError, asyncHandler } from '../middleware/errorHandler.js';
-
-const getCookieOptions = () => ({
-  httpOnly: true,
-  secure: true,
-  sameSite: 'none',
-  maxAge: 7 * 24 * 60 * 60 * 1000
-});
 
 export const authController = {
   login: asyncHandler(async (req, res, next) => {
@@ -20,8 +11,7 @@ export const authController = {
     const user = await authenticateUser(email, password);
     if (!user) throw new AppError('Invalid credentials', 401, 'INVALID_CREDENTIALS');
     
-    const { accessToken, refreshToken } = generateTokens(user.id);
-    res.cookie('refreshToken', refreshToken, getCookieOptions());
+    const { accessToken } = generateTokens(user.id);
 
     res.json({
       user: {
@@ -30,8 +20,7 @@ export const authController = {
         name: user.name,
         role: user.role
       },
-      accessToken,
-      refreshToken
+      accessToken
     });
   }),
 
@@ -40,19 +29,7 @@ export const authController = {
     res.json({ user });
   }),
 
-  refresh: asyncHandler(async (req, res, next) => {
-    let refreshToken = req.cookies.refreshToken || req.body.refreshToken;
-    if (!refreshToken) throw new AppError('No refresh token', 401, 'NO_REFRESH_TOKEN');
-
-    const decoded = verifyRefreshToken(refreshToken);
-    const { accessToken, refreshToken: newRefreshToken } = generateTokens(decoded.userId);
-    res.cookie('refreshToken', newRefreshToken, getCookieOptions());
-
-    res.json({ accessToken, refreshToken: newRefreshToken });
-  }),
-
   logout: asyncHandler(async (req, res, next) => {
-    res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'none' });
     res.json({ message: 'Logged out successfully' });
   })
 };

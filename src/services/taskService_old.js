@@ -65,37 +65,6 @@ export const taskService = {
     });
   },
 
-  getTasksByWorkspace: async (workspaceId, userId) => {
-    const workspace = await prisma.workspace.findUnique({
-      where: { id: workspaceId },
-      include: {
-        members: { where: { userId } },
-        projects: { select: { id: true } }
-      }
-    });
-
-    if (!workspace) throw new Error('Workspace not found');
-
-    const isOwner = workspace.ownerId === userId;
-    const isMember = workspace.members.length > 0;
-
-    if (!isOwner && !isMember) {
-      throw new Error('Access denied');
-    }
-
-    const projectIds = workspace.projects.map(p => p.id);
-
-    return await prisma.task.findMany({
-      where: { projectId: { in: projectIds } },
-      include: {
-        assignee: { select: { id: true, name: true, email: true } },
-        createdBy: { select: { id: true, name: true, email: true } },
-        project: { select: { id: true, name: true } }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
-  },
-
   createTask: async (data, userId, userRole = '') => {
     const isSuperAdmin = userRole?.toUpperCase?.() === 'SUPER_ADMIN';
     
@@ -296,6 +265,7 @@ export const taskService = {
     return await prisma.task.delete({ where: { id } });
   },
 
+  // Comments
   addComment: async (taskId, content, userId) => {
     const comment = await prisma.comment.create({
       data: { content, taskId, userId },
@@ -327,6 +297,7 @@ export const taskService = {
     });
   },
 
+  // Watchers
   getWatchers: async (taskId) => {
     const watchers = await prisma.taskWatcher.findMany({
       where: { taskId },
@@ -343,6 +314,7 @@ export const taskService = {
     return await prisma.taskWatcher.deleteMany({ where: { taskId, userId } });
   },
 
+  // Subtasks
   getSubtasks: async (parentTaskId) => {
     try {
       return await prisma.task.findMany({
@@ -403,6 +375,7 @@ export const taskService = {
     });
   },
 
+  // Status
   updateTaskStatus: async (id, status) => {
     return await prisma.task.update({
       where: { id },
@@ -414,6 +387,7 @@ export const taskService = {
     });
   },
 
+  // Favorites & Archive
   toggleFavorite: async (id) => {
     const task = await prisma.task.findUnique({ where: { id } });
     return await prisma.task.update({
@@ -438,6 +412,7 @@ export const taskService = {
     });
   },
 
+  // Dependencies
   addDependency: async (taskId, dependsOnId, dependencyType = 'BLOCKS') => {
     if (taskId === dependsOnId) {
       throw new Error('A task cannot depend on itself');
@@ -500,6 +475,7 @@ export const taskService = {
     return false;
   },
 
+  // History
   recordChange: async (taskId, field, oldValue, newValue, changedBy) => {
     try {
       return await prisma.taskHistory.create({
@@ -537,6 +513,7 @@ export const taskService = {
     return histories;
   },
 
+  // Recurring Tasks
   createRecurringTask: async (projectId, data, userId) => {
     const nextDueDate = new Date(data.nextDueDate);
     

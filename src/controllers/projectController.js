@@ -1,5 +1,5 @@
 import { projectService } from '../services/projectService.js';
-import { ROLE_HIERARCHY } from '../utils/permissions.js';
+import { ROLE_HIERARCHY } from '../utils/permissionHelpers.js';
 
 export const projectController = {
   getProjects: async (req, res) => {

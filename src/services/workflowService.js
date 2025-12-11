@@ -67,7 +67,10 @@ export const workflowService = {
     const defaultStates = [
       { name: 'TODO', color: '#gray', order: 0 },
       { name: 'IN_PROGRESS', color: '#blue', order: 1 },
-      { name: 'DONE', color: '#green', order: 2 }
+      { name: 'IN_REVIEW', color: '#purple', order: 2 },
+      { name: 'VALIDATED', color: '#orange', order: 3 },
+      { name: 'DONE', color: '#green', order: 4 },
+      { name: 'CANCELLED', color: '#red', order: 5 }
     ];
 
     for (const state of defaultStates) {

@@ -1,22 +1,27 @@
 import { auditService } from '../services/auditService.js';
-import { taskHistoryService } from '../services/taskHistoryService.js';
+
+const AUDITABLE_ENTITIES = {
+  'projects': 'PROJECT',
+  'tasks': 'TASK',
+  'workspaces': 'WORKSPACE',
+  'sprints': 'SPRINT',
+  'milestones': 'MILESTONE',
+  'workflows': 'WORKFLOW',
+  'templates': 'TEMPLATE',
+  'teams': 'TEAM',
+  'delegations': 'DELEGATION',
+  'comments': 'COMMENT',
+  'files': 'FILE',
+  'time-entries': 'TIME_ENTRY',
+};
 
 export const auditMiddleware = async (req, res, next) => {
   const originalJson = res.json;
 
   res.json = function(data) {
     if (req.method !== 'GET' && req.user && res.statusCode < 400) {
-      const action = getActionFromMethod(req.method, req.path);
-      let entity = getEntityFromPath(req.path);
-      let entityId = getEntityIdFromPath(req.path);
-
-      if (req.method === 'POST' && data?.task?.id) {
-        entity = 'TASK';
-        entityId = data.task.id;
-      } else if (req.method === 'POST' && data?.project?.id) {
-        entity = 'PROJECT';
-        entityId = data.project.id;
-      }
+      const action = getActionFromMethod(req.method);
+      const { entity, entityId } = extractEntityInfo(req.path, req.method, data);
 
       if (entity && entityId) {
         auditService.logAction(
@@ -35,31 +40,45 @@ export const auditMiddleware = async (req, res, next) => {
   next();
 };
 
-function getActionFromMethod(method, path) {
+function getActionFromMethod(method) {
   if (method === 'POST') return 'CREATE';
   if (method === 'PUT' || method === 'PATCH') return 'UPDATE';
   if (method === 'DELETE') return 'DELETE';
   return 'UNKNOWN';
 }
 
-function getEntityFromPath(path) {
+function extractEntityInfo(path, method, data) {
   const segments = path.split('/').filter(Boolean);
-  if (segments.length > 0) {
-    const entity = segments[segments.length - 2] || segments[0];
-    return entity.replace(/s$/, '').toUpperCase();
+  
+  // Try to extract from response data first
+  for (const [key, entity] of Object.entries(AUDITABLE_ENTITIES)) {
+    if (data?.[key.replace(/-/g, '_')]?.id) {
+      return { entity, entityId: data[key.replace(/-/g, '_')].id };
+    }
+    // Try singular form
+    const singular = key.slice(0, -1);
+    if (data?.[singular]?.id) {
+      return { entity, entityId: data[singular].id };
+    }
   }
-  return null;
-}
 
-function getEntityIdFromPath(path) {
-  const segments = path.split('/').filter(Boolean);
-  const lastSegment = segments[segments.length - 1];
-  if (lastSegment && !isNaN(lastSegment) || /^[0-9a-f-]{36}$/.test(lastSegment)) {
-    return lastSegment;
+  // Extract from path
+  let entity = null;
+  let entityId = null;
+
+  for (const [pathKey, entityName] of Object.entries(AUDITABLE_ENTITIES)) {
+    if (segments.includes(pathKey)) {
+      entity = entityName;
+      const keyIndex = segments.indexOf(pathKey);
+      if (keyIndex + 1 < segments.length) {
+        const nextSegment = segments[keyIndex + 1];
+        if (/^[0-9a-f-]{36}$/.test(nextSegment) || !isNaN(nextSegment)) {
+          entityId = nextSegment;
+        }
+      }
+      break;
+    }
   }
-  return null;
-}
 
-export const recordTaskChange = async (taskId, changes, userId) => {
-  await taskHistoryService.recordMultipleChanges(taskId, changes, userId);
-};
+  return { entity, entityId };
+}

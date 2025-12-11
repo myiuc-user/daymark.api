@@ -5,9 +5,15 @@ import { workflowService } from '../services/workflowService.js';
 export const taskController = {
   getTasks: async (req, res) => {
     try {
-      const { projectId } = req.query;
+      const { projectId, workspaceId } = req.query;
+      
+      if (workspaceId) {
+        const tasks = await taskService.getTasksByWorkspace(workspaceId, req.user.id);
+        return res.json({ tasks });
+      }
+      
       if (!projectId) {
-        return res.status(400).json({ error: 'Project ID is required' });
+        return res.status(400).json({ error: 'Project ID or Workspace ID is required' });
       }
 
       const tasks = await taskService.getTasks(projectId, req.user.id);
@@ -375,6 +381,130 @@ export const taskController = {
     } catch (error) {
       console.error('Toggle archive error:', error);
       res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  addDependency: async (req, res) => {
+    try {
+      const { taskId } = req.params;
+      const { dependsOnId, dependencyType } = req.body;
+
+      const hasCycle = await taskService.hasCyclicDependency(taskId, dependsOnId);
+      if (hasCycle) {
+        return res.status(400).json({ error: 'Cyclic dependency detected' });
+      }
+
+      const dependency = await taskService.addDependency(taskId, dependsOnId, dependencyType);
+      res.status(201).json({ dependency });
+    } catch (error) {
+      console.error('Add dependency error:', error);
+      res.status(400).json({ error: error.message });
+    }
+  },
+
+  removeDependency: async (req, res) => {
+    try {
+      const { taskId, dependsOnId } = req.params;
+      await taskService.removeDependency(taskId, dependsOnId);
+      res.json({ message: 'Dependency removed' });
+    } catch (error) {
+      console.error('Remove dependency error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  getTaskDependencies: async (req, res) => {
+    try {
+      const { taskId } = req.params;
+      const dependencies = await taskService.getTaskDependencies(taskId);
+      res.json({ dependencies });
+    } catch (error) {
+      console.error('Get dependencies error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  getBlockingTasks: async (req, res) => {
+    try {
+      const { taskId } = req.params;
+      const blocking = await taskService.getBlockingTasks(taskId);
+      res.json({ blocking });
+    } catch (error) {
+      console.error('Get blocking tasks error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  getTaskHistory: async (req, res) => {
+    try {
+      const { taskId } = req.params;
+      const history = await taskService.getTaskHistory(taskId);
+      res.json({ history });
+    } catch (error) {
+      console.error('Get task history error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  createRecurringTask: async (req, res) => {
+    try {
+      const { projectId, title, description, frequency, dayOfWeek, dayOfMonth, nextDueDate } = req.body;
+      
+      const recurring = await taskService.createRecurringTask(projectId, {
+        title,
+        description,
+        frequency,
+        dayOfWeek,
+        dayOfMonth,
+        nextDueDate
+      }, req.user.id);
+      
+      res.status(201).json({ recurringTask: recurring });
+    } catch (error) {
+      console.error('Create recurring task error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  getRecurringTasks: async (req, res) => {
+    try {
+      const { projectId } = req.query;
+      const recurring = await taskService.getRecurringTasks(projectId);
+      res.json({ recurringTasks: recurring });
+    } catch (error) {
+      console.error('Get recurring tasks error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  updateRecurringTask: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { title, description, frequency, dayOfWeek, dayOfMonth } = req.body;
+      
+      const recurring = await taskService.updateRecurringTask(id, {
+        title,
+        description,
+        frequency,
+        dayOfWeek,
+        dayOfMonth
+      });
+      
+      res.json({ recurringTask: recurring });
+    } catch (error) {
+      console.error('Update recurring task error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  deleteRecurringTask: async (req, res) => {
+    try {
+      const { id } = req.params;
+      await taskService.deleteRecurringTask(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Delete recurring task error:', error);
+      res.status(500).json({ error: error.message });
     }
   }
 };

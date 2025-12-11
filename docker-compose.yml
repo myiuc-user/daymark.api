@@ -11,8 +11,13 @@ services:
       - "3001:3001"
     env_file:
       - .env
+    volumes:
+      - uploads:/app/uploads
     networks:
       - daymark-network
+
+volumes:
+  uploads:
 
 networks:
   daymark-network:

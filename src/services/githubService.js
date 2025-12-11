@@ -1,10 +1,13 @@
 import { Octokit } from '@octokit/rest';
 import simpleGit from 'simple-git';
 import prisma from '../config/prisma.js';
+import { taskService } from './taskService.js';
 
 class GitHubService {
   constructor() {
     this.git = simpleGit();
+    this.clientId = process.env.GITHUB_CLIENT_ID;
+    this.clientSecret = process.env.GITHUB_CLIENT_SECRET;
   }
 
   getOctokit(token) {
@@ -17,6 +20,81 @@ class GitHubService {
     });
   }
 
+  // Auth methods
+  getAuthUrl(state) {
+    const params = new URLSearchParams({
+      client_id: this.clientId,
+      redirect_uri: `${process.env.FRONTEND_URL}/auth/github/callback`,
+      scope: 'repo,user:email',
+      state
+    });
+    return `https://github.com/login/oauth/authorize?${params}`;
+  }
+
+  async getAccessToken(code) {
+    const response = await fetch('https://github.com/login/oauth/access_token', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        client_id: this.clientId,
+        client_secret: this.clientSecret,
+        code
+      })
+    });
+
+    const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(data.error_description || 'GitHub OAuth error');
+    }
+    return data.access_token;
+  }
+
+  async getUserInfo(token) {
+    const octokit = this.getOctokit(token);
+    const { data } = await octokit.rest.users.getAuthenticated();
+    return data;
+  }
+
+  async saveUserToken(userId, token, githubUser) {
+    return await prisma.user.update({
+      where: { id: userId },
+      data: {
+        githubToken: token,
+        githubUsername: githubUser.login,
+        githubData: githubUser
+      }
+    });
+  }
+
+  async getUserToken(userId) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { githubToken: true, githubUsername: true }
+    });
+    return user?.githubToken;
+  }
+
+  async hasUserToken(userId) {
+    const token = await this.getUserToken(userId);
+    return !!token;
+  }
+
+  async removeUserToken(userId) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        githubToken: null,
+        githubUsername: null,
+        githubData: null
+      }
+    });
+  }
+
+  // Repository methods
   async getUserRepos(token) {
     try {
       const octokit = this.getOctokit(token);
@@ -26,7 +104,7 @@ class GitHubService {
         sort: 'updated'
       });
       
-      const mapped = data.map(repo => ({
+      return data.map(repo => ({
         id: repo.id,
         name: repo.name,
         fullName: repo.full_name,
@@ -36,8 +114,6 @@ class GitHubService {
         stars: repo.stargazers_count,
         forks: repo.forks_count
       }));
-      
-      return mapped;
     } catch (error) {
       console.error(`[GitHubService] Error fetching repos:`, error);
       throw new Error(`Failed to fetch user repos: ${error.message}`);
@@ -49,10 +125,9 @@ class GitHubService {
       const octokit = this.getOctokit(token);
       
       const { data: userOrgs } = await octokit.rest.orgs.listForAuthenticatedUser({ per_page: 100 });
-      
       const { data: user } = await octokit.rest.users.getAuthenticated();
       
-      const orgs = [
+      return [
         {
           id: user.id,
           login: user.login,
@@ -68,8 +143,6 @@ class GitHubService {
           type: 'Organization'
         }))
       ];
-      
-      return orgs;
     } catch (error) {
       console.error(`[GitHubService] Error fetching organizations:`, error);
       throw new Error(`Failed to fetch organizations: ${error.message}`);
@@ -86,7 +159,7 @@ class GitHubService {
         sort: 'updated'
       });
       
-      const mapped = data.map(repo => ({
+      return data.map(repo => ({
         id: repo.id,
         name: repo.name,
         fullName: repo.full_name,
@@ -96,8 +169,6 @@ class GitHubService {
         stars: repo.stargazers_count,
         forks: repo.forks_count
       }));
-      
-      return mapped;
     } catch (error) {
       console.error(`[GitHubService] Error fetching org repos:`, error);
       throw new Error(`Failed to fetch organization repos: ${error.message}`);
@@ -109,7 +180,7 @@ class GitHubService {
       const octokit = this.getOctokit(token);
       const { data } = await octokit.rest.repos.get({ owner, repo });
       
-      const info = {
+      return {
         name: data.name,
         fullName: data.full_name,
         description: data.description,
@@ -119,34 +190,9 @@ class GitHubService {
         forks: data.forks_count,
         openIssues: data.open_issues_count
       };
-      
-      return info;
     } catch (error) {
       console.error(`[GitHubService] Error fetching repo info:`, error);
       throw new Error(`GitHub API error: ${error.message}`);
-    }
-  }
-
-  async getCommits(owner, repo, token, since = null) {
-    try {
-      const octokit = this.getOctokit(token);
-      const params = { owner, repo, per_page: 100 };
-      if (since) params.since = since;
-      
-      const { data } = await octokit.rest.repos.listCommits(params);
-      
-      return data.map(commit => ({
-        sha: commit.sha,
-        message: commit.commit.message,
-        author: commit.commit.author.name,
-        date: commit.commit.author.date,
-        additions: commit.stats?.additions || 0,
-        deletions: commit.stats?.deletions || 0,
-        files: commit.files?.length || 0
-      }));
-    } catch (error) {
-      console.error(`[GitHubService] Error fetching commits:`, error);
-      throw new Error(`Failed to fetch commits: ${error.message}`);
     }
   }
 
@@ -158,14 +204,12 @@ class GitHubService {
       const totalBytes = Object.values(languages).reduce((sum, bytes) => sum + bytes, 0);
       const estimatedLOC = Math.round(totalBytes / 50);
       
-      const metrics = {
+      return {
         languages,
         totalBytes,
         estimatedLOC,
         primaryLanguage: Object.keys(languages)[0] || 'Unknown'
       };
-      
-      return metrics;
     } catch (error) {
       console.error(`[GitHubService] Error fetching code metrics:`, error);
       throw new Error(`Failed to get code metrics: ${error.message}`);
@@ -193,26 +237,226 @@ class GitHubService {
     }
   }
 
-  calculateCOCOMO(linesOfCode, complexity = 'ORGANIC') {
-    const coefficients = {
-      ORGANIC: { a: 2.4, b: 1.05, c: 2.5, d: 0.38 },
-      SEMI_DETACHED: { a: 3.0, b: 1.12, c: 2.5, d: 0.35 },
-      EMBEDDED: { a: 3.6, b: 1.20, c: 2.5, d: 0.32 }
+  // Commit methods
+  async getProjectCommits(projectId, userId) {
+    const project = await prisma.project.findUnique({
+      where: { id: projectId }
+    });
+
+    if (!project?.githubRepo) throw new Error('Project not linked to GitHub');
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user?.githubToken) throw new Error('GitHub token not found');
+
+    const [owner, repo] = project.githubRepo.split('/');
+    const octokit = this.getOctokit(user.githubToken);
+
+    const { data } = await octokit.repos.listCommits({
+      owner,
+      repo,
+      per_page: 50
+    });
+
+    return data.map(commit => ({
+      sha: commit.sha,
+      message: commit.commit.message,
+      author: commit.commit.author.name,
+      date: commit.commit.author.date
+    }));
+  }
+
+  async linkTaskToCommit(taskId, commitHash, userId) {
+    const task = await prisma.task.findUnique({
+      where: { id: taskId },
+      include: { project: true }
+    });
+
+    if (!task) throw new Error('Task not found');
+    if (!task.project.githubRepo) throw new Error('Project not linked to GitHub');
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user?.githubToken) throw new Error('GitHub token not found');
+
+    const [owner, repo] = task.project.githubRepo.split('/');
+    const octokit = this.getOctokit(user.githubToken);
+
+    const commit = await octokit.repos.getCommit({ owner, repo, ref: commitHash });
+
+    return await prisma.task.update({
+      where: { id: taskId },
+      data: {
+        commitHash,
+        commitMessage: commit.data.commit.message
+      },
+      include: { project: true }
+    });
+  }
+
+  async updateCommitMessage(taskId, userId) {
+    const task = await prisma.task.findUnique({
+      where: { id: taskId },
+      include: { project: true }
+    });
+
+    if (!task?.commitHash) throw new Error('Task not linked to commit');
+    if (!task.project.githubRepo) throw new Error('Project not linked to GitHub');
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user?.githubToken) throw new Error('GitHub token not found');
+
+    const [owner, repo] = task.project.githubRepo.split('/');
+    const octokit = this.getOctokit(user.githubToken);
+
+    const newMessage = task.title;
+
+    try {
+      await octokit.repos.createCommitComment({
+        owner,
+        repo,
+        commit_sha: task.commitHash,
+        body: `Task: ${newMessage}`
+      });
+    } catch (error) {
+      console.error('Failed to add commit comment:', error);
+    }
+
+    return await prisma.task.update({
+      where: { id: taskId },
+      data: { commitMessage: newMessage }
+    });
+  }
+
+  async unlinkTaskFromCommit(taskId) {
+    return await prisma.task.update({
+      where: { id: taskId },
+      data: { commitHash: null, commitMessage: null }
+    });
+  }
+
+  // Sync methods
+  async syncGitHubIssues(projectId, userId) {
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      include: { owner: true }
+    });
+
+    if (!project?.githubRepo) throw new Error('Project not linked to GitHub');
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user?.githubToken) throw new Error('GitHub token not found');
+
+    const [owner, repo] = project.githubRepo.split('/');
+    const octokit = this.getOctokit(user.githubToken);
+
+    const { data: issues } = await octokit.issues.listForRepo({
+      owner,
+      repo,
+      state: 'all',
+      per_page: 100
+    });
+
+    const syncedTasks = [];
+
+    for (const issue of issues) {
+      const existingTask = await prisma.task.findFirst({
+        where: {
+          projectId,
+          description: { contains: `github-issue-${issue.number}` }
+        }
+      });
+
+      if (!existingTask) {
+        const task = await taskService.createTask({
+          title: issue.title,
+          description: `${issue.body}\n\ngithub-issue-${issue.number}`,
+          projectId,
+          priority: 'MEDIUM',
+          status: issue.state === 'closed' ? 'DONE' : 'TODO',
+          dueDate: issue.due_on ? new Date(issue.due_on) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          createdById: project.team_lead,
+          assigneeId: project.team_lead
+        }, userId);
+
+        syncedTasks.push(task);
+      } else {
+        await prisma.task.update({
+          where: { id: existingTask.id },
+          data: {
+            status: issue.state === 'closed' ? 'DONE' : 'TODO',
+            title: issue.title
+          }
+        });
+      }
+    }
+
+    return syncedTasks;
+  }
+
+  async createGitHubIssueFromTask(taskId, userId) {
+    const task = await prisma.task.findUnique({
+      where: { id: taskId },
+      include: { project: true }
+    });
+
+    if (!task?.project.githubRepo) throw new Error('Project not linked to GitHub');
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user?.githubToken) throw new Error('GitHub token not found');
+
+    const [owner, repo] = task.project.githubRepo.split('/');
+    const octokit = this.getOctokit(user.githubToken);
+
+    const { data: issue } = await octokit.issues.create({
+      owner,
+      repo,
+      title: task.title,
+      body: task.description || ''
+    });
+
+    await prisma.task.update({
+      where: { id: taskId },
+      data: {
+        description: `${task.description}\n\ngithub-issue-${issue.number}`
+      }
+    });
+
+    return issue;
+  }
+
+  async updateGitHubIssueFromTask(taskId, userId) {
+    const task = await prisma.task.findUnique({
+      where: { id: taskId },
+      include: { project: true }
+    });
+
+    if (!task?.project.githubRepo) throw new Error('Project not linked to GitHub');
+
+    const issueMatch = task.description?.match(/github-issue-(\d+)/);
+    if (!issueMatch) throw new Error('Task not linked to GitHub issue');
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user?.githubToken) throw new Error('GitHub token not found');
+
+    const [owner, repo] = task.project.githubRepo.split('/');
+    const issueNumber = parseInt(issueMatch[1]);
+    const octokit = this.getOctokit(user.githubToken);
+
+    const statusMap = {
+      'TODO': 'open',
+      'IN_PROGRESS': 'open',
+      'DONE': 'closed'
     };
-    
-    const { a, b, c, d } = coefficients[complexity];
-    const kloc = linesOfCode / 1000;
-    
-    const effort = a * Math.pow(kloc, b);
-    const time = c * Math.pow(effort, d);
-    const people = effort / time;
-    
-    return {
-      effort: Math.round(effort * 10) / 10,
-      developmentTime: Math.round(time * 10) / 10,
-      averageTeamSize: Math.round(people * 10) / 10,
-      estimatedCost: Math.round(effort * 8000)
-    };
+
+    const { data: issue } = await octokit.issues.update({
+      owner,
+      repo,
+      issue_number: issueNumber,
+      title: task.title,
+      body: task.description?.replace(/\n\ngithub-issue-\d+/, '') || '',
+      state: statusMap[task.status] || 'open'
+    });
+
+    return issue;
   }
 }
 

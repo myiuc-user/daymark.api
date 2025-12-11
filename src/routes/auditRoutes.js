@@ -1,6 +1,6 @@
 import express from 'express';
 import { auditService } from '../services/auditService.js';
-import { taskHistoryService } from '../services/taskHistoryService.js';
+import { taskService } from '../services/taskService.js';
 import { auditMiddleware } from '../middleware/auditMiddleware.js';
 
 const router = express.Router();
@@ -42,7 +42,7 @@ router.get('/history/:entity/:entityId', async (req, res) => {
 router.get('/task-history/:taskId', async (req, res) => {
   try {
     const { taskId } = req.params;
-    const history = await taskHistoryService.getTaskHistory(taskId);
+    const history = await taskService.getTaskHistory(taskId);
     res.json(history);
   } catch (error) {
     res.status(500).json({ error: error.message });

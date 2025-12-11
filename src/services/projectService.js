@@ -1,9 +1,9 @@
 import prisma from '../config/prisma.js';
 import { notificationService } from './notificationService.js';
 import { githubService } from './githubService.js';
-import { githubAuthService } from './githubAuthService.js';
+
 import { projectProgressService } from './projectProgressService.js';
-import { VALID_PROJECT_ROLES } from '../utils/permissions.js';
+import { VALID_PROJECT_ROLES } from '../utils/permissionHelpers.js';
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
@@ -320,7 +320,7 @@ export const projectService = {
   connectGithub: async (projectId, githubRepo, userId) => {
     const [owner, repo] = githubRepo.split('/');
     
-    const token = await githubAuthService.getUserToken(userId);
+    const token = await githubService.getUserToken(userId);
     if (!token) {
       throw new Error('GitHub account not connected. Please connect your GitHub account first.');
     }
@@ -333,7 +333,6 @@ export const projectService = {
     const githubData = {
       ...repoInfo,
       codeMetrics,
-      estimation: githubService.calculateCOCOMO(codeMetrics.estimatedLOC),
       lastSync: new Date().toISOString()
     };
 
@@ -372,7 +371,7 @@ export const projectService = {
 
     const [owner, repo] = project.githubRepo.split('/');
     
-    const token = await githubAuthService.getUserToken(userId);
+    const token = await githubService.getUserToken(userId);
     if (!token) {
       throw new Error('GitHub account not connected');
     }
@@ -385,7 +384,6 @@ export const projectService = {
     const githubData = {
       ...repoInfo,
       codeMetrics,
-      estimation: githubService.calculateCOCOMO(codeMetrics.estimatedLOC),
       lastSync: new Date().toISOString()
     };
 

@@ -54,11 +54,15 @@ export const createTaskSchema = z.object({
 export const validateRequest = (schema) => {
   return (req, res, next) => {
     try {
-      schema.parse(req.body);
+      const validated = schema.parse(req.body);
+      req.body = validated;
       next();
     } catch (error) {
+      console.error('Validation error:', error.errors);
       return res.status(400).json({
         error: 'Validation failed',
+        code: 'VALIDATION_ERROR',
+        statusCode: 400,
         details: error.errors
       });
     }

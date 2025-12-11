@@ -1,9 +1,280 @@
 import prisma from '../config/prisma.js';
-import { socketService } from './socketService.js';
-import { sendTaskAssignmentEmail, sendProjectUpdateEmail } from './emailService.js';
+import { Server } from 'socket.io';
+import jwt from 'jsonwebtoken';
+import Handlebars from 'handlebars';
+import nodemailer from 'nodemailer';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Socket.io initialization
+class SocketService {
+  constructor() {
+    this.io = null;
+    this.connectedUsers = new Map();
+    this.roomUsers = new Map();
+  }
+
+  initialize(server) {
+    this.io = new Server(server, {
+      cors: {
+        origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+        credentials: true
+      }
+    });
+
+    this.io.use(async (socket, next) => {
+      try {
+        const token = socket.handshake.auth.token;
+        if (!token) {
+          return next(new Error('Authentication error'));
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await prisma.user.findUnique({
+          where: { id: decoded.userId },
+          select: { id: true, name: true, email: true, image: true, isActive: true }
+        });
+
+        if (!user || !user.isActive) {
+          return next(new Error('User not found or inactive'));
+        }
+
+        socket.userId = user.id;
+        socket.user = user;
+        next();
+      } catch (error) {
+        next(new Error('Authentication error'));
+      }
+    });
+
+    this.io.on('connection', (socket) => {
+      console.log(`User ${socket.user.name} connected with socket ${socket.id}`);
+      
+      this.connectedUsers.set(socket.userId, {
+        socketId: socket.id,
+        user: socket.user,
+        lastSeen: new Date()
+      });
+
+      socket.join(`user:${socket.userId}`);
+      console.log(`User ${socket.userId} joined room user:${socket.userId}`);
+
+      socket.on('join-project', async (projectId) => {
+        try {
+          const project = await prisma.project.findFirst({
+            where: {
+              id: projectId,
+              OR: [
+                { team_lead: socket.userId },
+                { members: { some: { userId: socket.userId } } },
+                { workspace: { 
+                  OR: [
+                    { ownerId: socket.userId },
+                    { members: { some: { userId: socket.userId } } }
+                  ]
+                }}
+              ]
+            }
+          });
+
+          if (project) {
+            socket.join(`project:${projectId}`);
+            
+            if (!this.roomUsers.has(projectId)) {
+              this.roomUsers.set(projectId, new Set());
+            }
+            this.roomUsers.get(projectId).add(socket.userId);
+
+            socket.to(`project:${projectId}`).emit('user-joined', {
+              user: socket.user,
+              projectId
+            });
+
+            const roomUserIds = Array.from(this.roomUsers.get(projectId));
+            const roomUsers = roomUserIds.map(id => this.connectedUsers.get(id)?.user).filter(Boolean);
+            
+            socket.emit('room-users', { projectId, users: roomUsers });
+          }
+        } catch (error) {
+          socket.emit('error', { message: 'Failed to join project room' });
+        }
+      });
+
+      socket.on('leave-project', (projectId) => {
+        socket.leave(`project:${projectId}`);
+        
+        if (this.roomUsers.has(projectId)) {
+          this.roomUsers.get(projectId).delete(socket.userId);
+        }
+
+        socket.to(`project:${projectId}`).emit('user-left', {
+          user: socket.user,
+          projectId
+        });
+      });
+
+      socket.on('task-update', (data) => {
+        socket.to(`project:${data.projectId}`).emit('task-updated', {
+          ...data,
+          updatedBy: socket.user
+        });
+      });
+
+      socket.on('typing-start', (data) => {
+        socket.to(`project:${data.projectId}`).emit('user-typing', {
+          user: socket.user,
+          taskId: data.taskId,
+          projectId: data.projectId
+        });
+      });
+
+      socket.on('typing-stop', (data) => {
+        socket.to(`project:${data.projectId}`).emit('user-stopped-typing', {
+          user: socket.user,
+          taskId: data.taskId,
+          projectId: data.projectId
+        });
+      });
+
+      socket.on('cursor-move', (data) => {
+        socket.to(`project:${data.projectId}`).emit('cursor-moved', {
+          user: socket.user,
+          position: data.position,
+          taskId: data.taskId,
+          projectId: data.projectId
+        });
+      });
+
+      socket.on('disconnect', () => {
+        console.log(`User ${socket.user.name} disconnected`);
+        
+        this.connectedUsers.delete(socket.userId);
+        
+        for (const [projectId, users] of this.roomUsers.entries()) {
+          if (users.has(socket.userId)) {
+            users.delete(socket.userId);
+            socket.to(`project:${projectId}`).emit('user-left', {
+              user: socket.user,
+              projectId
+            });
+          }
+        }
+      });
+    });
+  }
+
+  sendNotification(userId, notification) {
+    if (!this.io) {
+      console.warn('Socket.io not initialized');
+      return;
+    }
+    console.log(`Sending notification to user ${userId}:`, notification);
+    this.io.to(`user:${userId}`).emit('notification', notification);
+  }
+
+  sendProjectUpdate(projectId, event, data) {
+    if (!this.io) {
+      console.warn('Socket.io not initialized');
+      return;
+    }
+    this.io.to(`project:${projectId}`).emit(event, data);
+  }
+
+  getProjectUsers(projectId) {
+    const userIds = this.roomUsers.get(projectId) || new Set();
+    return Array.from(userIds).map(id => this.connectedUsers.get(id)?.user).filter(Boolean);
+  }
+
+  isUserOnline(userId) {
+    return this.connectedUsers.has(userId);
+  }
+
+  getConnectedUsers() {
+    return Array.from(this.connectedUsers.values());
+  }
+}
+
+const socketService = new SocketService();
+
+// Email service
+const uploadDir = path.join(__dirname, '../../uploads/profiles');
+
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST || 'smtp.office365.com',
+  port: process.env.EMAIL_PORT || 587,
+  secure: process.env.EMAIL_SECURE === 'true' || false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+const loadTemplate = (templateName) => {
+  try {
+    const templatePath = path.join(__dirname, '../views/emails', `${templateName}.hbs`);
+    const templateContent = fs.readFileSync(templatePath, 'utf-8');
+    return Handlebars.compile(templateContent);
+  } catch (error) {
+    console.error(`Failed to load template ${templateName}:`, error);
+    throw error;
+  }
+};
+
+const compiledTemplates = {
+  invitation: loadTemplate('invitation'),
+  taskAssignment: loadTemplate('taskAssignment'),
+  projectUpdate: loadTemplate('projectUpdate')
+};
+
+const sendInvitationEmail = async (email, workspaceName, inviteLink, userName = 'there') => {
+  const html = compiledTemplates.invitation({ workspaceName, inviteLink, userName });
+  return transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: `🚀 Join ${workspaceName} - Your collaboration awaits`,
+    html
+  });
+};
+
+const sendTaskAssignmentEmail = async (email, taskData) => {
+  const html = compiledTemplates.taskAssignment({
+    taskTitle: taskData.title,
+    taskDescription: taskData.description,
+    projectName: taskData.projectName,
+    taskPriority: taskData.priority,
+    dueDate: taskData.dueDate,
+    taskLink: taskData.taskLink
+  });
+  return transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: `📋 New Task: ${taskData.title}`,
+    html
+  });
+};
+
+const sendProjectUpdateEmail = async (email, updateData) => {
+  const html = compiledTemplates.projectUpdate({
+    projectName: updateData.projectName,
+    updateTitle: updateData.title,
+    updateMessage: updateData.message,
+    projectLink: updateData.projectLink
+  });
+  return transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: `📊 ${updateData.title}`,
+    html
+  });
+};
+
+// Notification service
 export const notificationService = {
-  // Notification Preference Methods
+  socketService,
+
   getPreferences: async (userId) => {
     let prefs = await prisma.notificationPreference.findUnique({
       where: { userId }
@@ -26,7 +297,6 @@ export const notificationService = {
     });
   },
 
-  // Notification Methods
   createNotification: async (userId, data) => {
     try {
       let prefs = await prisma.notificationPreference.findUnique({
@@ -348,5 +618,9 @@ export const notificationService = {
     } catch (error) {
       console.error('Error sending notification to project:', error);
     }
-  }
+  },
+
+  sendInvitationEmail,
+  sendTaskAssignmentEmail,
+  sendProjectUpdateEmail
 };

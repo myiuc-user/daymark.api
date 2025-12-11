@@ -1,6 +1,6 @@
 import prisma from '../config/prisma.js';
 import { workspaceService } from '../services/workspaceService.js';
-import { hasRoleOrHigher } from '../utils/permissions.js';
+import { hasRoleOrHigher } from '../utils/permissionHelpers.js';
 
 export const workspaceController = {
   getWorkspaces: async (req, res) => {

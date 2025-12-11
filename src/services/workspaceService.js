@@ -1,8 +1,8 @@
 import prisma from '../config/prisma.js';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
-import { sendInvitationEmail } from './emailService.js';
-import { VALID_WORKSPACE_ROLES } from '../utils/permissions.js';
+import { notificationService } from './notificationService.js';
+import { VALID_WORKSPACE_ROLES } from '../utils/permissionHelpers.js';
 
 export const workspaceService = {
   getUserWorkspaces: async (userId) => {
@@ -257,7 +257,7 @@ export const workspaceService = {
       });
 
       const inviteLink = `${process.env.FRONTEND_URL}/invite/${inviteToken}`;
-      await sendInvitationEmail(email, workspaceName, inviteLink);
+      await notificationService.sendInvitationEmail(email, workspaceName, inviteLink);
       
       results.push(newInvitation);
     }

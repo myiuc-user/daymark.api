@@ -20,4 +20,5 @@ volumes:
   uploads:
 
 networks:
-  coolify
+  coolify:
+    external: true

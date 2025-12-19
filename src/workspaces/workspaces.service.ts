@@ -6,9 +6,10 @@ export class WorkspacesService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(userId: string) {
-    return this.prisma.workspace.findMany({
+    const workspaces = await this.prisma.workspace.findMany({
       where: { members: { some: { userId } } }
     });
+    return workspaces || [];
   }
 
   async findOne(id: string) {

@@ -44,7 +44,20 @@ export class WorkspacesController {
   }
 
   @Post(':id/invitations')
-  createInvitation(@Param('id') id: string, @Body() data: any, @CurrentUser() user: any) {
-    return this.workspacesService.createInvitation(id, data, user.id);
+  async createInvitation(@Param('id') id: string, @Body() data: any, @CurrentUser() user: any) {
+    try {
+      console.log('Controller received invitation request:', {
+        workspaceId: id,
+        userId: user.id,
+        data: JSON.stringify(data, null, 2)
+      });
+      
+      const result = await this.workspacesService.createInvitation(id, data, user.id);
+      console.log('Controller returning result:', result);
+      return result;
+    } catch (error) {
+      console.error('Controller error:', error);
+      throw error;
+    }
   }
 }

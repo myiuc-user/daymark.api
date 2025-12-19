@@ -71,39 +71,71 @@ export class WorkspacesService {
   }
 
   async createInvitation(workspaceId: string, data: any, invitedById: string) {
-    console.log('createInvitation data:', JSON.stringify(data, null, 2));
-    
-    const workspace = await this.prisma.workspace.findUnique({ where: { id: workspaceId } });
-    const inviter = await this.prisma.user.findUnique({ where: { id: invitedById } });
-    
-    const invitations = await Promise.all(
-      data.invitations.map(async (invitation: any) => {
-        const token = Math.random().toString(36).substring(2, 15);
-        const invitationData = {
-          email: invitation.email,
-          role: invitation.role,
-          token,
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-          workspaceId,
-          invitedById
-        };
-        
-        console.log('Creating invitation with data:', JSON.stringify(invitationData, null, 2));
-        
-        const createdInvitation = await this.prisma.workspaceInvitation.create({
-          data: invitationData
-        });
-        
-        await this.emailService.sendInvitationEmail(
-          invitation.email,
-          token,
-          workspace?.name || 'Workspace',
-          inviter?.name || 'Someone'
-        );
-        
-        return createdInvitation;
-      })
-    );
-    return { invitations };
+    try {
+      console.log('createInvitation called with:', {
+        workspaceId,
+        data: JSON.stringify(data, null, 2),
+        invitedById
+      });
+      
+      if (!data.invitations || !Array.isArray(data.invitations)) {
+        throw new Error('Invalid invitations data: must be an array');
+      }
+      
+      const workspace = await this.prisma.workspace.findUnique({ where: { id: workspaceId } });
+      if (!workspace) {
+        throw new Error(`Workspace not found: ${workspaceId}`);
+      }
+      
+      const inviter = await this.prisma.user.findUnique({ where: { id: invitedById } });
+      if (!inviter) {
+        throw new Error(`Inviter not found: ${invitedById}`);
+      }
+      
+      const invitations = await Promise.all(
+        data.invitations.map(async (invitation: any) => {
+          if (!invitation.email || !invitation.role) {
+            throw new Error('Invalid invitation: email and role are required');
+          }
+          
+          const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+          const invitationData = {
+            email: invitation.email,
+            role: invitation.role,
+            token,
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            workspaceId,
+            invitedById
+          };
+          
+          console.log('Creating invitation with data:', JSON.stringify(invitationData, null, 2));
+          
+          const createdInvitation = await this.prisma.workspaceInvitation.create({
+            data: invitationData
+          });
+          
+          try {
+            await this.emailService.sendInvitationEmail(
+              invitation.email,
+              token,
+              workspace.name,
+              inviter.name
+            );
+            console.log(`Email sent successfully to ${invitation.email}`);
+          } catch (emailError) {
+            console.error('Failed to send email:', emailError);
+            // Don't fail the invitation creation if email fails
+          }
+          
+          return createdInvitation;
+        })
+      );
+      
+      console.log(`Successfully created ${invitations.length} invitations`);
+      return { invitations };
+    } catch (error) {
+      console.error('Error in createInvitation:', error);
+      throw error;
+    }
   }
 }

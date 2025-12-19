@@ -13,9 +13,13 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     
     app.enableCors({
-      origin: ['http://localhost:5173', process.env.CORS_ORIGIN || 'http://localhost:5173'],
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      origin: [
+        'http://localhost:5173',
+        'https://daymark.myiuc.com',
+        process.env.CORS_ORIGIN || 'http://localhost:5173'
+      ],
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
       credentials: true
     });
 

@@ -48,16 +48,29 @@ export class EmailService {
 
   private getTransporter(): nodemailer.Transporter {
     if (!this.transporter) {
+      const emailUser = process.env.EMAIL_USER || 'galio.noreply@myiuc.com';
+      const emailPass = process.env.EMAIL_PASS || 'U5/_2304@@g@l!0-2023=' ;
+      
+      console.log('Email configuration:', {
+        user: emailUser,
+        hasPassword: !!emailPass,
+        passwordLength: emailPass ? emailPass.length : 0
+      });
+      
+      if (!emailPass) {
+        throw new Error('EMAIL_PASS environment variable is not set');
+      }
+      
       this.transporter = nodemailer.createTransport({
         host: 'smtp.office365.com',
         port: 587,
         secure: false,
         auth: {
-          user: 'galio.noreply@myiuc.com',
-          pass: process.env.MAIL_PASSWORD,
+          user: emailUser,
+          pass: emailPass,
         },
         tls: {
-          rejectUnauthorized: true
+          rejectUnauthorized: false
         },
         pool: true,
         maxConnections: 5,
@@ -70,28 +83,39 @@ export class EmailService {
   }
 
   async sendInvitationEmail(email: string, token: string, workspaceName: string, inviterName: string) {
-    const acceptUrl = `${process.env.FRONTEND_URL}/accept-invitation?token=${token}`;
-    
-    const htmlContent = this.invitationTemplate({
-      workspaceName,
-      inviterName,
-      acceptUrl
-    });
-
-    const mailOptions = {
-      from: 'galio.noreply@myiuc.com',
-      to: email,
-      subject: `You're invited to join ${workspaceName}`,
-      html: htmlContent
-    };
-
     try {
+      console.log('Sending invitation email to:', email);
+      console.log('Environment variables:', {
+        FRONTEND_URL: process.env.FRONTEND_URL,
+        EMAIL_PASS: process.env.EMAIL_PASS ? '***' : 'NOT_SET'
+      });
+      
+      const acceptUrl = `${process.env.FRONTEND_URL}/accept-invitation?token=${token}`;
+      
+      const htmlContent = this.invitationTemplate({
+        workspaceName,
+        inviterName,
+        acceptUrl
+      });
+
+      const mailOptions = {
+        from: 'galio.noreply@myiuc.com',
+        to: email,
+        subject: `You're invited to join ${workspaceName}`,
+        html: htmlContent
+      };
+
       const transporter = this.getTransporter();
-      await transporter.sendMail(mailOptions);
+      const result = await transporter.sendMail(mailOptions);
+      console.log('Email sent successfully:', result.messageId);
       return { success: true, message: 'Invitation email sent' };
-    } catch (error) {
-      console.error('Error sending invitation email:', error);
-      return { success: false, message: 'Failed to send invitation email' };
+    } catch (error: any) {
+      console.error('Error sending invitation email:', {
+        error: error?.message || 'Unknown error',
+        stack: error?.stack,
+        code: error?.code
+      });
+      return { success: false, message: error?.message || 'Failed to send email' };
     }
   }
 }

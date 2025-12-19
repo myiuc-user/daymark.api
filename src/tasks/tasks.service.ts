@@ -18,8 +18,8 @@ export class TasksService {
     const taskData = {
       ...data,
       createdById,
-      // Si pas de due_date, c'est un TODO, sinon c'est une TASK
-      type: !data.due_date ? 'TODO' : 'TASK',
+      // Si pas de due_date, le status est TODO, sinon garder le type envoyé
+      status: !data.due_date ? 'TODO' : (data.status || 'IN_PROGRESS'),
       // Si pas de due_date, mettre une date par défaut dans 7 jours
       due_date: data.due_date || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     };

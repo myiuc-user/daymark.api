@@ -42,4 +42,9 @@ export class WorkspacesController {
   getInvitations(@Param('id') id: string) {
     return this.workspacesService.getInvitations(id);
   }
+
+  @Post(':id/invitations')
+  createInvitation(@Param('id') id: string, @Body() data: any, @CurrentUser() user: any) {
+    return this.workspacesService.createInvitation(id, data, user.id);
+  }
 }

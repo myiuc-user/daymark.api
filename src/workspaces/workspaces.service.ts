@@ -65,4 +65,14 @@ export class WorkspacesService {
     });
     return invitations || [];
   }
+
+  async createInvitation(workspaceId: string, data: any, invitedById: string) {
+    return this.prisma.workspaceInvitation.create({
+      data: {
+        ...data,
+        workspaceId,
+        invitedById
+      }
+    });
+  }
 }

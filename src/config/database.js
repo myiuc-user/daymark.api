@@ -4,8 +4,8 @@ import { Client } from 'pg';
 dotenv.config();
 
 const dbConfig = {
-  host: process.env.DATABASE_HOST || '157.180.12.145',
-  port: parseInt(process.env.DATABASE_PORT || '5433'),
+  host: process.env.DATABASE_HOST || 'DaymarkDB',
+  port: parseInt(process.env.DATABASE_PORT || '5432'),
   user: process.env.DATABASE_USER || 'daymark',
   password: process.env.DATABASE_PWD?.replace(/\"/g, '') || 'DaymarkSecure2024Abc9',
   database: process.env.DATABASE_NAME || 'daymark'

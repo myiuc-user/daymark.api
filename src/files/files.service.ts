@@ -16,4 +16,17 @@ export class FilesService {
   async delete(id: string) {
     return this.prisma.file.delete({ where: { id } });
   }
+
+  async getProjectFiles(projectId: string) {
+    const files = await this.prisma.file.findMany({
+      where: { projectId },
+      include: {
+        uploadedBy: {
+          select: { id: true, name: true, email: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    return files || [];
+  }
 }

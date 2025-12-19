@@ -23,4 +23,9 @@ export class FilesController {
   delete(@Param('id') id: string) {
     return this.filesService.delete(id);
   }
+
+  @Get('list/project/:projectId')
+  getProjectFiles(@Param('projectId') projectId: string) {
+    return this.filesService.getProjectFiles(projectId);
+  }
 }

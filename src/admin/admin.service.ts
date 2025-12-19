@@ -10,7 +10,7 @@ export class AdminService {
   }
 
   async updateUserRole(userId: string, role: string) {
-    return this.prisma.user.update({ where: { id: userId }, data: { role } });
+    return this.prisma.user.update({ where: { id: userId }, data: { role: role as any } });
   }
 
   async updateUserStatus(userId: string, isActive: boolean) {

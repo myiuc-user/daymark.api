@@ -1,6 +1,6 @@
-# Daymark - Project Management Backend
+# Daymark - Project Management API
 
-Backend API for the project management system.
+Backend API for the Daymark project management system built with NestJS.
 
 ## 🚀 Quick Start
 
@@ -143,7 +143,7 @@ On first startup, a super admin account is automatically created:
 ## 🔒 Authentication
 
 The API uses JWT with two tokens:
-- **Access Token:** 15 minutes (Authorization header)
+- **Access Token:** 24 hours (Authorization header)
 - **Refresh Token:** 7 days (httpOnly cookie)
 
 ### Required Headers
@@ -156,12 +156,19 @@ Content-Type: application/json
 
 ```
 src/
-├── controllers/     # Request handlers
-├── middleware/      # Auth, validation, error handling
-├── routes/          # Route definitions
-├── services/        # Business logic
-├── utils/           # Validation, helpers
-└── config/          # Database, routes configuration
+├── auth/            # Authentication module
+├── users/           # User management
+├── workspaces/      # Workspace management
+├── projects/        # Project management
+├── tasks/           # Task management
+├── teams/           # Team collaboration
+├── notifications/   # Notification system
+├── files/           # File management
+├── analytics/       # Analytics and reporting
+├── common/          # Shared utilities
+├── config/          # Configuration files
+├── prisma/          # Database service
+└── main.ts          # Application entry point
 ```
 
 ## 🗄️ Database
@@ -236,7 +243,6 @@ FRONTEND_URL=http://localhost:5173
 - JWT with short expiration
 - Data validation with Zod
 - CORS configured
-- Helmet for security headers
 - httpOnly cookies for refresh tokens
 - Rate limiting on sensitive endpoints
 - Database connection retry logic (5 attempts)
@@ -263,18 +269,29 @@ pnpm run db:reset
 pnpm run db:seed
 ```
 
+### Build for production
+```bash
+pnpm run build
+```
+
 ## 🚀 Deployment
 
 1. Set production environment variables
 2. Setup PostgreSQL database
 3. Run migrations: `pnpm run db:deploy`
-4. Start server: `pnpm start`
+4. Build application: `pnpm run build`
+5. Start server: `pnpm start`
 
-## 📋 Roadmap
+## 📋 Available Scripts
 
-See [TODO.md](./TODO.md) for backend features and improvements.
-
-For frontend features, see [daymark.app TODO](../daymark.app/TODO.md)
+- `pnpm run dev` - Start development server with hot reload
+- `pnpm start` - Start production server
+- `pnpm run build` - Build for production
+- `pnpm run db:generate` - Generate Prisma client
+- `pnpm run db:migrate` - Run database migrations
+- `pnpm run db:deploy` - Deploy migrations to production
+- `pnpm run db:reset` - Reset database
+- `pnpm run db:seed` - Seed database with initial data
 
 ## 📞 Support
 

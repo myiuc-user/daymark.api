@@ -14,6 +14,11 @@ export class AuditService {
   }
 
   async getProjectAudit(projectId: string) {
-    return this.prisma.auditLog.findMany({ where: { projectId } });
+    return this.prisma.auditLog.findMany({ 
+      where: { 
+        entity: 'Project',
+        entityId: projectId 
+      } 
+    });
   }
 }

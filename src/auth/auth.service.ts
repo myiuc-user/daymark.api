@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import * as bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -82,38 +82,52 @@ export class AuthService {
         return;
       }
 
-      const hashedPassword = await this.hashPassword(process.env.ROOT_ADMIN_PASSWORD);
+      const adminPassword = process.env.ROOT_ADMIN_PASSWORD;
+      const adminEmail = process.env.ROOT_ADMIN_EMAIL;
+      
+      if (!adminPassword || !adminEmail) {
+        throw new Error('ROOT_ADMIN_PASSWORD and ROOT_ADMIN_EMAIL must be set');
+      }
+
+      const hashedPassword = await this.hashPassword(adminPassword);
       
       await this.prisma.user.create({
         data: {
           name: 'Super Admin',
-          email: process.env.ROOT_ADMIN_EMAIL,
+          email: adminEmail,
           password: hashedPassword,
           role: 'SUPER_ADMIN',
           isActive: true
         }
       });
 
-      console.log(`Root admin created: ${process.env.ROOT_ADMIN_EMAIL}`);
+      console.log(`Root admin created: ${adminEmail}`);
     } catch (error) {
-      console.error('Error creating root admin:', error.message);
+      console.error('Error creating root admin:', error instanceof Error ? error.message : String(error));
     }
   }
 
   async resetAdminPassword() {
     try {
-      const hashedPassword = await this.hashPassword(process.env.ROOT_ADMIN_PASSWORD);
+      const adminPassword = process.env.ROOT_ADMIN_PASSWORD;
+      const adminEmail = process.env.ROOT_ADMIN_EMAIL;
+      
+      if (!adminPassword || !adminEmail) {
+        throw new Error('ROOT_ADMIN_PASSWORD and ROOT_ADMIN_EMAIL must be set');
+      }
+
+      const hashedPassword = await this.hashPassword(adminPassword);
       
       const updated = await this.prisma.user.updateMany({
-        where: { email: process.env.ROOT_ADMIN_EMAIL },
+        where: { email: adminEmail },
         data: { password: hashedPassword }
       });
 
       if (updated.count > 0) {
-        console.log(`Admin password reset for: ${process.env.ROOT_ADMIN_EMAIL}`);
+        console.log(`Admin password reset for: ${adminEmail}`);
       }
     } catch (error) {
-      console.error('Error resetting admin password:', error.message);
+      console.error('Error resetting admin password:', error instanceof Error ? error.message : String(error));
     }
   }
 }

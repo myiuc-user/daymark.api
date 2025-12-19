@@ -20,4 +20,46 @@ export class UsersService {
   async delete(id: string) {
     return this.prisma.user.delete({ where: { id } });
   }
+
+  async getProjectPermissions(userId: string, projectId: string) {
+    const projectMember = await this.prisma.projectMember.findUnique({
+      where: {
+        userId_projectId: {
+          userId,
+          projectId
+        }
+      },
+      include: {
+        project: {
+          select: {
+            team_lead: true,
+            workspaceId: true
+          }
+        },
+        user: {
+          select: {
+            role: true
+          }
+        }
+      }
+    });
+
+    if (!projectMember) {
+      return { permissions: [] };
+    }
+
+    const permissions = [];
+    
+    // Super admin has all permissions
+    if (projectMember.user.role === 'SUPER_ADMIN') {
+      permissions.push('PROJECT.CREATE', 'PROJECT.MANAGE_MEMBERS', 'PROJECT.DELETE');
+    }
+    
+    // Project admin or team lead
+    if (projectMember.role === 'ADMIN' || projectMember.project.team_lead === userId) {
+      permissions.push('PROJECT.MANAGE_MEMBERS');
+    }
+    
+    return { permissions };
+  }
 }

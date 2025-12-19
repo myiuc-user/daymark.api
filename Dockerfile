@@ -13,6 +13,9 @@ RUN pnpm install
 # Copy source files
 COPY . .
 
+# Build the application
+RUN pnpm run build
+
 
 # Stage 2: Runtime
 FROM node:20-slim
@@ -23,12 +26,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends openssl postgre
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/app.js ./app.js
-COPY --from=builder /app/src ./src
+COPY --from=builder /app/dist ./dist
 
 RUN pnpm prisma generate
 
-RUN echo "Checking files..." && ls -la ./src/ && echo "Files copied successfully"
+RUN echo "Checking files..." && ls -la ./dist/ && echo "Files copied successfully"
 
 COPY --from=builder /app/docker-entrypoint.sh ./docker-entrypoint.sh
 RUN chmod +x ./docker-entrypoint.sh

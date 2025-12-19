@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Param, Put, Delete, Query, UseGuards } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { JwtGuard } from '../common/guards/jwt.guard';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @Controller('tasks')
 @UseGuards(JwtGuard)
@@ -18,8 +19,8 @@ export class TasksController {
   }
 
   @Post()
-  create(@Body() data: any) {
-    return this.tasksService.create(data);
+  create(@Body() data: any, @CurrentUser() user: any) {
+    return this.tasksService.create(data, user.id);
   }
 
   @Put(':id')

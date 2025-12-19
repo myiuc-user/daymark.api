@@ -14,8 +14,27 @@ export class TasksService {
     return this.prisma.task.findUnique({ where: { id } });
   }
 
-  async create(data: any) {
-    return this.prisma.task.create({ data });
+  async create(data: any, createdById: string) {
+    const taskData = {
+      ...data,
+      createdById,
+      // Si pas de due_date, c'est un TODO, sinon c'est une TASK
+      type: !data.due_date ? 'TODO' : 'TASK',
+      // Si pas de due_date, mettre une date par défaut dans 7 jours
+      due_date: data.due_date || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    };
+    
+    return this.prisma.task.create({ 
+      data: taskData,
+      include: {
+        assignee: {
+          select: { id: true, name: true, email: true }
+        },
+        createdBy: {
+          select: { id: true, name: true, email: true }
+        }
+      }
+    });
   }
 
   async update(id: string, data: any) {

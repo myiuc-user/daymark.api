@@ -60,4 +60,14 @@ export class WorkspacesController {
       throw error;
     }
   }
+
+  @Get('invitation/:token')
+  getInvitationByToken(@Param('token') token: string) {
+    return this.workspacesService.getInvitationByToken(token);
+  }
+
+  @Post('accept-invitation/:token')
+  acceptInvitation(@Param('token') token: string, @Body() data: any) {
+    return this.workspacesService.acceptInvitation(token, data);
+  }
 }

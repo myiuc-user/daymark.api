@@ -138,4 +138,72 @@ export class WorkspacesService {
       throw error;
     }
   }
+
+  async getInvitationByToken(token: string) {
+    const invitation = await this.prisma.workspaceInvitation.findUnique({
+      where: { token },
+      include: {
+        workspace: { select: { id: true, name: true } },
+        invitedBy: { select: { name: true, email: true } }
+      }
+    });
+    
+    if (!invitation) {
+      throw new Error('Invitation not found');
+    }
+    
+    if (invitation.expiresAt < new Date()) {
+      throw new Error('Invitation has expired');
+    }
+    
+    return { invitation };
+  }
+
+  async acceptInvitation(token: string, data: { name: string; password: string }) {
+    const invitation = await this.prisma.workspaceInvitation.findUnique({
+      where: { token },
+      include: { workspace: true }
+    });
+    
+    if (!invitation) {
+      throw new Error('Invitation not found');
+    }
+    
+    if (invitation.expiresAt < new Date()) {
+      throw new Error('Invitation has expired');
+    }
+    
+    if (invitation.acceptedAt) {
+      throw new Error('Invitation already accepted');
+    }
+    
+    // Create user account
+    const bcrypt = require('bcryptjs');
+    const hashedPassword = await bcrypt.hash(data.password, 12);
+    
+    const user = await this.prisma.user.create({
+      data: {
+        name: data.name,
+        email: invitation.email,
+        password: hashedPassword
+      }
+    });
+    
+    // Add user to workspace
+    await this.prisma.workspaceMember.create({
+      data: {
+        userId: user.id,
+        workspaceId: invitation.workspaceId,
+        role: invitation.role
+      }
+    });
+    
+    // Mark invitation as accepted
+    await this.prisma.workspaceInvitation.update({
+      where: { id: invitation.id },
+      data: { acceptedAt: new Date() }
+    });
+    
+    return { message: 'Invitation accepted successfully', user: { id: user.id, name: user.name, email: user.email } };
+  }
 }

@@ -4,14 +4,17 @@ FROM node:20 as builder
 WORKDIR /app
 
 # 🛠️ Correct order to avoid pnpm lockfile mismatch
-COPY package.json ./
+COPY package.json pnpm-lock.yaml* ./
 
 # Install pnpm and dependencies in one layer
 RUN npm install -g pnpm
-RUN pnpm install
+RUN pnpm install --frozen-lockfile
 
 # Copy source files
 COPY . .
+
+# Generate Prisma client first
+RUN pnpm run db:generate
 
 # Build the application
 RUN pnpm run build

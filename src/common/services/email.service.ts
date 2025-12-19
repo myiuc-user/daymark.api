@@ -90,7 +90,7 @@ export class EmailService {
         EMAIL_PASS: process.env.EMAIL_PASS ? '***' : 'NOT_SET'
       });
       
-      const acceptUrl = `${process.env.FRONTEND_URL}/accept-invitation?token=${token}`;
+      const acceptUrl = `${process.env.FRONTEND_URL}/invite/${token}`;
       
       const htmlContent = this.invitationTemplate({
         workspaceName,

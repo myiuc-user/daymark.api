@@ -14,11 +14,10 @@ services:
     volumes:
       - uploads:/app/uploads
     networks:
-      - daymark-network
+      - coolify
 
 volumes:
   uploads:
 
 networks:
-  daymark-network:
-    driver: bridge
+  coolify

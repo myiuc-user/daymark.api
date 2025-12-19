@@ -7,7 +7,21 @@ export class WorkspacesService {
 
   async findAll(userId: string) {
     const workspaces = await this.prisma.workspace.findMany({
-      where: { members: { some: { userId } } }
+      where: {
+        OR: [
+          { ownerId: userId },
+          { members: { some: { userId } } }
+        ]
+      },
+      include: {
+        members: {
+          include: {
+            user: {
+              select: { id: true, name: true, email: true }
+            }
+          }
+        }
+      }
     });
     return workspaces || [];
   }

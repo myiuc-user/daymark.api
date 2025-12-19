@@ -16,4 +16,9 @@ export class AnalyticsController {
   getTeamAnalytics(@Param('workspaceId') workspaceId: string) {
     return this.analyticsService.getTeamAnalytics(workspaceId);
   }
+
+  @Get('dashboard/:id')
+  getDashboardAnalytics(@Param('id') id: string) {
+    return this.analyticsService.getDashboardAnalytics(id);
+  }
 }

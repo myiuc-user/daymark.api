@@ -37,4 +37,9 @@ export class WorkspacesController {
   getMembers(@Param('id') id: string) {
     return this.workspacesService.getMembers(id);
   }
+
+  @Get(':id/invitations')
+  getInvitations(@Param('id') id: string) {
+    return this.workspacesService.getInvitations(id);
+  }
 }

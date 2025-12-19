@@ -15,4 +15,21 @@ export class AnalyticsService {
     const projects = await this.prisma.project.findMany({ where: { workspaceId } });
     return { totalProjects: projects.length };
   }
+
+  async getDashboardAnalytics(workspaceId: string) {
+    const [projects, tasks, members] = await Promise.all([
+      this.prisma.project.findMany({ where: { workspaceId } }),
+      this.prisma.task.findMany({ where: { project: { workspaceId } } }),
+      this.prisma.workspaceMember.findMany({ where: { workspaceId } })
+    ]);
+    
+    const completedTasks = tasks.filter(t => t.status === 'DONE').length;
+    return {
+      totalProjects: projects.length,
+      totalTasks: tasks.length,
+      completedTasks,
+      totalMembers: members.length,
+      completionRate: tasks.length > 0 ? (completedTasks / tasks.length) * 100 : 0
+    };
+  }
 }

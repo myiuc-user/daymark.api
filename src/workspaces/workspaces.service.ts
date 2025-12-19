@@ -53,4 +53,16 @@ export class WorkspacesService {
     });
     return members;
   }
+
+  async getInvitations(workspaceId: string) {
+    const invitations = await this.prisma.workspaceInvitation.findMany({
+      where: { workspaceId },
+      include: {
+        invitedBy: {
+          select: { id: true, name: true, email: true }
+        }
+      }
+    });
+    return invitations;
+  }
 }

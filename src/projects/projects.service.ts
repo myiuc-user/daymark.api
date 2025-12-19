@@ -15,7 +15,7 @@ export class ProjectsService {
   }
 
   async create(data: any) {
-    const { team_members, ...projectData } = data;
+    const { team_members, progress, ...projectData } = data;
     
     const project = await this.prisma.project.create({
       data: {

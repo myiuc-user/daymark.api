@@ -25,6 +25,8 @@
     "@nestjs/websockets": "^10.3.0",
     "@octokit/rest": "^20.0.2",
     "@prisma/client": "^5.7.1",
+    "@types/handlebars": "^4.1.0",
+    "@types/nodemailer": "^7.0.4",
     "bcryptjs": "^2.4.3",
     "date-fns": "^4.1.0",
     "dotenv": "^16.3.1",

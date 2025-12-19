@@ -47,20 +47,58 @@ export class WorkspacesService {
   }
 
   async getMembers(workspaceId: string) {
+    const workspace = await this.prisma.workspace.findUnique({
+      where: { id: workspaceId },
+      include: {
+        owner: {
+          select: { id: true, name: true, email: true, image: true, role: true }
+        }
+      }
+    });
+
     const members = await this.prisma.workspaceMember.findMany({
       where: { workspaceId },
       include: {
         user: {
-          select: { id: true, name: true, email: true, image: true }
+          select: { id: true, name: true, email: true, image: true, role: true }
         }
       }
     });
-    return members || [];
+
+    const allMembers = [];
+    
+    // Add owner as first member with ADMIN role
+    if (workspace?.owner) {
+      allMembers.push({
+        id: `owner-${workspace.owner.id}`,
+        userId: workspace.owner.id,
+        workspaceId,
+        role: 'ADMIN',
+        user: workspace.owner,
+        isOwner: true
+      });
+    }
+    
+    // Add regular members (excluding owner if they're also in members table)
+    members.forEach(member => {
+      if (member.userId !== workspace?.ownerId) {
+        allMembers.push({
+          ...member,
+          isOwner: false
+        });
+      }
+    });
+    
+    return allMembers;
   }
 
   async getInvitations(workspaceId: string) {
     const invitations = await this.prisma.workspaceInvitation.findMany({
-      where: { workspaceId },
+      where: {
+        workspaceId,
+        acceptedAt: null,
+        expiresAt: { gt: new Date() }
+      },
       include: {
         invitedBy: {
           select: { id: true, name: true, email: true }

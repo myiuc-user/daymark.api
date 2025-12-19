@@ -15,7 +15,30 @@ export class ProjectsService {
   }
 
   async create(data: any) {
-    return this.prisma.project.create({ data });
+    const { team_members, ...projectData } = data;
+    
+    const project = await this.prisma.project.create({
+      data: {
+        ...projectData,
+        members: team_members && Array.isArray(team_members) && team_members.length > 0 ? {
+          create: team_members.map(userId => ({
+            userId,
+            role: userId === projectData.team_lead ? 'ADMIN' : 'MEMBER'
+          }))
+        } : undefined
+      },
+      include: {
+        members: {
+          include: {
+            user: {
+              select: { id: true, name: true, email: true }
+            }
+          }
+        }
+      }
+    });
+    
+    return project;
   }
 
   async update(id: string, data: any) {

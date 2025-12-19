@@ -6,13 +6,13 @@ export class AnalyticsService {
   constructor(private prisma: PrismaService) {}
 
   async getProjectAnalytics(projectId: string) {
-    const tasks = await this.prisma.task.findMany({ where: { projectId } });
+    const tasks = await this.prisma.task.findMany({ where: { projectId } }) || [];
     const completed = tasks.filter(t => t.status === 'DONE').length;
-    return { total: tasks.length, completed, percentage: (completed / tasks.length) * 100 };
+    return { total: tasks.length, completed, percentage: tasks.length > 0 ? (completed / tasks.length) * 100 : 0 };
   }
 
   async getTeamAnalytics(workspaceId: string) {
-    const projects = await this.prisma.project.findMany({ where: { workspaceId } });
+    const projects = await this.prisma.project.findMany({ where: { workspaceId } }) || [];
     return { totalProjects: projects.length };
   }
 
@@ -23,13 +23,17 @@ export class AnalyticsService {
       this.prisma.workspaceMember.findMany({ where: { workspaceId } })
     ]);
     
-    const completedTasks = tasks.filter(t => t.status === 'DONE').length;
+    const projectsList = projects || [];
+    const tasksList = tasks || [];
+    const membersList = members || [];
+    const completedTasks = tasksList.filter(t => t.status === 'DONE').length;
+    
     return {
-      totalProjects: projects.length,
-      totalTasks: tasks.length,
+      totalProjects: projectsList.length,
+      totalTasks: tasksList.length,
       completedTasks,
-      totalMembers: members.length,
-      completionRate: tasks.length > 0 ? (completedTasks / tasks.length) * 100 : 0
+      totalMembers: membersList.length,
+      completionRate: tasksList.length > 0 ? (completedTasks / tasksList.length) * 100 : 0
     };
   }
 }

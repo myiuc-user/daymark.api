@@ -24,8 +24,9 @@ export class TeamsService {
   }
 
   async assignMultiple(data: { userIds: string[]; projectId: string; role?: ProjectRole }) {
-    return Promise.all(data.userIds.map((userId: string) =>
+    const results = await Promise.all(data.userIds.map((userId: string) =>
       this.prisma.projectMember.create({ data: { projectId: data.projectId, userId, role: data.role || ProjectRole.MEMBER } })
     ));
+    return results || [];
   }
 }

@@ -6,7 +6,8 @@ export class CommentsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(taskId: string) {
-    return this.prisma.comment.findMany({ where: { taskId } });
+    const comments = await this.prisma.comment.findMany({ where: { taskId } });
+    return comments || [];
   }
 
   async create(data: any) {

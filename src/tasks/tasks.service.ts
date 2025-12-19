@@ -6,7 +6,8 @@ export class TasksService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(projectId: string) {
-    return this.prisma.task.findMany({ where: { projectId } });
+    const tasks = await this.prisma.task.findMany({ where: { projectId } });
+    return tasks || [];
   }
 
   async findOne(id: string) {

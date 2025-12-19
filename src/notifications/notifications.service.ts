@@ -6,7 +6,8 @@ export class NotificationsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(userId: string) {
-    return this.prisma.notification.findMany({ where: { userId } });
+    const notifications = await this.prisma.notification.findMany({ where: { userId } });
+    return notifications || [];
   }
 
   async markAsRead(id: string) {

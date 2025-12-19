@@ -51,7 +51,7 @@ export class WorkspacesService {
         }
       }
     });
-    return members;
+    return members || [];
   }
 
   async getInvitations(workspaceId: string) {
@@ -63,6 +63,6 @@ export class WorkspacesService {
         }
       }
     });
-    return invitations;
+    return invitations || [];
   }
 }

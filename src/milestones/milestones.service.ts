@@ -6,7 +6,8 @@ export class MilestonesService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(projectId: string) {
-    return this.prisma.milestone.findMany({ where: { projectId } });
+    const milestones = await this.prisma.milestone.findMany({ where: { projectId } });
+    return milestones || [];
   }
 
   async create(data: any) {

@@ -32,4 +32,9 @@ export class WorkspacesController {
   delete(@Param('id') id: string) {
     return this.workspacesService.delete(id);
   }
+
+  @Get(':id/members')
+  getMembers(@Param('id') id: string) {
+    return this.workspacesService.getMembers(id);
+  }
 }

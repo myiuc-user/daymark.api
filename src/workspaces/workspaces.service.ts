@@ -41,4 +41,16 @@ export class WorkspacesService {
   async delete(id: string) {
     return this.prisma.workspace.delete({ where: { id } });
   }
+
+  async getMembers(workspaceId: string) {
+    const members = await this.prisma.workspaceMember.findMany({
+      where: { workspaceId },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, image: true }
+        }
+      }
+    });
+    return members;
+  }
 }

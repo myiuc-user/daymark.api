@@ -6,7 +6,17 @@ export class TasksService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(projectId: string) {
-    const tasks = await this.prisma.task.findMany({ where: { projectId } });
+    const tasks = await this.prisma.task.findMany({ 
+      where: { projectId },
+      include: {
+        assignee: {
+          select: { id: true, name: true, email: true, image: true }
+        },
+        createdBy: {
+          select: { id: true, name: true, email: true }
+        }
+      }
+    });
     return tasks || [];
   }
 
@@ -28,7 +38,7 @@ export class TasksService {
       data: taskData,
       include: {
         assignee: {
-          select: { id: true, name: true, email: true }
+          select: { id: true, name: true, email: true, image: true }
         },
         createdBy: {
           select: { id: true, name: true, email: true }

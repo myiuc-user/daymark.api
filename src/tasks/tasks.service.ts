@@ -28,6 +28,9 @@ export class TasksService {
       where: { id },
       include: this.taskInclude
     });
+    if (!task) {
+      throw new Error('Task not found');
+    }
     return { task };
   }
 
@@ -88,5 +91,140 @@ export class TasksService {
       include: this.taskInclude
     });
     return { tasks: tasks || [] };
+  }
+
+  async getComments(taskId: string) {
+    const comments = await this.prisma.comment.findMany({
+      where: { taskId },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, image: true }
+        }
+      },
+      orderBy: { createdAt: 'asc' }
+    });
+    return { comments };
+  }
+
+  async createComment(taskId: string, data: any, userId: string) {
+    const comment = await this.prisma.comment.create({
+      data: {
+        content: data.content,
+        taskId,
+        userId
+      },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, image: true }
+        }
+      }
+    });
+    return { comment };
+  }
+
+  async getSubtasks(taskId: string) {
+    const subtasks = await this.prisma.task.findMany({
+      where: { parentTaskId: taskId },
+      include: this.taskInclude
+    });
+    return { subtasks };
+  }
+
+  async createSubtask(parentTaskId: string, data: any, createdById: string) {
+    const subtask = await this.prisma.task.create({
+      data: {
+        ...data,
+        parentTaskId,
+        createdById,
+        status: 'TODO'
+      },
+      include: this.taskInclude
+    });
+    return { subtask };
+  }
+
+  async toggleArchive(taskId: string) {
+    const task = await this.prisma.task.findUnique({ where: { id: taskId } });
+    if (!task) throw new Error('Task not found');
+    const updatedTask = await this.prisma.task.update({
+      where: { id: taskId },
+      data: { isArchived: !task.isArchived }
+    });
+    return { success: true, isArchived: updatedTask.isArchived };
+  }
+
+  async toggleFavorite(taskId: string) {
+    const task = await this.prisma.task.findUnique({ where: { id: taskId } });
+    if (!task) throw new Error('Task not found');
+    const updatedTask = await this.prisma.task.update({
+      where: { id: taskId },
+      data: { isFavorite: !task.isFavorite }
+    });
+    return { success: true, isFavorite: updatedTask.isFavorite };
+  }
+
+  async getTimeEntries(taskId: string) {
+    const timeEntries = await this.prisma.timeEntry.findMany({
+      where: { taskId },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    return { timeEntries };
+  }
+
+  async addTimeEntry(taskId: string, data: any, userId: string) {
+    const timeEntry = await this.prisma.timeEntry.create({
+      data: {
+        taskId,
+        userId,
+        hours: data.hours,
+        description: data.description,
+        date: data.date ? new Date(data.date) : new Date()
+      },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true }
+        }
+      }
+    });
+    return { timeEntry };
+  }
+
+  async getWatchers(taskId: string) {
+    const watchers = await this.prisma.taskWatcher.findMany({
+      where: { taskId },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, image: true }
+        }
+      }
+    });
+    return { watchers };
+  }
+
+  async addWatcher(taskId: string, userId: string) {
+    const watcher = await this.prisma.taskWatcher.create({
+      data: { taskId, userId },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, image: true }
+        }
+      }
+    });
+    return { success: true, watcher };
+  }
+
+  async removeWatcher(taskId: string, userId: string) {
+    await this.prisma.taskWatcher.deleteMany({
+      where: {
+        taskId,
+        userId
+      }
+    });
+    return { success: true };
   }
 }

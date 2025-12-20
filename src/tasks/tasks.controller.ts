@@ -24,22 +24,22 @@ export class TasksController {
 
   @Get(':id/subtasks')
   getSubtasks(@Param('id') taskId: string) {
-    return [];
+    return this.tasksService.getSubtasks(taskId);
   }
 
   @Post(':id/subtasks')
-  createSubtask(@Param('id') taskId: string, @Body() data: any) {
-    return { subtask: data };
+  createSubtask(@Param('id') taskId: string, @Body() data: any, @CurrentUser() user: any) {
+    return this.tasksService.createSubtask(taskId, data, user.id);
   }
 
   @Get(':id/comments')
   getComments(@Param('id') taskId: string) {
-    return [];
+    return this.tasksService.getComments(taskId);
   }
 
   @Post(':id/comments')
   createComment(@Param('id') taskId: string, @Body() data: any, @CurrentUser() user: any) {
-    return { comment: { ...data, userId: user.id } };
+    return this.tasksService.createComment(taskId, data, user.id);
   }
 
   @Patch(':taskId/subtasks/toggle-status')
@@ -49,12 +49,12 @@ export class TasksController {
 
   @Patch(':id/archive')
   toggleArchive(@Param('id') taskId: string) {
-    return { success: true, isArchived: true };
+    return this.tasksService.toggleArchive(taskId);
   }
 
   @Patch(':id/favorite')
   toggleFavorite(@Param('id') taskId: string) {
-    return { success: true, isFavorite: true };
+    return this.tasksService.toggleFavorite(taskId);
   }
 
   @Patch(':id/status')
@@ -74,27 +74,27 @@ export class TasksController {
 
   @Get(':id/time')
   getTimeEntries(@Param('id') taskId: string) {
-    return [];
+    return this.tasksService.getTimeEntries(taskId);
   }
 
   @Post(':id/time')
-  addTimeEntry(@Param('id') taskId: string, @Body() data: any) {
-    return { timeEntry: data };
+  addTimeEntry(@Param('id') taskId: string, @Body() data: any, @CurrentUser() user: any) {
+    return this.tasksService.addTimeEntry(taskId, data, user.id);
   }
 
   @Get(':id/watchers')
   getWatchers(@Param('id') taskId: string) {
-    return [];
+    return this.tasksService.getWatchers(taskId);
   }
 
   @Post(':id/watchers')
   addWatcher(@Param('id') taskId: string, @Body() data: any) {
-    return { success: true };
+    return this.tasksService.addWatcher(taskId, data.userId);
   }
 
   @Delete(':id/watchers/:userId')
   removeWatcher(@Param('id') taskId: string, @Param('userId') userId: string) {
-    return { success: true };
+    return this.tasksService.removeWatcher(taskId, userId);
   }
 
   @Get(':id/dependencies')

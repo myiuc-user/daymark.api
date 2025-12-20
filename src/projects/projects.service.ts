@@ -20,6 +20,17 @@ export class ProjectsService {
               select: { id: true, name: true, email: true, image: true }
             }
           }
+        },
+        tasks: {
+          include: {
+            assignee: {
+              select: { id: true, name: true, email: true }
+            },
+            createdBy: {
+              select: { id: true, name: true, email: true }
+            }
+          },
+          orderBy: { createdAt: 'desc' }
         }
       }
     });

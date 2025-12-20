@@ -69,4 +69,23 @@ export class TasksService {
     // Implement recurring tasks logic
     return { message: 'Recurring tasks executed' };
   }
+
+  async findAllByWorkspace(workspaceId: string) {
+    const tasks = await this.prisma.task.findMany({
+      where: {
+        project: {
+          workspaceId
+        }
+      },
+      include: {
+        assignee: {
+          select: { id: true, name: true, email: true, image: true }
+        },
+        createdBy: {
+          select: { id: true, name: true, email: true }
+        }
+      }
+    });
+    return { tasks: tasks || [] };
+  }
 }

@@ -9,7 +9,10 @@ export class TasksController {
   constructor(private tasksService: TasksService) {}
 
   @Get()
-  findAll(@Query('projectId') projectId: string) {
+  findAll(@Query('projectId') projectId: string, @Query('workspaceId') workspaceId: string) {
+    if (workspaceId) {
+      return this.tasksService.findAllByWorkspace(workspaceId);
+    }
     return this.tasksService.findAll(projectId);
   }
 
@@ -76,6 +79,61 @@ export class TasksController {
   @Post(':id/time')
   addTimeEntry(@Param('id') taskId: string, @Body() data: any) {
     return { timeEntry: data };
+  }
+
+  @Get(':id/watchers')
+  getWatchers(@Param('id') taskId: string) {
+    return [];
+  }
+
+  @Post(':id/watchers')
+  addWatcher(@Param('id') taskId: string, @Body() data: any) {
+    return { success: true };
+  }
+
+  @Delete(':id/watchers/:userId')
+  removeWatcher(@Param('id') taskId: string, @Param('userId') userId: string) {
+    return { success: true };
+  }
+
+  @Get(':id/dependencies')
+  getDependencies(@Param('id') taskId: string) {
+    return [];
+  }
+
+  @Post(':id/dependencies')
+  addDependency(@Param('id') taskId: string, @Body() data: any) {
+    return { success: true };
+  }
+
+  @Delete(':id/dependencies/:dependsOnId')
+  removeDependency(@Param('id') taskId: string, @Param('dependsOnId') dependsOnId: string) {
+    return { success: true };
+  }
+
+  @Get(':id/blocking')
+  getBlockingTasks(@Param('id') taskId: string) {
+    return [];
+  }
+
+  @Get('recurring')
+  getRecurringTasks(@Query('projectId') projectId: string) {
+    return [];
+  }
+
+  @Post('recurring')
+  createRecurringTask(@Body() data: any) {
+    return { recurringTask: data };
+  }
+
+  @Put('recurring/:id')
+  updateRecurringTask(@Param('id') id: string, @Body() data: any) {
+    return { recurringTask: data };
+  }
+
+  @Delete('recurring/:id')
+  deleteRecurringTask(@Param('id') id: string) {
+    return { success: true };
   }
 
   @Get(':id')

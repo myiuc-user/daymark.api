@@ -13,24 +13,9 @@ export class TasksController {
     return this.tasksService.findAll(projectId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tasksService.findOne(id);
-  }
-
   @Post()
   create(@Body() data: any, @CurrentUser() user: any) {
     return this.tasksService.create(data, user.id);
-  }
-
-  @Put(':id')
-  update(@Param('id') id: string, @Body() data: any) {
-    return this.tasksService.update(id, data);
-  }
-
-  @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.tasksService.delete(id);
   }
 
   @Get(':id/subtasks')
@@ -43,11 +28,6 @@ export class TasksController {
     return { subtask: data };
   }
 
-  @Patch(':taskId/subtasks/toggle-status')
-  toggleSubtaskStatus(@Param('taskId') taskId: string) {
-    return { success: true };
-  }
-
   @Get(':id/comments')
   getComments(@Param('id') taskId: string) {
     return [];
@@ -56,5 +36,60 @@ export class TasksController {
   @Post(':id/comments')
   createComment(@Param('id') taskId: string, @Body() data: any, @CurrentUser() user: any) {
     return { comment: { ...data, userId: user.id } };
+  }
+
+  @Patch(':taskId/subtasks/toggle-status')
+  toggleSubtaskStatus(@Param('taskId') taskId: string) {
+    return { success: true };
+  }
+
+  @Patch(':id/archive')
+  toggleArchive(@Param('id') taskId: string) {
+    return { success: true, isArchived: true };
+  }
+
+  @Patch(':id/favorite')
+  toggleFavorite(@Param('id') taskId: string) {
+    return { success: true, isFavorite: true };
+  }
+
+  @Patch(':id/status')
+  updateStatus(@Param('id') taskId: string, @Body() data: any) {
+    return this.tasksService.update(taskId, { status: data.status });
+  }
+
+  @Get(':id/history')
+  getHistory(@Param('id') taskId: string) {
+    return [];
+  }
+
+  @Get(':id/activity')
+  getActivity(@Param('id') taskId: string) {
+    return [];
+  }
+
+  @Get(':id/time')
+  getTimeEntries(@Param('id') taskId: string) {
+    return [];
+  }
+
+  @Post(':id/time')
+  addTimeEntry(@Param('id') taskId: string, @Body() data: any) {
+    return { timeEntry: data };
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.tasksService.findOne(id);
+  }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Body() data: any) {
+    return this.tasksService.update(id, data);
+  }
+
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return this.tasksService.delete(id);
   }
 }

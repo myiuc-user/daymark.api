@@ -1,64 +1,76 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateTaskDto, UpdateTaskDto } from './dto/task.dto';
 
 @Injectable()
 export class TasksService {
   constructor(private prisma: PrismaService) {}
 
+  private readonly taskInclude = {
+    assignee: {
+      select: { id: true, name: true, email: true, image: true }
+    },
+    createdBy: {
+      select: { id: true, name: true, email: true }
+    }
+  };
+
   async findAll(projectId: string) {
     const tasks = await this.prisma.task.findMany({ 
       where: { projectId },
-      include: {
-        assignee: {
-          select: { id: true, name: true, email: true, image: true }
-        },
-        createdBy: {
-          select: { id: true, name: true, email: true }
-        }
-      }
+      include: this.taskInclude
     });
-    return tasks || [];
+    return { tasks: tasks || [] };
   }
 
   async findOne(id: string) {
-    return this.prisma.task.findUnique({ 
+    const task = await this.prisma.task.findUnique({ 
       where: { id },
-      include: {
-        assignee: {
-          select: { id: true, name: true, email: true, image: true }
-        },
-        createdBy: {
-          select: { id: true, name: true, email: true }
-        }
-      }
+      include: this.taskInclude
     });
+    return { task };
   }
 
-  async create(data: any, createdById: string) {
-    const taskData = {
-      ...data,
+  async create(createTaskDto: CreateTaskDto, createdById: string) {
+    const taskData = this.prepareTaskData(createTaskDto, createdById);
+    
+    const task = await this.prisma.task.create({ 
+      data: taskData,
+      include: this.taskInclude
+    });
+    return { task };
+  }
+
+  private prepareTaskData(data: CreateTaskDto, createdById: string) {
+    const taskData: any = {
+      title: data.title,
+      description: data.description,
+      type: data.type,
+      priority: data.priority,
+      projectId: data.projectId,
       createdById,
-      // Si pas de due_date, le status est TODO, sinon garder le type envoyé
       status: !data.due_date ? 'TODO' : (data.status || 'IN_PROGRESS'),
-      // Si pas de due_date, mettre une date par défaut dans 7 jours
-      due_date: data.due_date || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      due_date: data.due_date ? new Date(data.due_date) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     };
     
-    return this.prisma.task.create({ 
-      data: taskData,
-      include: {
-        assignee: {
-          select: { id: true, name: true, email: true, image: true }
-        },
-        createdBy: {
-          select: { id: true, name: true, email: true }
-        }
-      }
-    });
+    if (data.assigneeId) {
+      taskData.assigneeId = data.assigneeId;
+    }
+    
+    if (data.storyPoints !== undefined) {
+      taskData.storyPoints = data.storyPoints;
+    }
+    
+    return taskData;
   }
 
-  async update(id: string, data: any) {
-    return this.prisma.task.update({ where: { id }, data });
+  async update(id: string, updateTaskDto: UpdateTaskDto) {
+    const task = await this.prisma.task.update({ 
+      where: { id }, 
+      data: updateTaskDto,
+      include: this.taskInclude
+    });
+    return { task };
   }
 
   async delete(id: string) {
@@ -72,19 +84,8 @@ export class TasksService {
 
   async findAllByWorkspace(workspaceId: string) {
     const tasks = await this.prisma.task.findMany({
-      where: {
-        project: {
-          workspaceId
-        }
-      },
-      include: {
-        assignee: {
-          select: { id: true, name: true, email: true, image: true }
-        },
-        createdBy: {
-          select: { id: true, name: true, email: true }
-        }
-      }
+      where: { project: { workspaceId } },
+      include: this.taskInclude
     });
     return { tasks: tasks || [] };
   }

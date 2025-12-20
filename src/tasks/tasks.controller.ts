@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Param, Put, Delete, Query, UseGuards, Patc
 import { TasksService } from './tasks.service';
 import { JwtGuard } from '../common/guards/jwt.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { CreateTaskDto, UpdateTaskDto } from './dto/task.dto';
 
 @Controller('tasks')
 @UseGuards(JwtGuard)
@@ -17,8 +18,8 @@ export class TasksController {
   }
 
   @Post()
-  create(@Body() data: any, @CurrentUser() user: any) {
-    return this.tasksService.create(data, user.id);
+  create(@Body() createTaskDto: CreateTaskDto, @CurrentUser() user: any) {
+    return this.tasksService.create(createTaskDto, user.id);
   }
 
   @Get(':id/subtasks')
@@ -142,8 +143,8 @@ export class TasksController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() data: any) {
-    return this.tasksService.update(id, data);
+  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
+    return this.tasksService.update(id, updateTaskDto);
   }
 
   @Delete(':id')

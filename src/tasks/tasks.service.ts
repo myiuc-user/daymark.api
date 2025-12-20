@@ -21,7 +21,17 @@ export class TasksService {
   }
 
   async findOne(id: string) {
-    return this.prisma.task.findUnique({ where: { id } });
+    return this.prisma.task.findUnique({ 
+      where: { id },
+      include: {
+        assignee: {
+          select: { id: true, name: true, email: true, image: true }
+        },
+        createdBy: {
+          select: { id: true, name: true, email: true }
+        }
+      }
+    });
   }
 
   async create(data: any, createdById: string) {

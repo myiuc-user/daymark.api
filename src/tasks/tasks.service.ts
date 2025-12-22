@@ -45,6 +45,17 @@ export class TasksService {
     // Create history entry for task creation
     await this.createHistoryEntry(task.id, 'CREATED', 'Task created', createdById, null, task);
     
+    // Create audit log entry
+    await this.prisma.auditLog.create({
+      data: {
+        action: 'CREATE',
+        entity: 'TASK',
+        entityId: task.id,
+        userId: createdById,
+        changes: { message: `Created task "${task.title}"`, projectId: task.projectId }
+      }
+    });
+    
     return { task };
   }
 
@@ -71,7 +82,7 @@ export class TasksService {
     return taskData;
   }
 
-  async update(id: string, updateTaskDto: UpdateTaskDto) {
+  async update(id: string, updateTaskDto: UpdateTaskDto, userId?: string) {
     // Get current task for comparison
     const currentTask = await this.prisma.task.findUnique({ where: { id } });
     if (!currentTask) throw new Error('Task not found');
@@ -83,13 +94,48 @@ export class TasksService {
     });
     
     // Create history entries for changes
-    await this.createUpdateHistoryEntries(id, currentTask, updateTaskDto);
+    await this.createUpdateHistoryEntries(id, currentTask, updateTaskDto, userId);
+    
+    // Create audit log entry
+    if (userId) {
+      await this.prisma.auditLog.create({
+        data: {
+          action: 'UPDATE',
+          entity: 'TASK',
+          entityId: id,
+          userId,
+          changes: { 
+            message: `Updated task "${task.title}"`, 
+            projectId: task.projectId, 
+            updates: JSON.parse(JSON.stringify(updateTaskDto))
+          }
+        }
+      });
+    }
     
     return { task };
   }
 
-  async delete(id: string) {
-    return this.prisma.task.delete({ where: { id } });
+  async delete(id: string, userId?: string) {
+    const task = await this.prisma.task.findUnique({ where: { id } });
+    if (!task) throw new Error('Task not found');
+    
+    const result = await this.prisma.task.delete({ where: { id } });
+    
+    // Create audit log entry
+    if (userId) {
+      await this.prisma.auditLog.create({
+        data: {
+          action: 'DELETE',
+          entity: 'TASK',
+          entityId: id,
+          userId,
+          changes: { message: `Deleted task "${task.title}"`, projectId: task.projectId }
+        }
+      });
+    }
+    
+    return result;
   }
 
   async executeRecurringTasks() {

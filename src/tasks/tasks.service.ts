@@ -41,6 +41,10 @@ export class TasksService {
       data: taskData,
       include: this.taskInclude
     });
+    
+    // Create history entry for task creation
+    await this.createHistoryEntry(task.id, 'CREATED', 'Task created', createdById, null, task);
+    
     return { task };
   }
 
@@ -68,11 +72,19 @@ export class TasksService {
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto) {
+    // Get current task for comparison
+    const currentTask = await this.prisma.task.findUnique({ where: { id } });
+    if (!currentTask) throw new Error('Task not found');
+    
     const task = await this.prisma.task.update({ 
       where: { id }, 
       data: updateTaskDto,
       include: this.taskInclude
     });
+    
+    // Create history entries for changes
+    await this.createUpdateHistoryEntries(id, currentTask, updateTaskDto, task.updatedAt);
+    
     return { task };
   }
 
@@ -140,6 +152,10 @@ export class TasksService {
       },
       include: this.taskInclude
     });
+    
+    // Create history entry for subtask creation
+    await this.createHistoryEntry(parentTaskId, 'SUBTASK_ADDED', `Subtask "${data.title}" added`, createdById);
+    
     return { subtask };
   }
 
@@ -150,6 +166,14 @@ export class TasksService {
       where: { id: taskId },
       data: { isArchived: !task.isArchived }
     });
+    
+    // Create history entry
+    await this.createHistoryEntry(
+      taskId,
+      updatedTask.isArchived ? 'ARCHIVED' : 'UNARCHIVED',
+      updatedTask.isArchived ? 'Task archived' : 'Task unarchived'
+    );
+    
     return { success: true, isArchived: updatedTask.isArchived };
   }
 
@@ -160,6 +184,14 @@ export class TasksService {
       where: { id: taskId },
       data: { isFavorite: !task.isFavorite }
     });
+    
+    // Create history entry
+    await this.createHistoryEntry(
+      taskId,
+      updatedTask.isFavorite ? 'FAVORITED' : 'UNFAVORITED',
+      updatedTask.isFavorite ? 'Task marked as favorite' : 'Task removed from favorites'
+    );
+    
     return { success: true, isFavorite: updatedTask.isFavorite };
   }
 
@@ -226,5 +258,60 @@ export class TasksService {
       }
     });
     return { success: true };
+  }
+
+  private async createHistoryEntry(taskId: string, action: string, description: string, userId?: string, oldValue?: any, newValue?: any) {
+    await this.prisma.taskHistory.create({
+      data: {
+        taskId,
+        action,
+        description,
+        userId,
+        oldValue: oldValue ? JSON.stringify(oldValue) : null,
+        newValue: newValue ? JSON.stringify(newValue) : null,
+        createdAt: new Date()
+      }
+    });
+  }
+
+  private async createUpdateHistoryEntries(taskId: string, oldTask: any, updates: any, userId?: string) {
+    const changes = [];
+    
+    if (updates.title && updates.title !== oldTask.title) {
+      changes.push({ field: 'title', old: oldTask.title, new: updates.title });
+    }
+    if (updates.status && updates.status !== oldTask.status) {
+      changes.push({ field: 'status', old: oldTask.status, new: updates.status });
+    }
+    if (updates.priority && updates.priority !== oldTask.priority) {
+      changes.push({ field: 'priority', old: oldTask.priority, new: updates.priority });
+    }
+    if (updates.assigneeId !== undefined && updates.assigneeId !== oldTask.assigneeId) {
+      changes.push({ field: 'assignee', old: oldTask.assigneeId, new: updates.assigneeId });
+    }
+    
+    for (const change of changes) {
+      await this.createHistoryEntry(
+        taskId,
+        'UPDATED',
+        `${change.field} changed from "${change.old || 'None'}" to "${change.new || 'None'}"`,
+        userId,
+        change.old,
+        change.new
+      );
+    }
+  }
+
+  async getHistory(taskId: string) {
+    const history = await this.prisma.taskHistory.findMany({
+      where: { taskId },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    return { history };
   }
 }

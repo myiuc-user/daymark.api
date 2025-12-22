@@ -64,7 +64,7 @@ export class TasksController {
 
   @Get(':id/history')
   getHistory(@Param('id') taskId: string) {
-    return [];
+    return this.tasksService.getHistory(taskId);
   }
 
   @Get(':id/activity')

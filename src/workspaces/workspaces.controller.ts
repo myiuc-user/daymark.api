@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Param, Put, Delete, UseGuards } from '@nes
 import { WorkspacesService } from './workspaces.service';
 import { JwtGuard } from '../common/guards/jwt.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { Public } from '../common/decorators/public.decorator';
 
 @Controller('workspaces')
 @UseGuards(JwtGuard)
@@ -61,11 +62,13 @@ export class WorkspacesController {
     }
   }
 
+  @Public()
   @Get('invitation/:token')
   getInvitationByToken(@Param('token') token: string) {
     return this.workspacesService.getInvitationByToken(token);
   }
 
+  @Public()
   @Post('accept-invitation/:token')
   acceptInvitation(@Param('token') token: string, @Body() data: any) {
     return this.workspacesService.acceptInvitation(token, data);

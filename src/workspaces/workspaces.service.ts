@@ -27,7 +27,7 @@ export class WorkspacesService {
         }
       }
     });
-    return workspaces || [];
+    return { workspaces: workspaces || [] };
   }
 
   async findOne(id: string) {

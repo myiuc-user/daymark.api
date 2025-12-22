@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class AuditService {
   constructor(private prisma: PrismaService) {}
 
-  async getLogs(limit: number = 50, offset: number = 0, userId: string) {
+  async getLogs(limit: number = 50, offset: number = 0, userId: string, filters: any = {}) {
     // Get user with role
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new Error('User not found');
@@ -38,6 +38,26 @@ export class AuditService {
     } else {
       // Regular member sees only their own logs
       whereClause = { userId };
+    }
+
+    // Apply additional filters
+    if (filters.entity) {
+      whereClause.entity = filters.entity;
+    }
+    if (filters.entityId) {
+      whereClause.entityId = filters.entityId;
+    }
+    if (filters.action) {
+      whereClause.action = filters.action;
+    }
+    if (filters.startDate || filters.endDate) {
+      whereClause.createdAt = {};
+      if (filters.startDate) {
+        whereClause.createdAt.gte = new Date(filters.startDate);
+      }
+      if (filters.endDate) {
+        whereClause.createdAt.lte = new Date(filters.endDate);
+      }
     }
 
     const logs = await this.prisma.auditLog.findMany({

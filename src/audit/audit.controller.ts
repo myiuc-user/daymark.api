@@ -9,8 +9,29 @@ export class AuditController {
   constructor(private auditService: AuditService) {}
 
   @Get('logs')
-  getLogs(@CurrentUser() user: any, @Query('limit') limit?: string, @Query('offset') offset?: string) {
-    return this.auditService.getLogs(parseInt(limit || '50'), parseInt(offset || '0'), user.id);
+  getLogs(
+    @CurrentUser() user: any,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+    @Query('entity') entity?: string,
+    @Query('entityId') entityId?: string,
+    @Query('action') action?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string
+  ) {
+    const filters = {
+      entity,
+      entityId,
+      action,
+      startDate,
+      endDate
+    };
+    return this.auditService.getLogs(
+      parseInt(limit || '50'),
+      parseInt(offset || '0'),
+      user.id,
+      filters
+    );
   }
 
   @Get('project/:projectId')

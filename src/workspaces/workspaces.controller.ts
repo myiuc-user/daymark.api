@@ -62,6 +62,11 @@ export class WorkspacesController {
     }
   }
 
+  @Delete(':id/members/:userId')
+  removeMember(@Param('id') workspaceId: string, @Param('userId') userId: string, @CurrentUser() user: any) {
+    return this.workspacesService.removeMember(workspaceId, userId, user.id);
+  }
+
   @Public()
   @Get('invitation/:token')
   getInvitationByToken(@Param('token') token: string) {

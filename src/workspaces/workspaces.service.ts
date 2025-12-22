@@ -232,6 +232,22 @@ export class WorkspacesService {
             data: invitationData
           });
           
+          // Create audit log entry - logged under the inviter's account
+          await this.prisma.auditLog.create({
+            data: {
+              action: 'CREATE',
+              entity: 'MEMBER_INVITATION',
+              entityId: createdInvitation.id,
+              userId: invitedById, // Log under inviter's account
+              changes: { 
+                message: `Invited ${invitation.email} to workspace "${workspace.name}"`,
+                workspaceId,
+                invitedEmail: invitation.email,
+                role: invitation.role
+              }
+            }
+          });
+          
           try {
             await this.emailService.sendInvitationEmail(
               invitation.email,
@@ -255,6 +271,54 @@ export class WorkspacesService {
       console.error('Error in createInvitation:', error);
       throw error;
     }
+  }
+
+  async removeMember(workspaceId: string, memberUserId: string, removedById: string) {
+    // Get member info before deletion
+    const member = await this.prisma.workspaceMember.findFirst({
+      where: {
+        workspaceId,
+        userId: memberUserId
+      },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true }
+        },
+        workspace: {
+          select: { id: true, name: true }
+        }
+      }
+    });
+    
+    if (!member) {
+      throw new Error('Member not found in workspace');
+    }
+    
+    // Remove member from workspace
+    await this.prisma.workspaceMember.delete({
+      where: {
+        id: member.id
+      }
+    });
+    
+    // Create audit log entry - logged under the remover's account
+    await this.prisma.auditLog.create({
+      data: {
+        action: 'DELETE',
+        entity: 'MEMBER_REMOVED',
+        entityId: member.id,
+        userId: removedById, // Log under remover's account
+        changes: {
+          message: `Removed ${member.user.name} (${member.user.email}) from workspace "${member.workspace.name}"`,
+          workspaceId,
+          removedMemberName: member.user.name,
+          removedMemberEmail: member.user.email,
+          role: member.role
+        }
+      }
+    });
+    
+    return { message: 'Member removed successfully' };
   }
 
   async getInvitationByToken(token: string) {
@@ -308,11 +372,28 @@ export class WorkspacesService {
     });
     
     // Add user to workspace
-    await this.prisma.workspaceMember.create({
+    const member = await this.prisma.workspaceMember.create({
       data: {
         userId: user.id,
         workspaceId: invitation.workspaceId,
         role: invitation.role
+      }
+    });
+    
+    // Create audit log entry - logged under the inviter's account (not the new member)
+    await this.prisma.auditLog.create({
+      data: {
+        action: 'CREATE',
+        entity: 'MEMBER_JOINED',
+        entityId: member.id,
+        userId: invitation.invitedById, // Log under inviter's account
+        changes: { 
+          message: `${user.name} (${user.email}) joined workspace "${invitation.workspace.name}"`,
+          workspaceId: invitation.workspaceId,
+          newMemberName: user.name,
+          newMemberEmail: user.email,
+          role: invitation.role
+        }
       }
     });
     

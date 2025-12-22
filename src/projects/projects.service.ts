@@ -103,7 +103,13 @@ export class ProjectsService {
   }
 
   async update(id: string, data: any, userId?: string) {
-    const project = await this.prisma.project.update({ where: { id }, data });
+    // Filter out non-updatable fields and relations
+    const { owner, members, tasks, totalMembers, createdAt, updatedAt, ...updateData } = data;
+    
+    const project = await this.prisma.project.update({ 
+      where: { id }, 
+      data: updateData 
+    });
     
     // Create audit log entry
     if (userId) {

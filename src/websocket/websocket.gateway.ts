@@ -48,13 +48,13 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
   @SubscribeMessage('join-project')
   handleJoinProject(@ConnectedSocket() client: Socket, @MessageBody() projectId: string) {
     client.join(`project-${projectId}`);
-    console.log(`User ${client.data.user?.email} joined project ${projectId}`);
+    console.log(`User ${client.data.user?.email || 'Unknown'} joined project ${projectId}`);
   }
 
   @SubscribeMessage('leave-project')
   handleLeaveProject(@ConnectedSocket() client: Socket, @MessageBody() projectId: string) {
     client.leave(`project-${projectId}`);
-    console.log(`User ${client.data.user?.email} left project ${projectId}`);
+    console.log(`User ${client.data.user?.email || 'Unknown'} left project ${projectId}`);
   }
 
   @SubscribeMessage('task-update')

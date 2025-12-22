@@ -11,11 +11,15 @@ export class CommentsService {
   }
 
   async create(data: any) {
-    return this.prisma.comment.create({ data });
+    // Filter out fields that don't exist in the Comment model
+    const { mentions, ...createData } = data;
+    return this.prisma.comment.create({ data: createData });
   }
 
   async update(id: string, data: any) {
-    return this.prisma.comment.update({ where: { id }, data });
+    // Filter out fields that don't exist in the Comment model
+    const { mentions, ...updateData } = data;
+    return this.prisma.comment.update({ where: { id }, data: updateData });
   }
 
   async delete(id: string) {

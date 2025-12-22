@@ -62,4 +62,36 @@ export class UsersService {
     
     return { permissions };
   }
+
+  async getWorkspacePermissions(userId: string, workspaceId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const workspaceMember = await this.prisma.workspaceMember.findUnique({
+      where: {
+        userId_workspaceId: {
+          userId,
+          workspaceId
+        }
+      }
+    });
+    const workspace = await this.prisma.workspace.findUnique({ where: { id: workspaceId } });
+
+    const permissions = [];
+    
+    // Super admin has all permissions
+    if (user?.role === 'SUPER_ADMIN') {
+      permissions.push('WORKSPACE.MANAGE', 'PROJECT.CREATE', 'PROJECT.MANAGE_MEMBERS', 'PROJECT.DELETE');
+    }
+    
+    // Workspace owner
+    if (workspace?.userId === userId) {
+      permissions.push('WORKSPACE.MANAGE', 'PROJECT.CREATE', 'PROJECT.MANAGE_MEMBERS');
+    }
+    
+    // Workspace admin
+    if (workspaceMember?.role === 'ADMIN') {
+      permissions.push('PROJECT.CREATE', 'PROJECT.MANAGE_MEMBERS');
+    }
+    
+    return { permissions };
+  }
 }

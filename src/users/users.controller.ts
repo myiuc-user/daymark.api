@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Put, Body, Param, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtGuard } from '../common/guards/jwt.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -18,8 +18,18 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  @Put(':id')
+  update(@Param('id') id: string, @Body() updateData: any) {
+    return this.usersService.update(id, updateData);
+  }
+
   @Get('permissions/project/:projectId')
   getProjectPermissions(@Param('projectId') projectId: string, @CurrentUser() user: any) {
     return this.usersService.getProjectPermissions(user.id, projectId);
+  }
+
+  @Get('permissions/workspace/:workspaceId')
+  getWorkspacePermissions(@Param('workspaceId') workspaceId: string, @CurrentUser() user: any) {
+    return this.usersService.getWorkspacePermissions(user.id, workspaceId);
   }
 }

@@ -83,7 +83,7 @@ export class TasksService {
     });
     
     // Create history entries for changes
-    await this.createUpdateHistoryEntries(id, currentTask, updateTaskDto, task.updatedAt);
+    await this.createUpdateHistoryEntries(id, currentTask, updateTaskDto);
     
     return { task };
   }
@@ -264,12 +264,10 @@ export class TasksService {
     await this.prisma.taskHistory.create({
       data: {
         taskId,
-        action,
-        description,
-        userId,
+        field: action,
         oldValue: oldValue ? JSON.stringify(oldValue) : null,
         newValue: newValue ? JSON.stringify(newValue) : null,
-        createdAt: new Date()
+        changedBy: userId || 'system'
       }
     });
   }
@@ -291,14 +289,15 @@ export class TasksService {
     }
     
     for (const change of changes) {
-      await this.createHistoryEntry(
-        taskId,
-        'UPDATED',
-        `${change.field} changed from "${change.old || 'None'}" to "${change.new || 'None'}"`,
-        userId,
-        change.old,
-        change.new
-      );
+      await this.prisma.taskHistory.create({
+        data: {
+          taskId,
+          field: change.field,
+          oldValue: change.old || null,
+          newValue: change.new || null,
+          changedBy: userId || 'system'
+        }
+      });
     }
   }
 

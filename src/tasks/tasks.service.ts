@@ -87,9 +87,22 @@ export class TasksService {
     const currentTask = await this.prisma.task.findUnique({ where: { id } });
     if (!currentTask) throw new Error('Task not found');
     
+    // Prepare update data with proper Prisma relations
+    const updateData: any = { ...updateTaskDto };
+    
+    // Handle assignee relation properly
+    if ('assigneeId' in updateTaskDto) {
+      delete updateData.assigneeId;
+      if (updateTaskDto.assigneeId) {
+        updateData.assignee = { connect: { id: updateTaskDto.assigneeId } };
+      } else {
+        updateData.assignee = { disconnect: true };
+      }
+    }
+    
     const task = await this.prisma.task.update({ 
       where: { id }, 
-      data: updateTaskDto,
+      data: updateData,
       include: this.taskInclude
     });
     

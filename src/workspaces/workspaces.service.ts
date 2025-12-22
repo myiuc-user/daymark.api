@@ -18,6 +18,9 @@ export class WorkspacesService {
         ]
       },
       include: {
+        owner: {
+          select: { id: true, name: true, email: true, image: true, role: true }
+        },
         members: {
           include: {
             user: {
@@ -27,11 +30,88 @@ export class WorkspacesService {
         }
       }
     });
-    return { workspaces: workspaces || [] };
+
+    // Include owner in members count for each workspace
+    const workspacesWithMembers = workspaces.map(workspace => {
+      const allMembers = [];
+      
+      if (workspace.owner) {
+        allMembers.push({
+          id: `owner-${workspace.owner.id}`,
+          userId: workspace.owner.id,
+          workspaceId: workspace.id,
+          role: 'ADMIN',
+          user: workspace.owner,
+          isOwner: true
+        });
+      }
+      
+      workspace.members.forEach(member => {
+        if (member.userId !== workspace.ownerId) {
+          allMembers.push({
+            ...member,
+            isOwner: false
+          });
+        }
+      });
+
+      return {
+        ...workspace,
+        members: allMembers
+      };
+    });
+
+    return { workspaces: workspacesWithMembers || [] };
   }
 
   async findOne(id: string) {
-    return this.prisma.workspace.findUnique({ where: { id } });
+    const workspace = await this.prisma.workspace.findUnique({
+      where: { id },
+      include: {
+        owner: {
+          select: { id: true, name: true, email: true, image: true, role: true }
+        },
+        members: {
+          include: {
+            user: {
+              select: { id: true, name: true, email: true, image: true, role: true }
+            }
+          }
+        }
+      }
+    });
+
+    if (!workspace) return null;
+
+    // Include owner in members list
+    const allMembers = [];
+    
+    if (workspace.owner) {
+      allMembers.push({
+        id: `owner-${workspace.owner.id}`,
+        userId: workspace.owner.id,
+        workspaceId: id,
+        role: 'ADMIN',
+        user: workspace.owner,
+        isOwner: true
+      });
+    }
+    
+    workspace.members.forEach(member => {
+      if (member.userId !== workspace.ownerId) {
+        allMembers.push({
+          ...member,
+          isOwner: false
+        });
+      }
+    });
+
+    return {
+      workspace: {
+        ...workspace,
+        members: allMembers
+      }
+    };
   }
 
   async create(data: any) {

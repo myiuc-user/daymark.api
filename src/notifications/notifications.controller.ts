@@ -18,6 +18,11 @@ export class NotificationsController {
     return this.notificationsService.markAsRead(id);
   }
 
+  @Patch('read-all')
+  markAllAsRead(@CurrentUser() user: any) {
+    return this.notificationsService.markAllAsRead(user.id);
+  }
+
   @Delete(':id')
   delete(@Param('id') id: string) {
     return this.notificationsService.delete(id);

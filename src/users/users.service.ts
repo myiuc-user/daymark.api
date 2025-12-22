@@ -83,7 +83,7 @@ export class UsersService {
     }
     
     // Workspace owner
-    if (workspace?.userId === userId) {
+    if (workspace?.ownerId === userId) {
       permissions.push('WORKSPACE.MANAGE', 'PROJECT.CREATE', 'PROJECT.MANAGE_MEMBERS');
     }
     

@@ -33,6 +33,11 @@ export class ProjectsController {
     return this.projectsService.delete(id, user.id);
   }
 
+  @Get(':id/members')
+  getMembers(@Param('id') projectId: string) {
+    return this.projectsService.getMembers(projectId);
+  }
+
   @Post(':id/members')
   addMember(@Param('id') projectId: string, @Body() data: { userId: string; role?: 'ADMIN' | 'MEMBER' | 'VIEWER' }, @CurrentUser() user: any) {
     return this.projectsService.addMember(projectId, data.userId, data.role || 'MEMBER', user.id);

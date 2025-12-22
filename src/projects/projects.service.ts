@@ -149,6 +149,18 @@ export class ProjectsService {
     return result;
   }
 
+  async getMembers(projectId: string) {
+    const members = await this.prisma.projectMember.findMany({
+      where: { projectId },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, image: true }
+        }
+      }
+    });
+    return { members: members || [] };
+  }
+
   async addMember(projectId: string, userId: string, role: 'ADMIN' | 'MEMBER' | 'VIEWER', addedById: string) {
     // Get project and user info
     const project = await this.prisma.project.findUnique({ where: { id: projectId } });

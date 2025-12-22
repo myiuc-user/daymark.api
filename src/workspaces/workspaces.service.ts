@@ -169,7 +169,7 @@ export class WorkspacesService {
       }
     });
     
-    return allMembers;
+    return { members: allMembers };
   }
 
   async getInvitations(workspaceId: string) {

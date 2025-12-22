@@ -84,7 +84,14 @@ export class TasksService {
 
   async update(id: string, updateTaskDto: UpdateTaskDto, userId?: string) {
     // Get current task for comparison
-    const currentTask = await this.prisma.task.findUnique({ where: { id } });
+    const currentTask = await this.prisma.task.findUnique({ 
+      where: { id },
+      include: {
+        project: {
+          select: { team_lead: true, name: true }
+        }
+      }
+    });
     if (!currentTask) throw new Error('Task not found');
     
     // Prepare update data with proper Prisma relations
@@ -122,6 +129,20 @@ export class TasksService {
             projectId: task.projectId, 
             updates: JSON.parse(JSON.stringify(updateTaskDto))
           }
+        }
+      });
+    }
+    
+    // Notify project lead if user is not the project lead
+    if (userId && currentTask.project.team_lead && userId !== currentTask.project.team_lead) {
+      const user = await this.prisma.user.findUnique({ where: { id: userId } });
+      await this.prisma.notification.create({
+        data: {
+          userId: currentTask.project.team_lead,
+          type: 'TASK_UPDATED',
+          title: 'Task Updated',
+          message: `${user?.name || 'Someone'} updated task "${task.title}" in project "${currentTask.project.name}"`,
+          read: false
         }
       });
     }

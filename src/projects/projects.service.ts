@@ -6,8 +6,45 @@ export class ProjectsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(workspaceId: string) {
-    const projects = await this.prisma.project.findMany({ where: { workspaceId } });
-    return projects || [];
+    const projects = await this.prisma.project.findMany({ 
+      where: { workspaceId },
+      include: {
+        owner: {
+          select: { id: true, name: true, email: true, image: true }
+        },
+        members: {
+          include: {
+            user: {
+              select: { id: true, name: true, email: true, image: true }
+            }
+          }
+        }
+      }
+    });
+    
+    // Calculate totalMembers for each project
+    const projectsWithMembers = projects.map(project => {
+      const allMembers = [...project.members];
+      const ownerIsMember = project.members.some(member => member.userId === project.team_lead);
+      
+      if (!ownerIsMember && project.owner) {
+        allMembers.unshift({
+          id: `owner-${project.owner.id}`,
+          userId: project.owner.id,
+          projectId: project.id,
+          role: 'ADMIN',
+          user: project.owner
+        } as any);
+      }
+      
+      return {
+        ...project,
+        members: allMembers,
+        totalMembers: allMembers.length
+      };
+    });
+    
+    return projectsWithMembers || [];
   }
 
   async findOne(id: string) {

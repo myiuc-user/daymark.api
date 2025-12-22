@@ -11,9 +11,12 @@ export class ProjectsService {
   }
 
   async findOne(id: string) {
-    return this.prisma.project.findUnique({
+    const project = await this.prisma.project.findUnique({
       where: { id },
       include: {
+        owner: {
+          select: { id: true, name: true, email: true, image: true }
+        },
         members: {
           include: {
             user: {
@@ -34,6 +37,31 @@ export class ProjectsService {
         }
       }
     });
+    
+    if (project) {
+      // Add owner to members list if not already included
+      const allMembers = [...project.members];
+      const ownerIsMember = project.members.some(member => member.userId === project.team_lead);
+      
+      if (!ownerIsMember && project.owner) {
+        allMembers.unshift({
+          id: `owner-${project.owner.id}`,
+          userId: project.owner.id,
+          projectId: project.id,
+          role: 'ADMIN',
+          customPermissions: [],
+          user: project.owner
+        } as any);
+      }
+      
+      return {
+        ...project,
+        members: allMembers,
+        totalMembers: allMembers.length
+      };
+    }
+    
+    return project;
   }
 
   async create(data: any) {
@@ -68,6 +96,7 @@ export class ProjectsService {
   }
 
   async delete(id: string) {
+    // Delete in cascade: tasks, comments, files, etc. will be deleted automatically due to Prisma schema constraints
     return this.prisma.project.delete({ where: { id } });
   }
 }

@@ -249,6 +249,22 @@ FRONTEND_URL=http://localhost:5173
 
 ## 📝 Development
 
+### TODO Comment Guidelines
+
+**IMPORTANT:** When implementing new features or identifying areas that need improvement, always add TODO comments in the code:
+
+```typescript
+// TODO: Add input validation for user registration
+// TODO: Implement rate limiting for login attempts
+// TODO: Add database connection pooling
+```
+
+### TODO Comment Structure
+- Use `// TODO:` prefix followed by clear description
+- Place TODO comments above the relevant code section
+- Be specific about what needs to be implemented
+- Include context when necessary (e.g., `// TODO: Add error handling for database timeout`)
+
 ### Start in dev mode
 ```bash
 pnpm run dev

@@ -34,7 +34,7 @@ export class ProjectsController {
   }
 
   @Post(':id/members')
-  addMember(@Param('id') projectId: string, @Body() data: { userId: string; role?: string }, @CurrentUser() user: any) {
+  addMember(@Param('id') projectId: string, @Body() data: { userId: string; role?: 'ADMIN' | 'MEMBER' | 'VIEWER' }, @CurrentUser() user: any) {
     return this.projectsService.addMember(projectId, data.userId, data.role || 'MEMBER', user.id);
   }
 

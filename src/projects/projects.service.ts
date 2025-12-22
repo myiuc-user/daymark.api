@@ -143,7 +143,7 @@ export class ProjectsService {
     return result;
   }
 
-  async addMember(projectId: string, userId: string, role: string, addedById: string) {
+  async addMember(projectId: string, userId: string, role: 'ADMIN' | 'MEMBER' | 'VIEWER', addedById: string) {
     // Get project and user info
     const project = await this.prisma.project.findUnique({ where: { id: projectId } });
     const user = await this.prisma.user.findUnique({ where: { id: userId } });

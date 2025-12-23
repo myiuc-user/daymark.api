@@ -4,42 +4,42 @@ import { TwoFactorMethod } from '@prisma/client';
 export class SetupTOTPDto {
   @IsString()
   @IsNotEmpty()
-  token: string;
+  token!: string;
 
   @IsString()
   @IsNotEmpty()
-  secret: string;
+  secret!: string;
 }
 
 export class VerifyCodeDto {
   @IsString()
   @IsNotEmpty()
-  code: string;
+  code!: string;
 
   @IsEnum(TwoFactorMethod)
-  method: TwoFactorMethod;
+  method!: TwoFactorMethod;
 }
 
 export class SendEmailCodeDto {
   @IsString()
   @IsNotEmpty()
-  userId: string;
+  userId!: string;
 
   @IsEnum(TwoFactorMethod)
-  method: TwoFactorMethod;
+  method!: TwoFactorMethod;
 }
 
 export class VerifyTwoFactorDto {
   @IsString()
   @IsNotEmpty()
-  userId: string;
+  userId!: string;
 
   @IsString()
   @IsNotEmpty()
-  code: string;
+  code!: string;
 
   @IsEnum(TwoFactorMethod)
-  method: TwoFactorMethod;
+  method!: TwoFactorMethod;
 
   @IsOptional()
   @IsBoolean()
@@ -49,5 +49,5 @@ export class VerifyTwoFactorDto {
 export class VerifyBackupCodeDto {
   @IsString()
   @IsNotEmpty()
-  code: string;
+  code!: string;
 }

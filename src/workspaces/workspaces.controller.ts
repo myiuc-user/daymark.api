@@ -67,6 +67,11 @@ export class WorkspacesController {
     return this.workspacesService.removeMember(workspaceId, userId, user.id);
   }
 
+  @Put(':id/members/:userId/role')
+  updateMemberRole(@Param('id') workspaceId: string, @Param('userId') userId: string, @Body() data: { role: string }, @CurrentUser() user: any) {
+    return this.workspacesService.updateMemberRole(workspaceId, userId, data.role, user.id);
+  }
+
   @Public()
   @Get('invitation/:token')
   getInvitationByToken(@Param('token') token: string) {

@@ -321,6 +321,65 @@ export class WorkspacesService {
     return { message: 'Member removed successfully' };
   }
 
+  async updateMemberRole(workspaceId: string, memberUserId: string, newRole: string, updatedById: string) {
+    // Get member info
+    const member = await this.prisma.workspaceMember.findFirst({
+      where: {
+        workspaceId,
+        userId: memberUserId
+      },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true }
+        },
+        workspace: {
+          select: { id: true, name: true }
+        }
+      }
+    });
+    
+    if (!member) {
+      throw new Error('Member not found in workspace');
+    }
+    
+    const oldRole = member.role;
+    
+    // Update member role
+    const updatedMember = await this.prisma.workspaceMember.update({
+      where: {
+        id: member.id
+      },
+      data: {
+        role: newRole
+      },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true }
+        }
+      }
+    });
+    
+    // Create audit log entry
+    await this.prisma.auditLog.create({
+      data: {
+        action: 'UPDATE',
+        entity: 'MEMBER_ROLE_UPDATED',
+        entityId: member.id,
+        userId: updatedById,
+        changes: {
+          message: `Updated ${member.user.name}'s role from ${oldRole} to ${newRole} in workspace "${member.workspace.name}"`,
+          workspaceId,
+          memberName: member.user.name,
+          memberEmail: member.user.email,
+          oldRole,
+          newRole
+        }
+      }
+    });
+    
+    return { member: updatedMember, message: 'Member role updated successfully' };
+  }
+
   async getInvitationByToken(token: string) {
     const invitation = await this.prisma.workspaceInvitation.findUnique({
       where: { token },

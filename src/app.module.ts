@@ -29,6 +29,7 @@ import { DelegationsModule } from './delegations/delegations.module';
 import { AuditModule } from './audit/audit.module';
 import { InvitationsModule } from './invitations/invitations.module';
 import { WebSocketModule } from './websocket/websocket.module';
+import { ReportsModule } from './reports/reports.module';
 import { CronService } from './services/cron.service';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -70,7 +71,8 @@ import { AuditInterceptor } from './common/interceptors/audit.interceptor';
     DelegationsModule,
     AuditModule,
     InvitationsModule,
-    WebSocketModule
+    WebSocketModule,
+    ReportsModule
   ],
   providers: [
     CronService,

@@ -52,6 +52,8 @@ model User {
   taskHistories   TaskHistory[]
   notificationPreference NotificationPreference?
   twoFactorCodes  TwoFactorCode[]
+  scheduledReports ScheduledReport[]
+  reportExecutions ReportExecution[]
 }
 
 model Workspace {
@@ -437,4 +439,53 @@ model TwoFactorCode {
   used      Boolean  @default(false)
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ScheduledReport {
+  id              String   @id @default(uuid())
+  name            String
+  description     String?
+  reportType      ReportType @default(TASK_SUMMARY)
+  cronExpression  String
+  isActive        Boolean  @default(true)
+  filters         Json     @default("{}")
+  recipients      String[] @default([])
+  createdById     String
+  workspaceId     String?
+  projectId       String?
+  lastRunAt       DateTime?
+  nextRunAt       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdBy       User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  executions      ReportExecution[]
+}
+
+model ReportExecution {
+  id                String   @id @default(uuid())
+  scheduledReportId String
+  executedAt        DateTime @default(now())
+  status            ExecutionStatus @default(PENDING)
+  filePath          String?
+  fileSize          Int?
+  recipients        String[] @default([])
+  errorMessage      String?
+  executedById      String
+  scheduledReport   ScheduledReport @relation(fields: [scheduledReportId], references: [id], onDelete: Cascade)
+  executedBy        User     @relation(fields: [executedById], references: [id], onDelete: Cascade)
+}
+
+enum ReportType {
+  TASK_SUMMARY
+  USER_PERFORMANCE
+  PROJECT_PROGRESS
+  TIME_TRACKING
+  TEAM_OVERVIEW
+}
+
+enum ExecutionStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
 }

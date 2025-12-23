@@ -46,10 +46,14 @@ export class ReportsService {
 
   @Cron(CronExpression.EVERY_MINUTE)
   async executeScheduledReports() {
+    const now = new Date();
     const dueReports = await this.prisma.scheduledReport.findMany({
       where: {
         isActive: true,
-        nextRunAt: { lte: new Date() }
+        OR: [
+          { nextRunAt: { lte: now } },
+          { nextRunAt: null }
+        ]
       }
     });
 

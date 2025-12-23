@@ -26,6 +26,12 @@ model User {
   githubData      Json?
   githubToken     String?
   githubUsername  String?
+  // 2FA fields
+  twoFactorEnabled    Boolean @default(false)
+  twoFactorMethods    TwoFactorMethod[] @default([])
+  twoFactorSecret     String?
+  backupCodes         String[] @default([])
+  twoFactorVerifiedAt DateTime?
   comments        Comment[]
   uploadedFiles   File[]
   mentions        Mention[]
@@ -45,6 +51,7 @@ model User {
   auditLogs       AuditLog[]
   taskHistories   TaskHistory[]
   notificationPreference NotificationPreference?
+  twoFactorCodes  TwoFactorCode[]
 }
 
 model Workspace {
@@ -414,4 +421,20 @@ enum SprintStatus {
   PLANNED
   ACTIVE
   COMPLETED
+}
+
+enum TwoFactorMethod {
+  TOTP
+  EMAIL
+}
+
+model TwoFactorCode {
+  id        String   @id @default(uuid())
+  userId    String
+  code      String
+  method    TwoFactorMethod
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

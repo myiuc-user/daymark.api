@@ -184,4 +184,59 @@ export class EmailService {
       return { success: false, message: error?.message || 'Failed to send email' };
     }
   }
+
+  async sendTaskCompletedEmail(email: string, projectLeadName: string, taskTitle: string, projectName: string, completedBy: string) {
+    try {
+      console.log('Sending task completed email to:', email);
+      
+      const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Task Completed</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #2563eb;">Task Completed</h2>
+        
+        <p>Hi ${projectLeadName},</p>
+        
+        <p>${completedBy} has marked the task "<strong>${taskTitle}</strong>" as completed in project "<strong>${projectName}</strong>".</p>
+        
+        <div style="background-color: #f0f9ff; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #2563eb;">
+            <p style="margin: 0; color: #1e40af;"><strong>✓ Task Status:</strong> Completed</p>
+        </div>
+        
+        <p>Great progress on the project!</p>
+        
+        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+        
+        <p style="color: #999; font-size: 12px;">
+            This is an automated notification from Daymark.
+        </p>
+    </div>
+</body>
+</html>`;
+
+      const mailOptions = {
+        from: 'galio.noreply@myiuc.com',
+        to: email,
+        subject: `Task completed: ${taskTitle}`,
+        html: htmlContent
+      };
+
+      const transporter = this.getTransporter();
+      const result = await transporter.sendMail(mailOptions);
+      console.log('Task completed email sent successfully:', result.messageId);
+      return { success: true, message: 'Task completed email sent' };
+    } catch (error: any) {
+      console.error('Error sending task completed email:', {
+        error: error?.message || 'Unknown error',
+        stack: error?.stack,
+        code: error?.code
+      });
+      return { success: false, message: error?.message || 'Failed to send email' };
+    }
+  }
 }

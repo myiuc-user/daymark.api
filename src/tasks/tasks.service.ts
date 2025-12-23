@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { EmailService } from '../common/services/email.service';
 import { CreateTaskDto, UpdateTaskDto } from './dto/task.dto';
 
 @Injectable()
 export class TasksService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private emailService: EmailService
+  ) {}
 
   private readonly taskInclude = {
     assignee: {
@@ -146,6 +150,28 @@ export class TasksService {
           read: false
         }
       });
+    }
+    
+    // Send email if task is marked as completed
+    if (updateTaskDto.status === 'DONE' && currentTask.status !== 'DONE' && userId && currentTask.project.team_lead) {
+      const [user, projectLead] = await Promise.all([
+        this.prisma.user.findUnique({ where: { id: userId } }),
+        this.prisma.user.findUnique({ where: { id: currentTask.project.team_lead } })
+      ]);
+      
+      if (projectLead && user) {
+        try {
+          await this.emailService.sendTaskCompletedEmail(
+            projectLead.email,
+            projectLead.name,
+            task.title,
+            currentTask.project.name,
+            user.name
+          );
+        } catch (emailError) {
+          console.error('Failed to send task completed email:', emailError);
+        }
+      }
     }
     
     return { task };

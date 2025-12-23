@@ -293,4 +293,41 @@ export class EmailService {
       return { success: false, message: error?.message || 'Failed to send email' };
     }
   }
+
+  async sendReportEmail(recipients: string[], reportName: string, description: string, reportType: string) {
+    try {
+      const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Rapport automatisé</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #2563eb;">${reportName}</h2>
+        <p>${description || 'Rapport généré automatiquement'}</p>
+        <div style="background-color: #f0f9ff; padding: 15px; border-radius: 6px; margin: 20px 0;">
+            <p><strong>Type:</strong> ${reportType}</p>
+            <p><strong>Généré le:</strong> ${new Date().toLocaleString('fr-FR')}</p>
+        </div>
+        <p>Données du rapport en pièce jointe.</p>
+    </div>
+</body>
+</html>`;
+
+      const mailOptions = {
+        from: 'galio.noreply@myiuc.com',
+        to: recipients,
+        subject: `Rapport automatisé: ${reportName}`,
+        html: htmlContent
+      };
+
+      const transporter = this.getTransporter();
+      const result = await transporter.sendMail(mailOptions);
+      return { success: true, message: 'Report email sent' };
+    } catch (error: any) {
+      return { success: false, message: error?.message || 'Failed to send email' };
+    }
+  }
 }

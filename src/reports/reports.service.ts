@@ -2,6 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../common/services/email.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import * as cron from 'node-cron';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -204,17 +205,75 @@ export class ReportsService {
   }
 
   private calculateNextRun(cronExpression: string): Date {
+    // Utiliser le fuseau horaire GMT+1 (Afrique de l'ouest et centre)
     const now = new Date();
+    const gmtPlus1Now = new Date(now.getTime() + (1 * 60 * 60 * 1000)); // GMT+1
     
-    if (cronExpression.includes('daily')) {
-      return new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    // Valider l'expression cron
+    if (!cron.validate(cronExpression)) {
+      throw new BadRequestException('Invalid cron expression');
     }
     
-    if (cronExpression.includes('weekly')) {
-      return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    // Calculer la prochaine exécution en GMT+1
+    const nextRun = new Date(gmtPlus1Now);
+    nextRun.setSeconds(0, 0); // Reset seconds and milliseconds
+    
+    // Incrémenter d'une minute pour commencer la recherche
+    nextRun.setMinutes(nextRun.getMinutes() + 1);
+    
+    // Chercher la prochaine date valide (max 366 jours)
+    for (let i = 0; i < 366 * 24 * 60; i++) {
+      if (this.matchesCron(nextRun, cronExpression)) {
+        // Convertir de GMT+1 vers UTC pour le stockage
+        return new Date(nextRun.getTime() - (1 * 60 * 60 * 1000));
+      }
+      nextRun.setMinutes(nextRun.getMinutes() + 1);
     }
     
-    return new Date(now.getTime() + 60 * 60 * 1000);
+    // Fallback si aucune date trouvée
+    return new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  }
+  
+  private matchesCron(date: Date, cronExpression: string): boolean {
+    const parts = cronExpression.split(' ');
+    if (parts.length !== 5) return false;
+    
+    const [minute, hour, dayOfMonth, month, dayOfWeek] = parts;
+    
+    return (
+      this.matchesCronField(date.getMinutes(), minute) &&
+      this.matchesCronField(date.getHours(), hour) &&
+      this.matchesCronField(date.getDate(), dayOfMonth) &&
+      this.matchesCronField(date.getMonth() + 1, month) &&
+      this.matchesCronField(date.getDay(), dayOfWeek)
+    );
+  }
+  
+  private matchesCronField(value: number, field: string): boolean {
+    if (field === '*') return true;
+    
+    // Handle ranges (e.g., 1-5)
+    if (field.includes('-')) {
+      const [start, end] = field.split('-').map(Number);
+      return value >= start && value <= end;
+    }
+    
+    // Handle steps (e.g., */5)
+    if (field.includes('/')) {
+      const [range, step] = field.split('/');
+      const stepNum = Number(step);
+      if (range === '*') {
+        return value % stepNum === 0;
+      }
+    }
+    
+    // Handle lists (e.g., 1,3,5)
+    if (field.includes(',')) {
+      return field.split(',').map(Number).includes(value);
+    }
+    
+    // Handle single value
+    return Number(field) === value;
   }
 
   async executeReportManually(reportId: string) {

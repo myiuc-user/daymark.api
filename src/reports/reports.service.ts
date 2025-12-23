@@ -81,6 +81,21 @@ export class ReportsService {
     try {
       const reportData = await this.generateReportData(report);
       
+      // Envoyer l'email avec le rapport
+      if (report.recipients && report.recipients.length > 0) {
+        await this.emailService.sendEmail({
+          to: report.recipients,
+          subject: `Rapport automatisé: ${report.name}`,
+          html: `
+            <h2>${report.name}</h2>
+            <p>${report.description || 'Rapport généré automatiquement'}</p>
+            <p>Type: ${report.reportType}</p>
+            <p>Généré le: ${new Date().toLocaleString('fr-FR')}</p>
+            <p>Données du rapport en pièce jointe.</p>
+          `
+        });
+      }
+      
       await this.prisma.reportExecution.update({
         where: { id: execution.id },
         data: {

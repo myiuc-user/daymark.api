@@ -18,11 +18,14 @@ export class ProjectsService {
               select: { id: true, name: true, email: true, image: true }
             }
           }
+        },
+        tasks: {
+          select: { id: true, status: true }
         }
       }
     });
     
-    // Calculate totalMembers for each project
+    // Calculate totalMembers and pending tasks for each project
     const projectsWithMembers = projects.map(project => {
       const allMembers = [...project.members];
       const ownerIsMember = project.members.some(member => member.userId === project.team_lead);
@@ -37,10 +40,13 @@ export class ProjectsService {
         } as any);
       }
       
+      const pendingTasks = project.tasks.filter(task => task.status !== 'DONE').length;
+      
       return {
         ...project,
         members: allMembers,
-        totalMembers: allMembers.length
+        totalMembers: allMembers.length,
+        pendingTasks
       };
     });
     

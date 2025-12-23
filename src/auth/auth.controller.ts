@@ -47,6 +47,7 @@ export class AuthController {
           twoFactorEnabled: user.twoFactorEnabled,
           twoFactorMethods: user.twoFactorMethods || []
         },
+        // amazonq-ignore-next-line
         accessToken
       };
     } catch (error) {

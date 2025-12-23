@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../common/services/email.service';
 import * as speakeasy from 'speakeasy';
 import * as QRCode from 'qrcode';
-import * as bcrypt from 'bcrypt';
+import * as bcryptjs from 'bcryptjs';
 import * as crypto from 'crypto';
 import { TwoFactorMethod } from '@prisma/client';
 
@@ -30,7 +30,7 @@ export class TwoFactorService {
       length: 32
     });
 
-    const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url);
+    const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url!);
 
     return {
       secret: secret.base32,
@@ -53,7 +53,7 @@ export class TwoFactorService {
 
     const backupCodes = this.generateBackupCodes();
     const hashedBackupCodes = await Promise.all(
-      backupCodes.map(code => bcrypt.hash(code, 10))
+      backupCodes.map(code => bcryptjs.hash(code, 10))
     );
 
     await this.prisma.user.update({
@@ -104,7 +104,7 @@ export class TwoFactorService {
     }
 
     const code = crypto.randomInt(100000, 999999).toString();
-    const hashedCode = await bcrypt.hash(code, 10);
+    const hashedCode = await bcryptjs.hash(code, 10);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
     await this.prisma.twoFactorCode.create({
@@ -140,7 +140,7 @@ export class TwoFactorService {
     throw new BadRequestException('Invalid 2FA method');
   }
 
-  private verifyTOTP(secret: string, token: string): boolean {
+  private verifyTOTP(secret: string | null, token: string): boolean {
     if (!secret) return false;
 
     return speakeasy.totp.verify({
@@ -164,7 +164,7 @@ export class TwoFactorService {
 
     if (!storedCode) return false;
 
-    const isValid = await bcrypt.compare(code, storedCode.code);
+    const isValid = await bcryptjs.compare(code, storedCode.code);
 
     if (isValid) {
       await this.prisma.twoFactorCode.update({
@@ -184,7 +184,7 @@ export class TwoFactorService {
     if (!user || !user.backupCodes.length) return false;
 
     for (let i = 0; i < user.backupCodes.length; i++) {
-      const isValid = await bcrypt.compare(code, user.backupCodes[i]);
+      const isValid = await bcryptjs.compare(code, user.backupCodes[i]);
       if (isValid) {
         const updatedCodes = user.backupCodes.filter((_, index) => index !== i);
         await this.prisma.user.update({
@@ -196,6 +196,28 @@ export class TwoFactorService {
     }
 
     return false;
+  }
+
+  async regenerateBackupCodes(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user || !user.twoFactorEnabled) {
+      throw new BadRequestException('2FA not enabled');
+    }
+
+    const backupCodes = this.generateBackupCodes();
+    const hashedBackupCodes = await Promise.all(
+      backupCodes.map(code => bcryptjs.hash(code, 10))
+    );
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { backupCodes: hashedBackupCodes }
+    });
+
+    return { backupCodes };
   }
 
   async disable2FA(userId: string) {

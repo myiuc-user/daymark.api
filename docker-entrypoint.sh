@@ -1,10 +1,10 @@
 #!/bin/sh
 
 echo "Running migrations..."
-npm run db:deploy || true
+pnpm run db:deploy || true
 
 echo "Running seed..."
-npm run db:seed || true
+pnpm run db:seed || true
 
 echo "Starting application..."
-npm start
+pnpm start

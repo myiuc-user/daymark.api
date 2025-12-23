@@ -322,6 +322,12 @@ export class WorkspacesService {
   }
 
   async updateMemberRole(workspaceId: string, memberUserId: string, newRole: string, updatedById: string) {
+    // Validate role - using UserRole enum which includes SUPER_ADMIN
+    const validRoles = ['SUPER_ADMIN', 'ADMIN', 'MEMBER'];
+    if (!validRoles.includes(newRole)) {
+      throw new Error(`Invalid role: ${newRole}. Valid roles are: ${validRoles.join(', ')}`);
+    }
+    
     // Get member info
     const member = await this.prisma.workspaceMember.findFirst({
       where: {
@@ -330,7 +336,7 @@ export class WorkspacesService {
       },
       include: {
         user: {
-          select: { id: true, name: true, email: true }
+          select: { id: true, name: true, email: true, role: true }
         },
         workspace: {
           select: { id: true, name: true }
@@ -342,20 +348,21 @@ export class WorkspacesService {
       throw new Error('Member not found in workspace');
     }
     
-    const oldRole = member.role;
+    const oldRole = member.user.role;
     
-    // Update member role
-    const updatedMember = await this.prisma.workspaceMember.update({
+    // Update user's global role
+    const updatedUser = await this.prisma.user.update({
       where: {
-        id: member.id
+        id: memberUserId
       },
       data: {
         role: newRole as any
       },
-      include: {
-        user: {
-          select: { id: true, name: true, email: true }
-        }
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true
       }
     });
     
@@ -377,7 +384,7 @@ export class WorkspacesService {
       }
     });
     
-    return { member: updatedMember, message: 'Member role updated successfully' };
+    return { member: { user: updatedUser }, message: 'User role updated successfully' };
   }
 
   async getInvitationByToken(token: string) {

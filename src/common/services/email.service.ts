@@ -239,4 +239,58 @@ export class EmailService {
       return { success: false, message: error?.message || 'Failed to send email' };
     }
   }
+
+  async send2FACode(email: string, code: string) {
+    try {
+      console.log('Sending 2FA code email to:', email);
+      
+      const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Code de vérification Daymark</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #2563eb;">Code de vérification</h2>
+        
+        <p>Votre code de vérification à deux facteurs est :</p>
+        
+        <div style="background-color: #f5f5f5; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 3px; margin: 20px 0; border-radius: 6px;">
+            ${code}
+        </div>
+        
+        <p style="color: #666;">Ce code expire dans 5 minutes.</p>
+        <p style="color: #666;">Si vous n'avez pas demandé ce code, ignorez cet email.</p>
+        
+        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+        
+        <p style="color: #999; font-size: 12px;">
+            Ceci est une notification automatique de Daymark.
+        </p>
+    </div>
+</body>
+</html>`;
+
+      const mailOptions = {
+        from: 'galio.noreply@myiuc.com',
+        to: email,
+        subject: 'Code de vérification Daymark',
+        html: htmlContent
+      };
+
+      const transporter = this.getTransporter();
+      const result = await transporter.sendMail(mailOptions);
+      console.log('2FA code email sent successfully:', result.messageId);
+      return { success: true, message: '2FA code email sent' };
+    } catch (error: any) {
+      console.error('Error sending 2FA code email:', {
+        error: error?.message || 'Unknown error',
+        stack: error?.stack,
+        code: error?.code
+      });
+      return { success: false, message: error?.message || 'Failed to send email' };
+    }
+  }
 }

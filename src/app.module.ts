@@ -6,6 +6,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
+import { TwoFactorModule } from './two-factor/two-factor.module';
 import { UsersModule } from './users/users.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 import { ProjectsModule } from './projects/projects.module';
@@ -47,6 +48,7 @@ import { AuditInterceptor } from './common/interceptors/audit.interceptor';
     }),
     PrismaModule,
     AuthModule,
+    TwoFactorModule,
     UsersModule,
     WorkspacesModule,
     ProjectsModule,

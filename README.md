@@ -192,7 +192,11 @@ src/
 # Generate client
 pnpm run db:generate
 
-# Create migration
+# Create migration (follows naming convention: YYYYMMDDHHMMSS_name)
+prisma migrate dev --name YYYYMMDDHHMMSS_migration_name
+# Example: prisma migrate dev --name 20241215143022_add_user_preferences
+
+# Run migrations
 pnpm run db:migrate
 
 # Reset database
@@ -201,6 +205,23 @@ pnpm run db:reset
 # Seed database
 pnpm run db:seed
 ```
+
+### Migration Naming Convention
+
+**IMPORTANT:** When creating new migrations with `prisma migrate dev`, always follow this naming convention:
+
+**Format:** `YYYYMMDDHHMMSS_descriptive_name`
+
+**Examples:**
+- `20241215143022_add_user_preferences`
+- `20241215144530_update_task_status_enum`
+- `20241215150000_create_notification_table`
+
+**Guidelines:**
+- Use current date and time in UTC
+- Use underscores to separate words
+- Keep names descriptive but concise
+- Follow existing migration patterns in the project
 
 ## 🔧 Environment Variables
 

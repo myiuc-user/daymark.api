@@ -18,7 +18,8 @@ export class TasksService {
   async findAll(projectId: string) {
     const tasks = await this.prisma.task.findMany({ 
       where: { projectId },
-      include: this.taskInclude
+      include: this.taskInclude,
+      orderBy: { due_date: 'asc' }
     });
     return { tasks: tasks || [] };
   }
@@ -180,7 +181,8 @@ export class TasksService {
   async findAllByWorkspace(workspaceId: string) {
     const tasks = await this.prisma.task.findMany({
       where: { project: { workspaceId } },
-      include: this.taskInclude
+      include: this.taskInclude,
+      orderBy: { due_date: 'asc' }
     });
     return { tasks: tasks || [] };
   }
@@ -217,7 +219,8 @@ export class TasksService {
   async getSubtasks(taskId: string) {
     const subtasks = await this.prisma.task.findMany({
       where: { parentTaskId: taskId },
-      include: this.taskInclude
+      include: this.taskInclude,
+      orderBy: { due_date: 'asc' }
     });
     return { subtasks };
   }

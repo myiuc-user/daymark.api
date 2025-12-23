@@ -350,7 +350,7 @@ export class WorkspacesService {
         id: member.id
       },
       data: {
-        role: newRole
+        role: newRole as any
       },
       include: {
         user: {

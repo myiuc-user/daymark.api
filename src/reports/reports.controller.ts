@@ -32,7 +32,7 @@ export class ReportsController {
 
   @Post(':id/execute')
   async executeReport(@Param('id') id: string) {
-    return this.reportsService.executeReport(id);
+    return this.reportsService.executeReportManually(id);
   }
 
   @Get(':id/executions')

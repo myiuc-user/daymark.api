@@ -13,8 +13,12 @@ export class ReportsService {
   ) {}
 
   async createScheduledReport(data: any) {
+    const nextRunAt = this.calculateNextRun(data.cronExpression);
     return this.prisma.scheduledReport.create({
-      data
+      data: {
+        ...data,
+        nextRunAt
+      }
     });
   }
 
@@ -62,7 +66,7 @@ export class ReportsService {
     }
   }
 
-  async executeReport(reportId: string) {
+  async executeReport(reportId: string, isManual: boolean = false) {
     const report = await this.prisma.scheduledReport.findUnique({
       where: { id: reportId }
     });
@@ -99,13 +103,15 @@ export class ReportsService {
         }
       });
 
-      const nextRunAt = this.calculateNextRun(report.cronExpression);
+      // Ne mettre à jour nextRunAt que si ce n'est pas une exécution manuelle
+      const updateData: any = { lastRunAt: new Date() };
+      if (!isManual) {
+        updateData.nextRunAt = this.calculateNextRun(report.cronExpression);
+      }
+      
       await this.prisma.scheduledReport.update({
         where: { id: reportId },
-        data: { 
-          lastRunAt: new Date(),
-          nextRunAt: this.calculateNextRun(report.cronExpression)
-        }
+        data: updateData
       });
 
     } catch (error) {
@@ -133,11 +139,15 @@ export class ReportsService {
   }
 
   private async getTaskSummaryData(report: any) {
+    const filters = report.filters || {};
+    const dateRange = parseInt(filters.dateRange || '7');
+    
     return this.prisma.task.findMany({
       where: {
-        ...(report.projectId && { projectId: report.projectId }),
+        ...(filters.projectId && { projectId: filters.projectId }),
+        ...(filters.userIds?.length > 0 && { assigneeId: { in: filters.userIds } }),
         createdAt: {
-          gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          gte: new Date(Date.now() - dateRange * 24 * 60 * 60 * 1000)
         }
       },
       include: {
@@ -148,20 +158,24 @@ export class ReportsService {
   }
 
   private async getUserPerformanceData(report: any) {
+    const filters = report.filters || {};
+    const dateRange = parseInt(filters.dateRange || '7');
+    const dateFilter = new Date(Date.now() - dateRange * 24 * 60 * 60 * 1000);
+    
     return this.prisma.user.findMany({
+      where: {
+        ...(filters.userIds?.length > 0 && { id: { in: filters.userIds } })
+      },
       include: {
         tasks: {
           where: {
-            updatedAt: {
-              gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-            }
+            ...(filters.projectId && { projectId: filters.projectId }),
+            updatedAt: { gte: dateFilter }
           }
         },
         timeEntries: {
           where: {
-            date: {
-              gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-            }
+            date: { gte: dateFilter }
           }
         }
       }
@@ -169,11 +183,20 @@ export class ReportsService {
   }
 
   private async getProjectProgressData(report: any) {
+    const filters = report.filters || {};
+    
     return this.prisma.project.findMany({
-      where: report.projectId ? { id: report.projectId } : {},
+      where: filters.projectId ? { id: filters.projectId } : {},
       include: {
-        tasks: true,
+        tasks: {
+          where: {
+            ...(filters.userIds?.length > 0 && { assigneeId: { in: filters.userIds } })
+          }
+        },
         members: {
+          where: {
+            ...(filters.userIds?.length > 0 && { userId: { in: filters.userIds } })
+          },
           include: { user: true }
         }
       }
@@ -192,6 +215,10 @@ export class ReportsService {
     }
     
     return new Date(now.getTime() + 60 * 60 * 1000);
+  }
+
+  async executeReportManually(reportId: string) {
+    return this.executeReport(reportId, true);
   }
 
   async getReportExecutions(reportId: string) {

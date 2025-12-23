@@ -8,7 +8,7 @@ export class AnalyticsService {
   async getProjectAnalytics(projectId: string) {
     const tasks = await this.prisma.task.findMany({ where: { projectId } }) || [];
     const completed = tasks.filter(t => t.status === 'DONE').length;
-    return { total: tasks.length, completed, percentage: tasks.length > 0 ? (completed / tasks.length) * 100 : 0 };
+    return { total: tasks.length, completed, percentage: tasks.length > 0 ? Math.round((completed / tasks.length) * 100 * 10) / 10 : 0 };
   }
 
   async getTeamAnalytics(workspaceId: string) {
@@ -37,7 +37,7 @@ export class AnalyticsService {
       totalTasks: tasksList.length,
       completedTasks,
       totalMembers,
-      completionRate: tasksList.length > 0 ? (completedTasks / tasksList.length) * 100 : 0
+      completionRate: tasksList.length > 0 ? Math.round((completedTasks / tasksList.length) * 100 * 10) / 10 : 0
     };
   }
 }

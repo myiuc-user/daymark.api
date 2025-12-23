@@ -384,6 +384,23 @@ export class WorkspacesService {
       }
     });
     
+    // Get updater info for email
+    const updater = await this.prisma.user.findUnique({ where: { id: updatedById } });
+    
+    // Send email notification
+    try {
+      await this.emailService.sendRoleUpdateEmail(
+        member.user.email,
+        member.user.name,
+        member.workspace.name,
+        oldRole,
+        newRole,
+        updater?.name || 'Administrator'
+      );
+    } catch (emailError) {
+      console.error('Failed to send role update email:', emailError);
+    }
+    
     return { member: { user: updatedUser }, message: 'User role updated successfully' };
   }
 

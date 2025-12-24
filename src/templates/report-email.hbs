@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{reportName}}</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #2563eb;">{{reportName}}</h2>
+        <p>{{description}}</p>
+        <div style="background-color: #f0f9ff; padding: 15px; border-radius: 6px; margin: 20px 0;">
+            <p><strong>Type:</strong> {{reportType}}</p>
+            <p><strong>Généré le:</strong> {{generatedAt}}</p>
+        </div>
+        
+        {{#if stats}}
+        <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="color: #1f2937; margin-top: 0;">📊 Statistiques ({{stats.period}})</h3>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 15px 0;">
+                <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #e5e7eb;">
+                    <div style="font-size: 24px; font-weight: bold; color: #2563eb;">{{stats.totalTasks}}</div>
+                    <div style="font-size: 12px; color: #6b7280;">Total tâches</div>
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #e5e7eb;">
+                    <div style="font-size: 24px; font-weight: bold; color: #10b981;">{{stats.completedTasks}}</div>
+                    <div style="font-size: 12px; color: #6b7280;">Terminées</div>
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #e5e7eb;">
+                    <div style="font-size: 24px; font-weight: bold; color: #f59e0b;">{{stats.inProgressTasks}}</div>
+                    <div style="font-size: 12px; color: #6b7280;">En cours</div>
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #e5e7eb;">
+                    <div style="font-size: 24px; font-weight: bold; color: #ef4444;">{{stats.todoTasks}}</div>
+                    <div style="font-size: 12px; color: #6b7280;">À faire</div>
+                </div>
+            </div>
+            
+            <div style="background: white; padding: 15px; border-radius: 6px; margin: 15px 0; border: 1px solid #e5e7eb;">
+                <div style="font-size: 18px; font-weight: bold; color: #1f2937;">Taux de completion: {{stats.completionRate}}%</div>
+                <div style="background: #e5e7eb; height: 8px; border-radius: 4px; margin: 8px 0;">
+                    <div style="background: #10b981; height: 8px; border-radius: 4px; width: {{stats.completionRate}}%;"></div>
+                </div>
+            </div>
+            
+            {{#if stats.userStats}}
+            <div style="margin: 20px 0;">
+                <h4 style="color: #1f2937;">👥 Performance par utilisateur</h4>
+                {{#each stats.userStats}}
+                <div style="background: white; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #e5e7eb;">
+                    <div style="font-weight: bold;">{{name}}</div>
+                    <div style="font-size: 14px; color: #6b7280;">
+                        {{totalTasks}} tâches • {{completedTasks}} terminées • {{inProgressTasks}} en cours
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+            {{/if}}
+            
+            {{#if stats.projectStats}}
+            <div style="margin: 20px 0;">
+                <h4 style="color: #1f2937;">📁 Performance par projet</h4>
+                {{#each stats.projectStats}}
+                <div style="background: white; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #e5e7eb;">
+                    <div style="font-weight: bold;">{{name}}</div>
+                    <div style="font-size: 14px; color: #6b7280;">
+                        {{totalTasks}} tâches • {{completedTasks}} terminées • {{inProgressTasks}} en cours
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+            {{/if}}
+            
+            <div style="font-size: 12px; color: #9ca3af; margin-top: 15px;">
+                Généré le: {{stats.generatedAt}}
+            </div>
+        </div>
+        {{/if}}
+        
+        <p>Vous trouverez le rapport détaillé en pièce jointe.</p>
+    </div>
+</body>
+</html>

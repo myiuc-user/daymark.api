@@ -1,82 +1,43 @@
 import { Injectable } from '@nestjs/common';
 import * as Handlebars from 'handlebars';
 import * as nodemailer from 'nodemailer';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class EmailService {
   private invitationTemplate: HandlebarsTemplateDelegate;
   private roleUpdateTemplate: HandlebarsTemplateDelegate;
+  private taskCompletedTemplate: HandlebarsTemplateDelegate;
+  private twoFATemplate: HandlebarsTemplateDelegate;
+  private reportTemplate: HandlebarsTemplateDelegate;
   private transporter: nodemailer.Transporter | null = null;
 
   constructor() {
-    const templateSource = `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Workspace Invitation</title>
-</head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #2563eb;">You're invited to join {{workspaceName}}</h2>
-        
-        <p>Hi there,</p>
-        
-        <p>{{inviterName}} has invited you to join the workspace "<strong>{{workspaceName}}</strong>" on Daymark.</p>
-        
-        <div style="text-align: center; margin: 30px 0;">
-            <a href="{{acceptUrl}}" 
-               style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
-                Accept Invitation
-            </a>
-        </div>
-        
-        <p style="color: #666; font-size: 14px;">
-            This invitation expires in 7 days. If you don't want to join this workspace, you can ignore this email.
-        </p>
-        
-        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-        
-        <p style="color: #999; font-size: 12px;">
-            If the button doesn't work, copy and paste this link into your browser:<br>
-            {{acceptUrl}}
-        </p>
-    </div>
-</body>
-</html>`;
-    this.invitationTemplate = Handlebars.compile(templateSource);
+    // Load invitation template
+    const invitationTemplatePath = path.join(__dirname, 'invitation-email.hbs');
+    const invitationTemplateSource = fs.readFileSync(invitationTemplatePath, 'utf8');
+    this.invitationTemplate = Handlebars.compile(invitationTemplateSource);
     
-    const roleUpdateTemplateSource = `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Role Updated</title>
-</head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #2563eb;">Your role has been updated</h2>
-        
-        <p>Hi {{userName}},</p>
-        
-        <p>Your role in workspace "<strong>{{workspaceName}}</strong>" has been updated by {{updatedBy}}.</p>
-        
-        <div style="background-color: #f8fafc; padding: 15px; border-radius: 6px; margin: 20px 0;">
-            <p style="margin: 0;"><strong>Previous role:</strong> {{oldRole}}</p>
-            <p style="margin: 0;"><strong>New role:</strong> {{newRole}}</p>
-        </div>
-        
-        <p>This change is effective immediately.</p>
-        
-        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-        
-        <p style="color: #999; font-size: 12px;">
-            This is an automated notification from Daymark.
-        </p>
-    </div>
-</body>
-</html>`;
+    // Load role update template
+    const roleUpdateTemplatePath = path.join(__dirname, 'role-update-email.hbs');
+    const roleUpdateTemplateSource = fs.readFileSync(roleUpdateTemplatePath, 'utf8');
     this.roleUpdateTemplate = Handlebars.compile(roleUpdateTemplateSource);
+    
+    // Load task completed template
+    const taskCompletedTemplatePath = path.join(__dirname, 'task-completed-email.hbs');
+    const taskCompletedTemplateSource = fs.readFileSync(taskCompletedTemplatePath, 'utf8');
+    this.taskCompletedTemplate = Handlebars.compile(taskCompletedTemplateSource);
+    
+    // Load 2FA template
+    const twoFATemplatePath = path.join(__dirname, '2fa-code-email.hbs');
+    const twoFATemplateSource = fs.readFileSync(twoFATemplatePath, 'utf8');
+    this.twoFATemplate = Handlebars.compile(twoFATemplateSource);
+    
+    // Load report template
+    const reportTemplatePath = path.join(__dirname, 'report-email.hbs');
+    const reportTemplateSource = fs.readFileSync(reportTemplatePath, 'utf8');
+    this.reportTemplate = Handlebars.compile(reportTemplateSource);
   }
 
   private getTransporter(): nodemailer.Transporter {
@@ -189,35 +150,12 @@ export class EmailService {
     try {
       console.log('Sending task completed email to:', email);
       
-      const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Task Completed</title>
-</head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #2563eb;">Task Completed</h2>
-        
-        <p>Hi ${projectLeadName},</p>
-        
-        <p>${completedBy} has marked the task "<strong>${taskTitle}</strong>" as completed in project "<strong>${projectName}</strong>".</p>
-        
-        <div style="background-color: #f0f9ff; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #2563eb;">
-            <p style="margin: 0; color: #1e40af;"><strong>✓ Task Status:</strong> Completed</p>
-        </div>
-        
-        <p>Great progress on the project!</p>
-        
-        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-        
-        <p style="color: #999; font-size: 12px;">
-            This is an automated notification from Daymark.
-        </p>
-    </div>
-</body>
-</html>`;
+      const htmlContent = this.taskCompletedTemplate({
+        projectLeadName,
+        taskTitle,
+        projectName,
+        completedBy
+      });
 
       const mailOptions = {
         from: 'galio.noreply@myiuc.com',
@@ -244,34 +182,7 @@ export class EmailService {
     try {
       console.log('Sending 2FA code email to:', email);
       
-      const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Code de vérification Daymark</title>
-</head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #2563eb;">Code de vérification</h2>
-        
-        <p>Votre code de vérification à deux facteurs est :</p>
-        
-        <div style="background-color: #f5f5f5; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 3px; margin: 20px 0; border-radius: 6px;">
-            ${code}
-        </div>
-        
-        <p style="color: #666;">Ce code expire dans 5 minutes.</p>
-        <p style="color: #666;">Si vous n'avez pas demandé ce code, ignorez cet email.</p>
-        
-        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-        
-        <p style="color: #999; font-size: 12px;">
-            Ceci est une notification automatique de Daymark.
-        </p>
-    </div>
-</body>
-</html>`;
+      const htmlContent = this.twoFATemplate({ code });
 
       const mailOptions = {
         from: 'galio.noreply@myiuc.com',
@@ -296,89 +207,13 @@ export class EmailService {
 
   async sendReportEmail(recipients: string[], reportName: string, description: string, reportType: string, stats?: any, pdfPath?: string) {
     try {
-      const statsHtml = stats ? `
-        <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <h3 style="color: #1f2937; margin-top: 0;">📊 Statistiques (${stats.period})</h3>
-          
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 15px 0;">
-            <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #e5e7eb;">
-              <div style="font-size: 24px; font-weight: bold; color: #2563eb;">${stats.totalTasks}</div>
-              <div style="font-size: 12px; color: #6b7280;">Total tâches</div>
-            </div>
-            <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #e5e7eb;">
-              <div style="font-size: 24px; font-weight: bold; color: #10b981;">${stats.completedTasks}</div>
-              <div style="font-size: 12px; color: #6b7280;">Terminées</div>
-            </div>
-            <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #e5e7eb;">
-              <div style="font-size: 24px; font-weight: bold; color: #f59e0b;">${stats.inProgressTasks}</div>
-              <div style="font-size: 12px; color: #6b7280;">En cours</div>
-            </div>
-            <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #e5e7eb;">
-              <div style="font-size: 24px; font-weight: bold; color: #ef4444;">${stats.todoTasks}</div>
-              <div style="font-size: 12px; color: #6b7280;">À faire</div>
-            </div>
-          </div>
-          
-          <div style="background: white; padding: 15px; border-radius: 6px; margin: 15px 0; border: 1px solid #e5e7eb;">
-            <div style="font-size: 18px; font-weight: bold; color: #1f2937;">Taux de completion: ${stats.completionRate}%</div>
-            <div style="background: #e5e7eb; height: 8px; border-radius: 4px; margin: 8px 0;">
-              <div style="background: #10b981; height: 8px; border-radius: 4px; width: ${stats.completionRate}%;"></div>
-            </div>
-          </div>
-          
-          ${stats.userStats?.length > 0 ? `
-            <div style="margin: 20px 0;">
-              <h4 style="color: #1f2937;">👥 Performance par utilisateur</h4>
-              ${stats.userStats.map((user: any) => `
-                <div style="background: white; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #e5e7eb;">
-                  <div style="font-weight: bold;">${user.name}</div>
-                  <div style="font-size: 14px; color: #6b7280;">
-                    ${user.totalTasks} tâches • ${user.completedTasks} terminées • ${user.inProgressTasks} en cours
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          ` : ''}
-          
-          ${stats.projectStats?.length > 0 ? `
-            <div style="margin: 20px 0;">
-              <h4 style="color: #1f2937;">📁 Performance par projet</h4>
-              ${stats.projectStats.map((project: any) => `
-                <div style="background: white; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #e5e7eb;">
-                  <div style="font-weight: bold;">${project.name}</div>
-                  <div style="font-size: 14px; color: #6b7280;">
-                    ${project.totalTasks} tâches • ${project.completedTasks} terminées • ${project.inProgressTasks} en cours
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          ` : ''}
-          
-          <div style="font-size: 12px; color: #9ca3af; margin-top: 15px;">
-            Généré le: ${stats.generatedAt}
-          </div>
-        </div>
-      ` : '';
-      
-      const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Rapport automatisé</title>
-</head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #2563eb;">${reportName}</h2>
-        <p>${description || 'Rapport généré automatiquement'}</p>
-        <div style="background-color: #f0f9ff; padding: 15px; border-radius: 6px; margin: 20px 0;">
-            <p><strong>Type:</strong> ${reportType}</p>
-            <p><strong>Généré le:</strong> ${new Date().toLocaleString('fr-FR', { timeZone: 'Africa/Lagos' })}</p>
-        </div>
-        ${statsHtml}
-    </div>
-</body>
-</html>`;
+      const htmlContent = this.reportTemplate({
+        reportName,
+        description: description || 'Rapport généré automatiquement',
+        reportType,
+        generatedAt: new Date().toLocaleString('fr-FR', { timeZone: 'Africa/Lagos' }),
+        stats
+      });
 
       const mailOptions = {
         from: 'galio.noreply@myiuc.com',

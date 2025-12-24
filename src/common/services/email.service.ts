@@ -205,14 +205,20 @@ export class EmailService {
     }
   }
 
-  async sendReportEmail(recipients: string[], reportName: string, description: string, reportType: string, stats?: any, pdfPath?: string) {
+  async sendReportEmail(recipients: string[], reportName: string, description: string, reportType: string, stats?: any, pdfPath?: string, tasks?: any[]) {
     try {
+      // Register Handlebars helpers for template
+      Handlebars.registerHelper('eq', function(a, b) {
+        return a === b;
+      });
+      
       const htmlContent = this.reportTemplate({
         reportName,
         description: description || 'Rapport généré automatiquement',
         reportType,
         generatedAt: new Date().toLocaleString('fr-FR', { timeZone: 'Africa/Lagos' }),
-        stats
+        stats,
+        tasks: tasks || []
       });
 
       const mailOptions = {

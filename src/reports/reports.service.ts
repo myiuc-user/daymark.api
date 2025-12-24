@@ -87,7 +87,7 @@ export class ReportsService {
     try {
       const reportData = await this.generateReportData(report);
       const reportStats = await this.generateReportStats(report, reportData);
-      const pdfPath = await this.generatePDF(report, reportStats);
+      const pdfPath = await this.generatePDF(report, reportStats, reportData);
       
       // Envoyer l'email avec le rapport et les statistiques
       if (report.recipients && report.recipients.length > 0) {
@@ -97,7 +97,8 @@ export class ReportsService {
           report.description || '',
           report.reportType,
           reportStats,
-          pdfPath
+          pdfPath,
+          reportData
         );
       }
       
@@ -375,7 +376,7 @@ export class ReportsService {
     }));
   }
 
-  private async generatePDF(report: any, stats: any): Promise<string> {
+  private async generatePDF(report: any, stats: any, tasks: any = []): Promise<string> {
     try {
       // Utiliser Puppeteer en mode local au lieu du service distant
       const browser = await puppeteer.launch({
@@ -398,7 +399,7 @@ export class ReportsService {
       
       const page = await browser.newPage();
       
-      const htmlContent = this.generatePDFHTML(report, stats);
+      const htmlContent = this.generatePDFHTML(report, stats, tasks);
       await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
       
       const pdfPath = `reports/report-${report.id}-${Date.now()}.pdf`;
@@ -430,7 +431,7 @@ export class ReportsService {
     }
   }
   
-  private generatePDFHTML(report: any, stats: any): string {
+  private generatePDFHTML(report: any, stats: any, tasks: any = []): string {
     return `
 <!DOCTYPE html>
 <html>
@@ -508,6 +509,40 @@ export class ReportsService {
                     ${project.totalTasks} tâches • ${project.completedTasks} terminées • ${project.inProgressTasks} en cours
                 </div>
             `).join('')}
+        </div>
+    ` : ''}
+    
+    ${Array.isArray(tasks) && tasks.length > 0 ? `
+        <div class="section">
+            <h2>📋 Liste des tâches</h2>
+            <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                <thead>
+                    <tr style="background: #f8fafc;">
+                        <th style="padding: 12px; text-align: left; border: 1px solid #e5e7eb;">Tâche</th>
+                        <th style="padding: 12px; text-align: left; border: 1px solid #e5e7eb;">Statut</th>
+                        <th style="padding: 12px; text-align: left; border: 1px solid #e5e7eb;">Assigné à</th>
+                        <th style="padding: 12px; text-align: left; border: 1px solid #e5e7eb;">Projet</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tasks.map((task: any) => `
+                        <tr>
+                            <td style="padding: 12px; border: 1px solid #e5e7eb;">${task.title}</td>
+                            <td style="padding: 12px; border: 1px solid #e5e7eb;">
+                                <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; ${
+                                  task.status === 'DONE' ? 'background: #dcfce7; color: #166534;' :
+                                  task.status === 'IN_PROGRESS' ? 'background: #fef3c7; color: #92400e;' :
+                                  'background: #fee2e2; color: #991b1b;'
+                                }">
+                                    ${task.status === 'DONE' ? 'Terminé' : task.status === 'IN_PROGRESS' ? 'En cours' : 'À faire'}
+                                </span>
+                            </td>
+                            <td style="padding: 12px; border: 1px solid #e5e7eb;">${task.assignee?.name || 'Non assigné'}</td>
+                            <td style="padding: 12px; border: 1px solid #e5e7eb;">${task.project?.name || 'Aucun projet'}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
         </div>
     ` : ''}
 </body>

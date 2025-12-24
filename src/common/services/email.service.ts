@@ -294,7 +294,7 @@ export class EmailService {
     }
   }
 
-  async sendReportEmail(recipients: string[], reportName: string, description: string, reportType: string, stats?: any) {
+  async sendReportEmail(recipients: string[], reportName: string, description: string, reportType: string, stats?: any, pdfPath?: string) {
     try {
       const statsHtml = stats ? `
         <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
@@ -384,7 +384,13 @@ export class EmailService {
         from: 'galio.noreply@myiuc.com',
         to: recipients,
         subject: `Rapport automatisé: ${reportName}`,
-        html: htmlContent
+        html: htmlContent,
+        ...(pdfPath && {
+          attachments: [{
+            filename: `${reportName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
+            path: pdfPath
+          }]
+        })
       };
 
       const transporter = this.getTransporter();

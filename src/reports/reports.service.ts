@@ -96,7 +96,8 @@ export class ReportsService {
           report.name,
           report.description || '',
           report.reportType,
-          reportStats
+          reportStats,
+          pdfPath
         );
       }
       

@@ -12,7 +12,7 @@ services:
     env_file:
       - .env
     environment:
-      - CHROMIUM_WS_ENDPOINT=ws://chromium:8000
+      - CHROMIUM_WS_ENDPOINT=ws://chromium:7000
     volumes:
       - uploads:/app/uploads
       - reports:/app/reports
@@ -26,7 +26,7 @@ services:
     container_name: daymark-chromium
     restart: unless-stopped
     ports:
-      - "8000:3000"
+      - "7000:3000"
     environment:
       - MAX_CONCURRENT_SESSIONS=10
       - CONNECTION_TIMEOUT=60000

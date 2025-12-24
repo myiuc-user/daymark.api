@@ -11,13 +11,34 @@ services:
       - "3001:3001"
     env_file:
       - .env
+    environment:
+      - CHROMIUM_WS_ENDPOINT=ws://chromium:8000
     volumes:
       - uploads:/app/uploads
+      - reports:/app/reports
+    depends_on:
+      - chromium
+    networks:
+      - coolify
+
+  chromium:
+    image: browserless/chrome:latest
+    container_name: daymark-chromium
+    restart: unless-stopped
+    ports:
+      - "8000:3000"
+    environment:
+      - MAX_CONCURRENT_SESSIONS=10
+      - CONNECTION_TIMEOUT=60000
+      - MAX_QUEUE_LENGTH=10
+      - PREBOOT_CHROME=true
+      - KEEP_ALIVE=true
     networks:
       - coolify
 
 volumes:
   uploads:
+  reports:
 
 networks:
   coolify:

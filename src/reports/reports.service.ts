@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../common/services/email.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import * as cron from 'node-cron';
+import * as puppeteer from 'puppeteer';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -85,14 +86,17 @@ export class ReportsService {
 
     try {
       const reportData = await this.generateReportData(report);
+      const reportStats = await this.generateReportStats(report, reportData);
+      const pdfPath = await this.generatePDF(report, reportStats);
       
-      // Envoyer l'email avec le rapport
+      // Envoyer l'email avec le rapport et les statistiques
       if (report.recipients && report.recipients.length > 0) {
         await this.emailService.sendReportEmail(
           report.recipients,
           report.name,
           report.description || '',
-          report.reportType
+          report.reportType,
+          reportStats
         );
       }
       
@@ -100,7 +104,7 @@ export class ReportsService {
         where: { id: execution.id },
         data: {
           status: 'COMPLETED',
-          filePath: 'generated-report.pdf'
+          filePath: pdfPath
         }
       });
 
@@ -274,6 +278,224 @@ export class ReportsService {
     
     // Handle single value
     return Number(field) === value;
+  }
+
+  private async generateReportStats(report: any, reportData: any) {
+    const filters = report.filters || {};
+    const dateRange = parseInt(filters.dateRange || '7');
+    const dateFilter = new Date(Date.now() - dateRange * 24 * 60 * 60 * 1000);
+    
+    // Statistiques générales
+    const totalTasks = Array.isArray(reportData) ? reportData.length : 0;
+    const completedTasks = Array.isArray(reportData) ? 
+      reportData.filter(task => task.status === 'DONE').length : 0;
+    const inProgressTasks = Array.isArray(reportData) ? 
+      reportData.filter(task => task.status === 'IN_PROGRESS').length : 0;
+    const todoTasks = Array.isArray(reportData) ? 
+      reportData.filter(task => task.status === 'TODO').length : 0;
+    
+    // Statistiques par utilisateur (si applicable)
+    const userStats = await this.getUserStats(filters, dateFilter);
+    
+    // Statistiques par projet (si applicable)
+    const projectStats = await this.getProjectStats(filters, dateFilter);
+    
+    return {
+      period: `${dateRange} derniers jours`,
+      totalTasks,
+      completedTasks,
+      inProgressTasks,
+      todoTasks,
+      completionRate: totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0,
+      userStats,
+      projectStats,
+      generatedAt: new Date().toLocaleString('fr-FR', { timeZone: 'Africa/Lagos' })
+    };
+  }
+  
+  private async getUserStats(filters: any, dateFilter: Date) {
+    const whereClause: any = {
+      tasks: {
+        some: {
+          updatedAt: { gte: dateFilter },
+          ...(filters.projectId && { projectId: filters.projectId })
+        }
+      }
+    };
+    
+    if (filters.userIds?.length > 0) {
+      whereClause.id = { in: filters.userIds };
+    }
+    
+    const users = await this.prisma.user.findMany({
+      where: whereClause,
+      include: {
+        tasks: {
+          where: {
+            updatedAt: { gte: dateFilter },
+            ...(filters.projectId && { projectId: filters.projectId })
+          }
+        }
+      }
+    });
+    
+    return users.map(user => ({
+      name: user.name,
+      totalTasks: user.tasks.length,
+      completedTasks: user.tasks.filter(t => t.status === 'DONE').length,
+      inProgressTasks: user.tasks.filter(t => t.status === 'IN_PROGRESS').length
+    }));
+  }
+  
+  private async getProjectStats(filters: any, dateFilter: Date) {
+    const whereClause: any = {};
+    
+    if (filters.projectId) {
+      whereClause.id = filters.projectId;
+    }
+    
+    const projects = await this.prisma.project.findMany({
+      where: whereClause,
+      include: {
+        tasks: {
+          where: {
+            updatedAt: { gte: dateFilter },
+            ...(filters.userIds?.length > 0 && { assigneeId: { in: filters.userIds } })
+          }
+        }
+      }
+    });
+    
+    return projects.map(project => ({
+      name: project.name,
+      totalTasks: project.tasks.length,
+      completedTasks: project.tasks.filter(t => t.status === 'DONE').length,
+      inProgressTasks: project.tasks.filter(t => t.status === 'IN_PROGRESS').length
+    }));
+  }
+
+  private async generatePDF(report: any, stats: any): Promise<string> {
+    try {
+      const browser = await puppeteer.connect({
+        browserWSEndpoint: process.env.CHROMIUM_WS_ENDPOINT || 'ws://chromium:8000'
+      });
+      
+      const page = await browser.newPage();
+      
+      const htmlContent = this.generatePDFHTML(report, stats);
+      await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+      
+      const pdfPath = `reports/report-${report.id}-${Date.now()}.pdf`;
+      const fullPath = path.join(process.cwd(), pdfPath);
+      
+      // Créer le dossier s'il n'existe pas
+      const dir = path.dirname(fullPath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      
+      await page.pdf({
+        path: fullPath,
+        format: 'A4',
+        printBackground: true,
+        margin: {
+          top: '20px',
+          right: '20px',
+          bottom: '20px',
+          left: '20px'
+        }
+      });
+      
+      await browser.close();
+      return pdfPath;
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      throw new Error('Failed to generate PDF report');
+    }
+  }
+  
+  private generatePDFHTML(report: any, stats: any): string {
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>${report.name}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }
+        .stat-card { background: #f8fafc; padding: 15px; border-radius: 8px; text-align: center; }
+        .stat-number { font-size: 24px; font-weight: bold; color: #2563eb; }
+        .stat-label { font-size: 12px; color: #6b7280; }
+        .progress-bar { background: #e5e7eb; height: 8px; border-radius: 4px; margin: 10px 0; }
+        .progress-fill { background: #10b981; height: 8px; border-radius: 4px; }
+        .section { margin: 30px 0; }
+        .user-item, .project-item { background: #f9fafb; padding: 12px; margin: 8px 0; border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>${report.name}</h1>
+        <p>${report.description || 'Rapport généré automatiquement'}</p>
+        <p><strong>Type:</strong> ${report.reportType} | <strong>Période:</strong> ${stats.period}</p>
+        <p><strong>Généré le:</strong> ${stats.generatedAt}</p>
+    </div>
+    
+    <div class="section">
+        <h2>📊 Statistiques générales</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">${stats.totalTasks}</div>
+                <div class="stat-label">Total tâches</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">${stats.completedTasks}</div>
+                <div class="stat-label">Terminées</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">${stats.inProgressTasks}</div>
+                <div class="stat-label">En cours</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">${stats.todoTasks}</div>
+                <div class="stat-label">À faire</div>
+            </div>
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <h3>Taux de completion: ${stats.completionRate}%</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: ${stats.completionRate}%;"></div>
+            </div>
+        </div>
+    </div>
+    
+    ${stats.userStats?.length > 0 ? `
+        <div class="section">
+            <h2>👥 Performance par utilisateur</h2>
+            ${stats.userStats.map((user: any) => `
+                <div class="user-item">
+                    <strong>${user.name}</strong><br>
+                    ${user.totalTasks} tâches • ${user.completedTasks} terminées • ${user.inProgressTasks} en cours
+                </div>
+            `).join('')}
+        </div>
+    ` : ''}
+    
+    ${stats.projectStats?.length > 0 ? `
+        <div class="section">
+            <h2>📁 Performance par projet</h2>
+            ${stats.projectStats.map((project: any) => `
+                <div class="project-item">
+                    <strong>${project.name}</strong><br>
+                    ${project.totalTasks} tâches • ${project.completedTasks} terminées • ${project.inProgressTasks} en cours
+                </div>
+            `).join('')}
+        </div>
+    ` : ''}
+</body>
+</html>`;
   }
 
   async executeReportManually(reportId: string) {

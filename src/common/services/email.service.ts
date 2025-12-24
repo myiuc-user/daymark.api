@@ -294,8 +294,72 @@ export class EmailService {
     }
   }
 
-  async sendReportEmail(recipients: string[], reportName: string, description: string, reportType: string) {
+  async sendReportEmail(recipients: string[], reportName: string, description: string, reportType: string, stats?: any) {
     try {
+      const statsHtml = stats ? `
+        <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="color: #1f2937; margin-top: 0;">📊 Statistiques (${stats.period})</h3>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 15px 0;">
+            <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #e5e7eb;">
+              <div style="font-size: 24px; font-weight: bold; color: #2563eb;">${stats.totalTasks}</div>
+              <div style="font-size: 12px; color: #6b7280;">Total tâches</div>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #e5e7eb;">
+              <div style="font-size: 24px; font-weight: bold; color: #10b981;">${stats.completedTasks}</div>
+              <div style="font-size: 12px; color: #6b7280;">Terminées</div>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #e5e7eb;">
+              <div style="font-size: 24px; font-weight: bold; color: #f59e0b;">${stats.inProgressTasks}</div>
+              <div style="font-size: 12px; color: #6b7280;">En cours</div>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #e5e7eb;">
+              <div style="font-size: 24px; font-weight: bold; color: #ef4444;">${stats.todoTasks}</div>
+              <div style="font-size: 12px; color: #6b7280;">À faire</div>
+            </div>
+          </div>
+          
+          <div style="background: white; padding: 15px; border-radius: 6px; margin: 15px 0; border: 1px solid #e5e7eb;">
+            <div style="font-size: 18px; font-weight: bold; color: #1f2937;">Taux de completion: ${stats.completionRate}%</div>
+            <div style="background: #e5e7eb; height: 8px; border-radius: 4px; margin: 8px 0;">
+              <div style="background: #10b981; height: 8px; border-radius: 4px; width: ${stats.completionRate}%;"></div>
+            </div>
+          </div>
+          
+          ${stats.userStats?.length > 0 ? `
+            <div style="margin: 20px 0;">
+              <h4 style="color: #1f2937;">👥 Performance par utilisateur</h4>
+              ${stats.userStats.map((user: any) => `
+                <div style="background: white; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #e5e7eb;">
+                  <div style="font-weight: bold;">${user.name}</div>
+                  <div style="font-size: 14px; color: #6b7280;">
+                    ${user.totalTasks} tâches • ${user.completedTasks} terminées • ${user.inProgressTasks} en cours
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+          
+          ${stats.projectStats?.length > 0 ? `
+            <div style="margin: 20px 0;">
+              <h4 style="color: #1f2937;">📁 Performance par projet</h4>
+              ${stats.projectStats.map((project: any) => `
+                <div style="background: white; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #e5e7eb;">
+                  <div style="font-weight: bold;">${project.name}</div>
+                  <div style="font-size: 14px; color: #6b7280;">
+                    ${project.totalTasks} tâches • ${project.completedTasks} terminées • ${project.inProgressTasks} en cours
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+          
+          <div style="font-size: 12px; color: #9ca3af; margin-top: 15px;">
+            Généré le: ${stats.generatedAt}
+          </div>
+        </div>
+      ` : '';
+      
       const htmlContent = `
 <!DOCTYPE html>
 <html>
@@ -309,9 +373,9 @@ export class EmailService {
         <p>${description || 'Rapport généré automatiquement'}</p>
         <div style="background-color: #f0f9ff; padding: 15px; border-radius: 6px; margin: 20px 0;">
             <p><strong>Type:</strong> ${reportType}</p>
-            <p><strong>Généré le:</strong> ${new Date().toLocaleString('fr-FR')}</p>
+            <p><strong>Généré le:</strong> ${new Date().toLocaleString('fr-FR', { timeZone: 'Africa/Lagos' })}</p>
         </div>
-        <p>Données du rapport en pièce jointe.</p>
+        ${statsHtml}
     </div>
 </body>
 </html>`;

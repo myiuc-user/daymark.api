@@ -376,8 +376,19 @@ export class ReportsService {
 
   private async generatePDF(report: any, stats: any): Promise<string> {
     try {
-      const browser = await puppeteer.connect({
-        browserWSEndpoint: process.env.CHROMIUM_WS_ENDPOINT || 'ws://chromium:3000'
+      // Utiliser Puppeteer en mode local au lieu du service distant
+      const browser = await puppeteer.launch({
+        headless: true,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--no-first-run',
+          '--no-zygote',
+          '--single-process',
+          '--disable-gpu'
+        ]
       });
       
       const page = await browser.newPage();

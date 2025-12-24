@@ -377,7 +377,7 @@ export class ReportsService {
   private async generatePDF(report: any, stats: any): Promise<string> {
     try {
       const browser = await puppeteer.connect({
-        browserWSEndpoint: process.env.CHROMIUM_WS_ENDPOINT || 'ws://chromium:8000'
+        browserWSEndpoint: process.env.CHROMIUM_WS_ENDPOINT || 'ws://chromium:3000'
       });
       
       const page = await browser.newPage();

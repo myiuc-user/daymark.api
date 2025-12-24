@@ -1,83 +1,199 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="utf-8">
-    <title>{{reportName}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{reportName}} - Rapport d'Activité</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #2c3e50; background-color: #f8fafc; }
+        .container { max-width: 800px; margin: 0 auto; background: white; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 30px; text-align: center; }
+        .header h1 { font-size: 28px; font-weight: 300; margin-bottom: 8px; }
+        .header .subtitle { font-size: 16px; opacity: 0.9; font-weight: 300; }
+        .meta-info { background: #f8fafc; padding: 20px 30px; border-bottom: 1px solid #e2e8f0; }
+        .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .meta-item { display: flex; align-items: center; }
+        .meta-label { font-weight: 600; color: #64748b; margin-right: 8px; }
+        .meta-value { color: #1e293b; }
+        .content { padding: 30px; }
+        .section { margin-bottom: 40px; }
+        .section-title { font-size: 20px; font-weight: 600; color: #1e293b; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .kpi-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .kpi-number { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+        .kpi-number.primary { color: #3b82f6; }
+        .kpi-number.success { color: #10b981; }
+        .kpi-number.warning { color: #f59e0b; }
+        .kpi-number.danger { color: #ef4444; }
+        .kpi-label { font-size: 14px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        .progress-section { background: #f8fafc; padding: 24px; border-radius: 8px; margin: 20px 0; }
+        .progress-title { font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 16px; }
+        .progress-bar { background: #e2e8f0; height: 12px; border-radius: 6px; overflow: hidden; }
+        .progress-fill { background: linear-gradient(90deg, #10b981, #059669); height: 100%; border-radius: 6px; transition: width 0.3s ease; }
+        .progress-text { text-align: center; margin-top: 8px; font-weight: 600; color: #1e293b; }
+        .performance-grid { display: grid; gap: 16px; }
+        .performance-item { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; }
+        .performance-header { display: flex; justify-content: between; align-items: center; margin-bottom: 12px; }
+        .performance-name { font-weight: 600; color: #1e293b; font-size: 16px; }
+        .performance-stats { display: flex; gap: 16px; font-size: 14px; color: #64748b; }
+        .performance-stat { display: flex; align-items: center; gap: 4px; }
+        .stat-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .stat-dot.completed { background: #10b981; }
+        .stat-dot.progress { background: #f59e0b; }
+        .stat-dot.todo { background: #64748b; }
+        .footer { background: #1e293b; color: white; padding: 30px; text-align: center; }
+        .footer-text { font-size: 14px; opacity: 0.8; }
+        .attachment-notice { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .attachment-notice h3 { color: #1e40af; margin-bottom: 8px; }
+        .attachment-notice p { color: #1e40af; font-size: 14px; }
+    </style>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #2563eb;">{{reportName}}</h2>
-        <p>{{description}}</p>
-        <div style="background-color: #f0f9ff; padding: 15px; border-radius: 6px; margin: 20px 0;">
-            <p><strong>Type:</strong> {{reportType}}</p>
-            <p><strong>Généré le:</strong> {{generatedAt}}</p>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>{{reportName}}</h1>
+            <div class="subtitle">Rapport d'Activité Projet</div>
         </div>
-        
-        {{#if stats}}
-        <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #1f2937; margin-top: 0;">📊 Statistiques ({{stats.period}})</h3>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 15px 0;">
-                <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #e5e7eb;">
-                    <div style="font-size: 24px; font-weight: bold; color: #2563eb;">{{stats.totalTasks}}</div>
-                    <div style="font-size: 12px; color: #6b7280;">Total tâches</div>
+
+        <!-- Meta Information -->
+        <div class="meta-info">
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <span class="meta-label">Type de rapport:</span>
+                    <span class="meta-value">{{reportType}}</span>
                 </div>
-                <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #e5e7eb;">
-                    <div style="font-size: 24px; font-weight: bold; color: #10b981;">{{stats.completedTasks}}</div>
-                    <div style="font-size: 12px; color: #6b7280;">Terminées</div>
+                <div class="meta-item">
+                    <span class="meta-label">Généré le:</span>
+                    <span class="meta-value">{{generatedAt}}</span>
                 </div>
-                <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #e5e7eb;">
-                    <div style="font-size: 24px; font-weight: bold; color: #f59e0b;">{{stats.inProgressTasks}}</div>
-                    <div style="font-size: 12px; color: #6b7280;">En cours</div>
+                {{#if stats}}
+                <div class="meta-item">
+                    <span class="meta-label">Période analysée:</span>
+                    <span class="meta-value">{{stats.period}}</span>
                 </div>
-                <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #e5e7eb;">
-                    <div style="font-size: 24px; font-weight: bold; color: #ef4444;">{{stats.todoTasks}}</div>
-                    <div style="font-size: 12px; color: #6b7280;">À faire</div>
+                {{/if}}
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Description -->
+            {{#if description}}
+            <div class="section">
+                <p style="font-size: 16px; color: #64748b; line-height: 1.7;">{{description}}</p>
+            </div>
+            {{/if}}
+
+            {{#if stats}}
+            <!-- Executive Summary -->
+            <div class="section">
+                <h2 class="section-title">📊 Résumé Exécutif</h2>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-number primary">{{stats.totalTasks}}</div>
+                        <div class="kpi-label">Total Tâches</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-number success">{{stats.completedTasks}}</div>
+                        <div class="kpi-label">Terminées</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-number warning">{{stats.inProgressTasks}}</div>
+                        <div class="kpi-label">En Cours</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-number danger">{{stats.todoTasks}}</div>
+                        <div class="kpi-label">À Faire</div>
+                    </div>
+                </div>
+
+                <!-- Progress Overview -->
+                <div class="progress-section">
+                    <div class="progress-title">Taux de Completion Global</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{stats.completionRate}}%;"></div>
+                    </div>
+                    <div class="progress-text">{{stats.completionRate}}% des tâches terminées</div>
                 </div>
             </div>
-            
-            <div style="background: white; padding: 15px; border-radius: 6px; margin: 15px 0; border: 1px solid #e5e7eb;">
-                <div style="font-size: 18px; font-weight: bold; color: #1f2937;">Taux de completion: {{stats.completionRate}}%</div>
-                <div style="background: #e5e7eb; height: 8px; border-radius: 4px; margin: 8px 0;">
-                    <div style="background: #10b981; height: 8px; border-radius: 4px; width: {{stats.completionRate}}%;"></div>
-                </div>
-            </div>
-            
+
+            <!-- Team Performance -->
             {{#if stats.userStats}}
-            <div style="margin: 20px 0;">
-                <h4 style="color: #1f2937;">👥 Performance par utilisateur</h4>
-                {{#each stats.userStats}}
-                <div style="background: white; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #e5e7eb;">
-                    <div style="font-weight: bold;">{{name}}</div>
-                    <div style="font-size: 14px; color: #6b7280;">
-                        {{totalTasks}} tâches • {{completedTasks}} terminées • {{inProgressTasks}} en cours
+            <div class="section">
+                <h2 class="section-title">👥 Performance Équipe</h2>
+                <div class="performance-grid">
+                    {{#each stats.userStats}}
+                    <div class="performance-item">
+                        <div class="performance-header">
+                            <div class="performance-name">{{name}}</div>
+                        </div>
+                        <div class="performance-stats">
+                            <div class="performance-stat">
+                                <span class="stat-dot completed"></span>
+                                <span>{{completedTasks}} terminées</span>
+                            </div>
+                            <div class="performance-stat">
+                                <span class="stat-dot progress"></span>
+                                <span>{{inProgressTasks}} en cours</span>
+                            </div>
+                            <div class="performance-stat">
+                                <span class="stat-dot todo"></span>
+                                <span>{{totalTasks}} total</span>
+                            </div>
+                        </div>
                     </div>
+                    {{/each}}
                 </div>
-                {{/each}}
             </div>
             {{/if}}
-            
+
+            <!-- Project Performance -->
             {{#if stats.projectStats}}
-            <div style="margin: 20px 0;">
-                <h4 style="color: #1f2937;">📁 Performance par projet</h4>
-                {{#each stats.projectStats}}
-                <div style="background: white; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #e5e7eb;">
-                    <div style="font-weight: bold;">{{name}}</div>
-                    <div style="font-size: 14px; color: #6b7280;">
-                        {{totalTasks}} tâches • {{completedTasks}} terminées • {{inProgressTasks}} en cours
+            <div class="section">
+                <h2 class="section-title">📁 Performance Projets</h2>
+                <div class="performance-grid">
+                    {{#each stats.projectStats}}
+                    <div class="performance-item">
+                        <div class="performance-header">
+                            <div class="performance-name">{{name}}</div>
+                        </div>
+                        <div class="performance-stats">
+                            <div class="performance-stat">
+                                <span class="stat-dot completed"></span>
+                                <span>{{completedTasks}} terminées</span>
+                            </div>
+                            <div class="performance-stat">
+                                <span class="stat-dot progress"></span>
+                                <span>{{inProgressTasks}} en cours</span>
+                            </div>
+                            <div class="performance-stat">
+                                <span class="stat-dot todo"></span>
+                                <span>{{totalTasks}} total</span>
+                            </div>
+                        </div>
                     </div>
+                    {{/each}}
                 </div>
-                {{/each}}
             </div>
             {{/if}}
-            
-            <div style="font-size: 12px; color: #9ca3af; margin-top: 15px;">
-                Généré le: {{stats.generatedAt}}
+            {{/if}}
+
+            <!-- Attachment Notice -->
+            <div class="attachment-notice">
+                <h3>📎 Rapport Détaillé</h3>
+                <p>Un rapport PDF détaillé contenant l'analyse complète des données est joint à cet email pour votre référence.</p>
             </div>
         </div>
-        {{/if}}
-        
-        <p>Vous trouverez le rapport détaillé en pièce jointe.</p>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-text">
+                Ce rapport a été généré automatiquement par Daymark Project Management System.<br>
+                Pour toute question, veuillez contacter votre administrateur système.
+            </div>
+        </div>
     </div>
 </body>
 </html>

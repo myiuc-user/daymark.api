@@ -99,8 +99,17 @@ export class ReportsService {
       const pdfPath = await this.generatePDF(report, reportStats, tasksForPDF);
       
       // Télécharger le PDF depuis MinIO pour l'attachement
-      const pdfStream = await this.filesService.getFileStream(pdfPath);
-      const pdfBuffer = await this.streamToBuffer(pdfStream);
+      let pdfBuffer: Buffer | undefined;
+      try {
+        const file = await this.filesService.findOne(pdfPath);
+        if (file) {
+          const pdfStream = await this.filesService.getFileStream(file.id);
+          pdfBuffer = await this.streamToBuffer(pdfStream);
+          console.log('PDF buffer created:', { size: pdfBuffer.length });
+        }
+      } catch (error) {
+        console.error('Error downloading PDF from MinIO:', error);
+      }
       
       // Envoyer l'email avec le rapport et les statistiques
       if (report.recipients && report.recipients.length > 0) {

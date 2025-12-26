@@ -436,7 +436,9 @@ export class ReportsService {
       const uploadedFile = await this.filesService.upload(mockFile, report.createdById);
       
       // Clean up temp file
-      fs.unlinkSync(tempPath);
+      if (fs.existsSync(tempPath)) {
+        fs.unlinkSync(tempPath);
+      }
       
       return uploadedFile.path;
     } catch (error) {

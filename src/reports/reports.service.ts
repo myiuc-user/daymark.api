@@ -101,11 +101,15 @@ export class ReportsService {
       // Télécharger le PDF depuis MinIO pour l'attachement
       let pdfBuffer: Buffer | undefined;
       try {
-        const file = await this.filesService.findOne(pdfPath);
+        const file = await this.prisma.file.findFirst({
+          where: { path: pdfPath }
+        });
         if (file) {
           const pdfStream = await this.filesService.getFileStream(file.id);
           pdfBuffer = await this.streamToBuffer(pdfStream);
           console.log('PDF buffer created:', { size: pdfBuffer.length });
+        } else {
+          console.log('File not found in database:', pdfPath);
         }
       } catch (error) {
         console.error('Error downloading PDF from MinIO:', error);

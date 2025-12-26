@@ -98,6 +98,9 @@ export class ReportsService {
       
       const pdfPath = await this.generatePDF(report, reportStats, tasksForPDF);
       
+      // Construire l'URL MinIO pour le PDF
+      const pdfUrl = `${process.env.MINIO_ENDPOINT}/daymark/${pdfPath}`;
+      
       // Envoyer l'email avec le rapport et les statistiques
       if (report.recipients && report.recipients.length > 0) {
         await this.emailService.sendReportEmail(
@@ -106,7 +109,7 @@ export class ReportsService {
           report.description || '',
           report.reportType,
           reportStats,
-          pdfPath,
+          pdfUrl,
           tasksForPDF
         );
       }

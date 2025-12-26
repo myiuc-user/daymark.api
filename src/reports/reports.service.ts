@@ -98,8 +98,9 @@ export class ReportsService {
       
       const pdfPath = await this.generatePDF(report, reportStats, tasksForPDF);
       
-      // Construire l'URL MinIO pour le PDF
-      const pdfUrl = `${process.env.MINIO_ENDPOINT}/daymark/${pdfPath}`;
+      // Télécharger le PDF depuis MinIO pour l'attachement
+      const pdfStream = await this.filesService.getFileStream(pdfPath);
+      const pdfBuffer = await this.streamToBuffer(pdfStream);
       
       // Envoyer l'email avec le rapport et les statistiques
       if (report.recipients && report.recipients.length > 0) {
@@ -109,7 +110,7 @@ export class ReportsService {
           report.description || '',
           report.reportType,
           reportStats,
-          pdfUrl,
+          pdfBuffer,
           tasksForPDF
         );
       }
@@ -292,6 +293,14 @@ export class ReportsService {
     
     // Handle single value
     return Number(field) === value;
+  }
+
+  private async streamToBuffer(stream: any): Promise<Buffer> {
+    const chunks: Buffer[] = [];
+    for await (const chunk of stream) {
+      chunks.push(chunk as Buffer);
+    }
+    return Buffer.concat(chunks);
   }
 
   private async generateReportStats(report: any, reportData: any) {

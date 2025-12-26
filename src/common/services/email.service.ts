@@ -211,13 +211,13 @@ export class EmailService {
     }
   }
 
-  async sendReportEmail(recipients: string[], reportName: string, description: string, reportType: string, stats?: any, pdfPath?: string, tasks?: any[]) {
+  async sendReportEmail(recipients: string[], reportName: string, description: string, reportType: string, stats?: any, pdfBuffer?: Buffer, tasks?: any[]) {
     try {
       console.log('Sending report email:', {
         recipients,
         reportName,
-        hasPdfPath: !!pdfPath,
-        pdfPath
+        hasPdfBuffer: !!pdfBuffer,
+        pdfBufferSize: pdfBuffer ? pdfBuffer.length : 0
       });
       
       // Register Handlebars helpers for template
@@ -238,7 +238,14 @@ export class EmailService {
         from: 'galio.noreply@myiuc.com',
         to: recipients,
         subject: `Rapport automatisé: ${reportName}`,
-        html: htmlContent
+        html: htmlContent,
+        ...(pdfBuffer && {
+          attachments: [{
+            filename: `${reportName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
+            content: pdfBuffer,
+            contentType: 'application/pdf'
+          }]
+        })
       };
 
       const transporter = this.getTransporter();

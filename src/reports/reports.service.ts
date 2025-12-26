@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../common/services/email.service';
+import { FilesService } from '../files/files.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import * as cron from 'node-cron';
 import * as puppeteer from 'puppeteer';
@@ -11,7 +12,8 @@ import * as path from 'path';
 export class ReportsService {
   constructor(
     private prisma: PrismaService,
-    private emailService: EmailService
+    private emailService: EmailService,
+    private filesService: FilesService
   ) {}
 
   async createScheduledReport(data: any) {
@@ -141,7 +143,7 @@ export class ReportsService {
       case 'PROJECT_PROGRESS':
         return this.getProjectProgressData(report);
       default:
-        return {};
+        return [];
     }
   }
 
@@ -378,7 +380,6 @@ export class ReportsService {
 
   private async generatePDF(report: any, stats: any, tasks: any = []): Promise<string> {
     try {
-      // Utiliser Puppeteer en mode local au lieu du service distant
       const browser = await puppeteer.launch({
         headless: true,
         executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium',
@@ -402,17 +403,16 @@ export class ReportsService {
       const htmlContent = this.generatePDFHTML(report, stats, tasks);
       await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
       
-      const pdfPath = `reports/report-${report.id}-${Date.now()}.pdf`;
-      const fullPath = path.join(process.cwd(), pdfPath);
+      const tempPath = path.join(process.cwd(), 'temp', `report-${report.id}-${Date.now()}.pdf`);
       
-      // Créer le dossier s'il n'existe pas
-      const dir = path.dirname(fullPath);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
+      // Créer le dossier temp s'il n'existe pas
+      const tempDir = path.dirname(tempPath);
+      if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir, { recursive: true });
       }
       
       await page.pdf({
-        path: fullPath,
+        path: tempPath,
         format: 'A4',
         printBackground: true,
         margin: {
@@ -424,7 +424,21 @@ export class ReportsService {
       });
       
       await browser.close();
-      return pdfPath;
+      
+      // Upload to MinIO via FilesService
+      const mockFile = {
+        originalname: `${report.name.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
+        path: tempPath,
+        size: fs.statSync(tempPath).size,
+        mimetype: 'application/pdf'
+      } as Express.Multer.File;
+      
+      const uploadedFile = await this.filesService.upload(mockFile, report.createdById);
+      
+      // Clean up temp file
+      fs.unlinkSync(tempPath);
+      
+      return uploadedFile.path;
     } catch (error) {
       console.error('Error generating PDF:', error);
       throw new Error('Failed to generate PDF report');

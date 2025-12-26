@@ -11,6 +11,7 @@ export class EmailService {
   private taskCompletedTemplate: HandlebarsTemplateDelegate;
   private twoFATemplate: HandlebarsTemplateDelegate;
   private reportTemplate: HandlebarsTemplateDelegate;
+  private reportPdfTemplate: HandlebarsTemplateDelegate;
   private transporter: nodemailer.Transporter | null = null;
 
   constructor() {
@@ -38,6 +39,11 @@ export class EmailService {
     const reportTemplatePath = path.join(__dirname, 'report-email.hbs');
     const reportTemplateSource = fs.readFileSync(reportTemplatePath, 'utf8');
     this.reportTemplate = Handlebars.compile(reportTemplateSource);
+    
+    // Load report PDF template
+    const reportPdfTemplatePath = path.join(__dirname, 'report-pdf.hbs');
+    const reportPdfTemplateSource = fs.readFileSync(reportPdfTemplatePath, 'utf8');
+    this.reportPdfTemplate = Handlebars.compile(reportPdfTemplateSource);
   }
 
   private getTransporter(): nodemailer.Transporter {
@@ -207,6 +213,13 @@ export class EmailService {
 
   async sendReportEmail(recipients: string[], reportName: string, description: string, reportType: string, stats?: any, pdfPath?: string, tasks?: any[]) {
     try {
+      console.log('Sending report email:', {
+        recipients,
+        reportName,
+        hasPdfPath: !!pdfPath,
+        pdfPath
+      });
+      
       // Register Handlebars helpers for template
       Handlebars.registerHelper('eq', function(a, b) {
         return a === b;
@@ -225,20 +238,35 @@ export class EmailService {
         from: 'galio.noreply@myiuc.com',
         to: recipients,
         subject: `Rapport automatisé: ${reportName}`,
-        html: htmlContent,
-        ...(pdfPath && {
-          attachments: [{
-            filename: `${reportName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
-            path: pdfPath
-          }]
-        })
+        html: htmlContent
       };
 
       const transporter = this.getTransporter();
       const result = await transporter.sendMail(mailOptions);
+      console.log('Report email sent successfully:', result.messageId);
       return { success: true, message: 'Report email sent' };
     } catch (error: any) {
+      console.error('Error sending report email:', {
+        error: error?.message || 'Unknown error',
+        stack: error?.stack,
+        code: error?.code
+      });
       return { success: false, message: error?.message || 'Failed to send email' };
     }
+  }
+
+  generatePDFHTML(report: any, stats: any, tasks: any = []): string {
+    // Register Handlebars helpers
+    Handlebars.registerHelper('eq', function(a, b) {
+      return a === b;
+    });
+    
+    return this.reportPdfTemplate({
+      reportName: report.name,
+      description: report.description || 'Rapport généré automatiquement',
+      reportType: report.reportType,
+      stats,
+      tasks
+    });
   }
 }

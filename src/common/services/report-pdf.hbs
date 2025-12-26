@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{reportName}}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }
+        .stat-card { background: #f8fafc; padding: 15px; border-radius: 8px; text-align: center; }
+        .stat-number { font-size: 24px; font-weight: bold; color: #2563eb; }
+        .stat-label { font-size: 12px; color: #6b7280; }
+        .progress-bar { background: #e5e7eb; height: 8px; border-radius: 4px; margin: 10px 0; }
+        .progress-fill { background: #10b981; height: 8px; border-radius: 4px; }
+        .section { margin: 30px 0; }
+        .user-item, .project-item { background: #f9fafb; padding: 12px; margin: 8px 0; border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{reportName}}</h1>
+        <p>{{description}}</p>
+        <p><strong>Type:</strong> {{reportType}} | <strong>Période:</strong> {{stats.period}}</p>
+        <p><strong>Généré le:</strong> {{stats.generatedAt}}</p>
+    </div>
+    
+    <div class="section">
+        <h2>📊 Statistiques générales</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{stats.totalTasks}}</div>
+                <div class="stat-label">Total tâches</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{stats.completedTasks}}</div>
+                <div class="stat-label">Terminées</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{stats.inProgressTasks}}</div>
+                <div class="stat-label">En cours</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{stats.todoTasks}}</div>
+                <div class="stat-label">À faire</div>
+            </div>
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <h3>Taux de completion: {{stats.completionRate}}%</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{stats.completionRate}}%;"></div>
+            </div>
+        </div>
+    </div>
+    
+    {{#if stats.userStats}}
+    {{#if stats.userStats.length}}
+    <div class="section">
+        <h2>👥 Performance par utilisateur</h2>
+        {{#each stats.userStats}}
+        <div class="user-item">
+            <strong>{{name}}</strong><br>
+            {{totalTasks}} tâches • {{completedTasks}} terminées • {{inProgressTasks}} en cours
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
+    {{/if}}
+    
+    {{#if stats.projectStats}}
+    {{#if stats.projectStats.length}}
+    <div class="section">
+        <h2>📁 Performance par projet</h2>
+        {{#each stats.projectStats}}
+        <div class="project-item">
+            <strong>{{name}}</strong><br>
+            {{totalTasks}} tâches • {{completedTasks}} terminées • {{inProgressTasks}} en cours
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
+    {{/if}}
+    
+    {{#if tasks}}
+    {{#if tasks.length}}
+    <div class="section">
+        <h2>📋 Liste des tâches</h2>
+        <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+            <thead>
+                <tr style="background: #f8fafc;">
+                    <th style="padding: 12px; text-align: left; border: 1px solid #e5e7eb;">Tâche</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #e5e7eb;">Statut</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #e5e7eb;">Assigné à</th>
+                    <th style="padding: 12px; text-align: left; border: 1px solid #e5e7eb;">Projet</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each tasks}}
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #e5e7eb;">{{title}}</td>
+                    <td style="padding: 12px; border: 1px solid #e5e7eb;">
+                        <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; {{#eq status 'DONE'}}background: #dcfce7; color: #166534;{{/eq}}{{#eq status 'IN_PROGRESS'}}background: #fef3c7; color: #92400e;{{/eq}}{{#unless (eq status 'DONE')}}{{#unless (eq status 'IN_PROGRESS')}}background: #fee2e2; color: #991b1b;{{/unless}}{{/unless}}">
+                            {{#eq status 'DONE'}}Terminé{{/eq}}{{#eq status 'IN_PROGRESS'}}En cours{{/eq}}{{#unless (eq status 'DONE')}}{{#unless (eq status 'IN_PROGRESS')}}À faire{{/unless}}{{/unless}}
+                        </span>
+                    </td>
+                    <td style="padding: 12px; border: 1px solid #e5e7eb;">{{#if assignee}}{{assignee.name}}{{else}}Non assigné{{/if}}</td>
+                    <td style="padding: 12px; border: 1px solid #e5e7eb;">{{#if project}}{{project.name}}{{else}}Aucun projet{{/if}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+    {{/if}}
+    {{/if}}
+</body>
+</html>

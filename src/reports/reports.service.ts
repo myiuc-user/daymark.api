@@ -89,7 +89,14 @@ export class ReportsService {
     try {
       const reportData = await this.generateReportData(report);
       const reportStats = await this.generateReportStats(report, reportData);
-      const pdfPath = await this.generatePDF(report, reportStats, reportData);
+      
+      // Pour TASK_SUMMARY, utiliser reportData comme tasks, sinon récupérer les tâches
+      const filtersObj = typeof report.filters === 'object' && report.filters !== null && !Array.isArray(report.filters) ? report.filters as Record<string, any> : {};
+      const dateRangeStr = typeof filtersObj.dateRange === 'string' ? filtersObj.dateRange : '7';
+      const tasksForPDF = report.reportType === 'TASK_SUMMARY' ? reportData : 
+        await this.getTasksForStats(filtersObj, new Date(Date.now() - parseInt(dateRangeStr) * 24 * 60 * 60 * 1000));
+      
+      const pdfPath = await this.generatePDF(report, reportStats, tasksForPDF);
       
       // Envoyer l'email avec le rapport et les statistiques
       if (report.recipients && report.recipients.length > 0) {
@@ -100,7 +107,7 @@ export class ReportsService {
           report.reportType,
           reportStats,
           pdfPath,
-          reportData
+          tasksForPDF
         );
       }
       
@@ -285,18 +292,34 @@ export class ReportsService {
   }
 
   private async generateReportStats(report: any, reportData: any) {
-    const filters = report.filters || {};
-    const dateRange = parseInt(filters.dateRange || '7');
+    const filters = typeof report.filters === 'object' && report.filters !== null && !Array.isArray(report.filters) ? report.filters as Record<string, any> : {};
+    const dateRangeStr = typeof filters.dateRange === 'string' ? filters.dateRange : '7';
+    const dateRange = parseInt(dateRangeStr);
     const dateFilter = new Date(Date.now() - dateRange * 24 * 60 * 60 * 1000);
     
-    // Statistiques générales
-    const totalTasks = Array.isArray(reportData) ? reportData.length : 0;
-    const completedTasks = Array.isArray(reportData) ? 
-      reportData.filter(task => task.status === 'DONE').length : 0;
-    const inProgressTasks = Array.isArray(reportData) ? 
-      reportData.filter(task => task.status === 'IN_PROGRESS').length : 0;
-    const todoTasks = Array.isArray(reportData) ? 
-      reportData.filter(task => task.status === 'TODO').length : 0;
+    let totalTasks = 0;
+    let completedTasks = 0;
+    let inProgressTasks = 0;
+    let todoTasks = 0;
+    
+    // Calculer les statistiques selon le type de rapport
+    if (report.reportType === 'TASK_SUMMARY') {
+      // reportData contient directement les tâches
+      totalTasks = Array.isArray(reportData) ? reportData.length : 0;
+      completedTasks = Array.isArray(reportData) ? 
+        reportData.filter(task => task.status === 'DONE').length : 0;
+      inProgressTasks = Array.isArray(reportData) ? 
+        reportData.filter(task => task.status === 'IN_PROGRESS').length : 0;
+      todoTasks = Array.isArray(reportData) ? 
+        reportData.filter(task => task.status === 'TODO').length : 0;
+    } else {
+      // Pour USER_PERFORMANCE et PROJECT_PROGRESS, récupérer les tâches séparément
+      const tasks = await this.getTasksForStats(filters, dateFilter);
+      totalTasks = tasks.length;
+      completedTasks = tasks.filter(task => task.status === 'DONE').length;
+      inProgressTasks = tasks.filter(task => task.status === 'IN_PROGRESS').length;
+      todoTasks = tasks.filter(task => task.status === 'TODO').length;
+    }
     
     // Statistiques par utilisateur (si applicable)
     const userStats = await this.getUserStats(filters, dateFilter);
@@ -315,6 +338,20 @@ export class ReportsService {
       projectStats,
       generatedAt: new Date().toLocaleString('fr-FR', { timeZone: 'Africa/Lagos' })
     };
+  }
+  
+  private async getTasksForStats(filters: any, dateFilter: Date) {
+    return this.prisma.task.findMany({
+      where: {
+        ...(filters.projectId && { projectId: filters.projectId }),
+        ...(filters.userIds?.length > 0 && { assigneeId: { in: filters.userIds } }),
+        updatedAt: { gte: dateFilter }
+      },
+      include: {
+        assignee: true,
+        project: true
+      }
+    });
   }
   
   private async getUserStats(filters: any, dateFilter: Date) {
@@ -400,7 +437,7 @@ export class ReportsService {
       
       const page = await browser.newPage();
       
-      const htmlContent = this.generatePDFHTML(report, stats, tasks);
+      const htmlContent = this.emailService.generatePDFHTML(report, stats, tasks);
       await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
       
       const tempPath = path.join(process.cwd(), 'temp', `report-${report.id}-${Date.now()}.pdf`);
@@ -447,124 +484,6 @@ export class ReportsService {
     }
   }
   
-  private generatePDFHTML(report: any, stats: any, tasks: any = []): string {
-    return `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>${report.name}</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }
-        .stat-card { background: #f8fafc; padding: 15px; border-radius: 8px; text-align: center; }
-        .stat-number { font-size: 24px; font-weight: bold; color: #2563eb; }
-        .stat-label { font-size: 12px; color: #6b7280; }
-        .progress-bar { background: #e5e7eb; height: 8px; border-radius: 4px; margin: 10px 0; }
-        .progress-fill { background: #10b981; height: 8px; border-radius: 4px; }
-        .section { margin: 30px 0; }
-        .user-item, .project-item { background: #f9fafb; padding: 12px; margin: 8px 0; border-radius: 6px; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>${report.name}</h1>
-        <p>${report.description || 'Rapport généré automatiquement'}</p>
-        <p><strong>Type:</strong> ${report.reportType} | <strong>Période:</strong> ${stats.period}</p>
-        <p><strong>Généré le:</strong> ${stats.generatedAt}</p>
-    </div>
-    
-    <div class="section">
-        <h2>📊 Statistiques générales</h2>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number">${stats.totalTasks}</div>
-                <div class="stat-label">Total tâches</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">${stats.completedTasks}</div>
-                <div class="stat-label">Terminées</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">${stats.inProgressTasks}</div>
-                <div class="stat-label">En cours</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">${stats.todoTasks}</div>
-                <div class="stat-label">À faire</div>
-            </div>
-        </div>
-        
-        <div style="margin: 20px 0;">
-            <h3>Taux de completion: ${stats.completionRate}%</h3>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: ${stats.completionRate}%;"></div>
-            </div>
-        </div>
-    </div>
-    
-    ${stats.userStats?.length > 0 ? `
-        <div class="section">
-            <h2>👥 Performance par utilisateur</h2>
-            ${stats.userStats.map((user: any) => `
-                <div class="user-item">
-                    <strong>${user.name}</strong><br>
-                    ${user.totalTasks} tâches • ${user.completedTasks} terminées • ${user.inProgressTasks} en cours
-                </div>
-            `).join('')}
-        </div>
-    ` : ''}
-    
-    ${stats.projectStats?.length > 0 ? `
-        <div class="section">
-            <h2>📁 Performance par projet</h2>
-            ${stats.projectStats.map((project: any) => `
-                <div class="project-item">
-                    <strong>${project.name}</strong><br>
-                    ${project.totalTasks} tâches • ${project.completedTasks} terminées • ${project.inProgressTasks} en cours
-                </div>
-            `).join('')}
-        </div>
-    ` : ''}
-    
-    ${Array.isArray(tasks) && tasks.length > 0 ? `
-        <div class="section">
-            <h2>📋 Liste des tâches</h2>
-            <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
-                <thead>
-                    <tr style="background: #f8fafc;">
-                        <th style="padding: 12px; text-align: left; border: 1px solid #e5e7eb;">Tâche</th>
-                        <th style="padding: 12px; text-align: left; border: 1px solid #e5e7eb;">Statut</th>
-                        <th style="padding: 12px; text-align: left; border: 1px solid #e5e7eb;">Assigné à</th>
-                        <th style="padding: 12px; text-align: left; border: 1px solid #e5e7eb;">Projet</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tasks.map((task: any) => `
-                        <tr>
-                            <td style="padding: 12px; border: 1px solid #e5e7eb;">${task.title}</td>
-                            <td style="padding: 12px; border: 1px solid #e5e7eb;">
-                                <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; ${
-                                  task.status === 'DONE' ? 'background: #dcfce7; color: #166534;' :
-                                  task.status === 'IN_PROGRESS' ? 'background: #fef3c7; color: #92400e;' :
-                                  'background: #fee2e2; color: #991b1b;'
-                                }">
-                                    ${task.status === 'DONE' ? 'Terminé' : task.status === 'IN_PROGRESS' ? 'En cours' : 'À faire'}
-                                </span>
-                            </td>
-                            <td style="padding: 12px; border: 1px solid #e5e7eb;">${task.assignee?.name || 'Non assigné'}</td>
-                            <td style="padding: 12px; border: 1px solid #e5e7eb;">${task.project?.name || 'Aucun projet'}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        </div>
-    ` : ''}
-</body>
-</html>`;
-  }
-
   async executeReportManually(reportId: string) {
     return this.executeReport(reportId, true);
   }

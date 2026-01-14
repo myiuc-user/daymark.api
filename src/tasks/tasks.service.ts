@@ -21,8 +21,14 @@ export class TasksService {
 
   async findAll(projectId: string) {
     const tasks = await this.prisma.task.findMany({ 
-      where: { projectId },
-      include: this.taskInclude,
+      where: { projectId, parentTaskId: null },
+      include: {
+        ...this.taskInclude,
+        subtasks: {
+          include: this.taskInclude,
+          orderBy: { due_date: 'asc' }
+        }
+      },
       orderBy: { due_date: 'asc' }
     });
     return { tasks: tasks || [] };

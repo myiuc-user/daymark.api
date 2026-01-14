@@ -258,12 +258,20 @@ export class TasksService {
   }
 
   async createSubtask(parentTaskId: string, data: any, createdById: string) {
+    const parentTask = await this.prisma.task.findUnique({ where: { id: parentTaskId } });
+    if (!parentTask) throw new Error('Parent task not found');
+    
     const subtask = await this.prisma.task.create({
       data: {
-        ...data,
+        title: data.title,
+        description: data.description || '',
+        type: data.type || 'TASK',
+        priority: data.priority || 'MEDIUM',
+        projectId: parentTask.projectId,
         parentTaskId,
         createdById,
-        status: 'TODO'
+        status: 'TODO',
+        due_date: data.due_date ? new Date(data.due_date) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
       },
       include: this.taskInclude
     });

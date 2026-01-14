@@ -146,7 +146,7 @@ model Task {
   status          TaskStatus     @default(TODO)
   type            TaskType       @default(TASK)
   priority        Priority       @default(MEDIUM)
-  assigneeId      String
+  assigneeId      String?
   due_date        DateTime
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
@@ -164,7 +164,7 @@ model Task {
   commitMessage   String?
   comments        Comment[]
   files           File[]
-  assignee        User           @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: Cascade)
+  assignee        User?          @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: Cascade)
   createdBy       User           @relation("TaskCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
   milestone       Milestone?     @relation("TaskMilestone", fields: [milestoneId], references: [id])
   project         Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)

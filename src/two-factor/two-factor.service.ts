@@ -228,7 +228,9 @@ export class TwoFactorService {
         twoFactorMethods: [],
         twoFactorSecret: null,
         backupCodes: [],
-        twoFactorVerifiedAt: null
+        twoFactorVerifiedAt: null,
+        twoFactorRecoveryToken: null,
+        twoFactorRecoveryTokenExpiry: null
       }
     });
 
@@ -260,5 +262,48 @@ export class TwoFactorService {
       methods: user?.twoFactorMethods || [],
       backupCodesCount: user?.backupCodes?.length || 0
     };
+  }
+
+  async requestRecovery(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      select: { id: true, email: true, twoFactorEnabled: true }
+    });
+
+    if (!user || !user.twoFactorEnabled) {
+      throw new BadRequestException('2FA not enabled for this account');
+    }
+
+    const recoveryToken = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        twoFactorRecoveryToken: recoveryToken,
+        twoFactorRecoveryTokenExpiry: expiresAt
+      }
+    });
+
+    await this.emailService.send2FARecoveryEmail(user.email, recoveryToken);
+
+    return { success: true, message: 'Recovery email sent' };
+  }
+
+  async verifyRecoveryToken(token: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        twoFactorRecoveryToken: token,
+        twoFactorRecoveryTokenExpiry: { gt: new Date() }
+      }
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid or expired recovery token');
+    }
+
+    await this.disable2FA(user.id);
+
+    return { success: true, message: '2FA disabled successfully' };
   }
 }

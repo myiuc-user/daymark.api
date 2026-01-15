@@ -10,6 +10,7 @@ export class EmailService {
   private roleUpdateTemplate: HandlebarsTemplateDelegate;
   private taskCompletedTemplate: HandlebarsTemplateDelegate;
   private twoFATemplate: HandlebarsTemplateDelegate;
+  private twoFARecoveryTemplate: HandlebarsTemplateDelegate;
   private reportTemplate: HandlebarsTemplateDelegate;
   private reportPdfTemplate: HandlebarsTemplateDelegate;
   private transporter: nodemailer.Transporter | null = null;
@@ -34,6 +35,11 @@ export class EmailService {
     const twoFATemplatePath = path.join(__dirname, '2fa-code-email.hbs');
     const twoFATemplateSource = fs.readFileSync(twoFATemplatePath, 'utf8');
     this.twoFATemplate = Handlebars.compile(twoFATemplateSource);
+    
+    // Load 2FA recovery template
+    const twoFARecoveryTemplatePath = path.join(__dirname, '2fa-recovery-email.hbs');
+    const twoFARecoveryTemplateSource = fs.readFileSync(twoFARecoveryTemplatePath, 'utf8');
+    this.twoFARecoveryTemplate = Handlebars.compile(twoFARecoveryTemplateSource);
     
     // Load report template
     const reportTemplatePath = path.join(__dirname, 'report-email.hbs');
@@ -203,6 +209,34 @@ export class EmailService {
       return { success: true, message: '2FA code email sent' };
     } catch (error: any) {
       console.error('Error sending 2FA code email:', {
+        error: error?.message || 'Unknown error',
+        stack: error?.stack,
+        code: error?.code
+      });
+      return { success: false, message: error?.message || 'Failed to send email' };
+    }
+  }
+
+  async send2FARecoveryEmail(email: string, recoveryToken: string) {
+    try {
+      console.log('Sending 2FA recovery email to:', email);
+      
+      const recoveryUrl = `${process.env.FRONTEND_URL}/auth/2fa/recover/${recoveryToken}`;
+      const htmlContent = this.twoFARecoveryTemplate({ recoveryUrl });
+
+      const mailOptions = {
+        from: 'galio.noreply@myiuc.com',
+        to: email,
+        subject: 'Récupération 2FA - Daymark',
+        html: htmlContent
+      };
+
+      const transporter = this.getTransporter();
+      const result = await transporter.sendMail(mailOptions);
+      console.log('2FA recovery email sent successfully:', result.messageId);
+      return { success: true, message: '2FA recovery email sent' };
+    } catch (error: any) {
+      console.error('Error sending 2FA recovery email:', {
         error: error?.message || 'Unknown error',
         stack: error?.stack,
         code: error?.code

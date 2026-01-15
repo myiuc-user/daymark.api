@@ -32,6 +32,8 @@ model User {
   twoFactorSecret     String?
   backupCodes         String[] @default([])
   twoFactorVerifiedAt DateTime?
+  twoFactorRecoveryToken String?
+  twoFactorRecoveryTokenExpiry DateTime?
   comments        Comment[]
   uploadedFiles   File[]
   mentions        Mention[]

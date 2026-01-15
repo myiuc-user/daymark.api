@@ -87,4 +87,16 @@ export class TwoFactorController {
   async disable2FA(@Request() req: AuthenticatedRequest) {
     return this.twoFactorService.disable2FA(req.user.id);
   }
+
+  @Post('recovery/request')
+  @SkipTwoFactor()
+  async requestRecovery(@Body() body: { email: string }) {
+    return this.twoFactorService.requestRecovery(body.email);
+  }
+
+  @Post('recovery/verify')
+  @SkipTwoFactor()
+  async verifyRecovery(@Body() body: { token: string }) {
+    return this.twoFactorService.verifyRecoveryToken(body.token);
+  }
 }

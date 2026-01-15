@@ -239,6 +239,7 @@ async function main() {
   const workspace = await prisma.workspace.create({
     data: {
       name: 'Projet 1 - Restructuration Gouvernance IUC',
+      slug: 'projet-1-gouvernance-iuc',
       description: 'Restructurer et renforcer la gouvernance de l\'IUC à travers 12 initiatives stratégiques',
       ownerId: superAdmin.id,
       members: {

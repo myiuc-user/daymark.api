@@ -1,0 +1,1756 @@
+
+
+**Document de référence pour le pilotage des 12 initiatives du Projet 1**
+
+---
+
+# TABLE DES MATIÈRES
+
+| Initiative | Titre | Page |
+|------------|-------|------|
+| P1-I1 | Transformation juridique en SAS | 3 |
+| P1-I2 | Identification membres CA et Comités | 10 |
+| P1-I3 | Calendrier annuel CA et Comités | 17 |
+| P1-I4 | Cartographie processus opérationnels | 23 |
+| P1-I5 | Refonte processus internes | 30 |
+| P1-I6 | Renforcement équipe de direction | 37 |
+| P1-I7 | Management de la performance RH | 44 |
+| P1-I8 | Évaluation continue qualité services | 51 |
+| P1-I9 | Structures lean, agiles et robustes | 58 |
+| P1-I10 | GPEC - Gestion Prévisionnelle Emplois | 65 |
+| P1-I11 | Gestion budgétaire - Phase 1 | 72 |
+| P1-I12 | Gestion budgétaire - Phase 2 | 79 |
+
+---
+
+# P1-I1: TRANSFORMATION JURIDIQUE EN SAS
+
+## 1. IDENTIFICATION
+
+| **Nom du projet** | Restructurer et renforcer la gouvernance IUC |
+| **Initiative** | Transformation juridique : Société Unipersonnelle → SAS |
+| **Code** | P1-I1 |
+| **Responsable** | Directeur Juridique / Secrétaire Général |
+| **Chef de projet** | Juriste Senior (à désigner) |
+| **Période** | T1 2026 - T4 2026 (12 mois) |
+| **Budget** | 23 650 000 FCFA |
+
+## 2. ÉNONCÉ
+
+Transformer la structure juridique de l'IUC en Société par Actions Simplifiée pour moderniser la gouvernance, faciliter les levées de fonds (objectif: 2-3 milliards FCFA sur 3 ans), renforcer la crédibilité institutionnelle et préparer la croissance. La SAS offre flexibilité capitalistique, gouvernance sur-mesure et attractivité investisseurs.
+
+## 3. PÉRIMÈTRE
+
+**Exigences principales:**
+- Audit juridique exhaustif structure actuelle
+- Valorisation IUC (3 méthodes: DCF, multiples, actif net)
+- Rédaction statuts SAS (50-70 pages) et pacte actionnaires (30-50 pages)
+- Validation AGE transformation
+- Formalités RCCM et publications légales
+- Mise à jour tous contrats institutionnels
+- Communication transformation (interne/externe)
+
+**Besoins:**
+- Sécurisation juridique croissance
+- Attractivité investisseurs institutionnels
+- Mécanismes entrée/sortie actionnaires
+- Gouvernance moderne (CA, comités)
+- Crédibilité partenaires bancaires/académiques
+
+## 4. CLIENTÈLE VISÉE
+
+**Directs:** Actionnaires (Joliba Capital, futurs investisseurs), Direction Générale, futur CA
+**Indirects:** Personnel, étudiants, banques, partenaires académiques
+
+## 5. OBJECTIFS SMART
+
+| Objectif | Indicateur | Échéance |
+|----------|-----------|----------|
+| Audit juridique | Rapport validé | Mars 2026 |
+| Valorisation | 3 méthodes, montant validé | Avril 2026 |
+| Statuts et pacte | Documents finalisés | Juin 2026 |
+| AGE transformation | PV approuvé | Juillet 2026 |
+| RCCM SAS | Nouveau RCCM obtenu | Sept 2026 |
+| Mise à jour contrats | 100% contrats actualisés | Nov 2026 |
+| Communication | 100% parties prenantes informées | Déc 2026 |
+
+## 6. BÉNÉFICES
+
+- **Juridiques:** Conformité standards internationaux, protection patrimoniale
+- **Financiers:** Facilitation levées fonds, valorisation clarifiée
+- **Stratégiques:** Image professionnelle, flexibilité M&A
+- **Organisationnels:** Séparation propriété/gestion, rôles clairs
+
+## 7. LIVRABLES
+
+1. Rapport audit juridique complet
+2. Rapport valorisation (3 méthodes)
+3. Statuts SAS finaux (50-70 pages)
+4. Pacte actionnaires signé (30-50 pages)
+5. Règlement intérieur CA (projet)
+6. PV AGE transformation
+7. Dossier RCCM complet
+8. Nouveau RCCM SAS
+9. Publications légales
+10. Contrats actualisés (dossier)
+11. Plan communication
+12. Documentation formation gouvernance
+
+## 8. PARTIES PRENANTES
+
+| Partie prenante | Rôle | Implication |
+|-----------------|------|-------------|
+| Direction Générale | Sponsor exécutif | Très élevée |
+| Joliba Capital | Actionnaire, validation | Très élevée |
+| Cabinet juridique externe | Conseil, rédaction | Très élevée |
+| Expert-comptable | Valorisation, audit | Élevée |
+| Chef de projet | Coordination | Très élevée |
+| RCCM/Administration | Enregistrement | Moyenne |
+
+## 9. EFFORTS ET BUDGET
+
+**Efforts:** Chef projet (80% 12 mois), Dir. Juridique (50% 12 mois), DG (15% 12 mois)
+
+**Budget:**
+- Cabinet juridique: 12M FCFA
+- Valorisation: 3M FCFA
+- RCCM/publications: 2M FCFA
+- Communication: 2M FCFA
+- Formation: 1M FCFA
+- Contingences: 2,15M FCFA
+- **Total: 23,65M FCFA**
+
+## 10. ÉCHÉANCIER
+
+| Phase | Durée | Période |
+|-------|-------|---------|
+| Diagnostic (audit juridique/financier) | 3 mois | Jan-Mar 2026 |
+| Valorisation | 3 mois | Fév-Avr 2026 |
+| Rédaction documents | 3 mois | Avr-Juin 2026 |
+| Validation AGE | 1 mois | Juil 2026 |
+| Formalités RCCM | 2 mois | Août-Sept 2026 |
+| Transition/Communication | 3 mois | Oct-Déc 2026 |
+
+## 11. RISQUES
+
+| Risque | P | I | Mitigation |
+|--------|---|---|------------|
+| Retards administratifs RCCM | M | É | Anticipation, dossier complet, relations |
+| Désaccord valorisation | F | TÉ | 3 méthodes indépendantes, médiateur |
+| Coûts dépassés | F | M | Contingences 10%, devis détaillés |
+| Documents non conformes | M | É | Audit préalable rigoureux |
+
+---
+
+# P1-I2: IDENTIFICATION MEMBRES CA ET COMITÉS
+
+## 1. IDENTIFICATION
+
+| **Nom du projet** | Restructurer et renforcer la gouvernance IUC |
+| **Initiative** | Identification et nomination membres CA et Comités |
+| **Code** | P1-I2 |
+| **Responsable** | Président CA désigné |
+| **Chef de projet** | Secrétaire Général |
+| **Période** | T2 2026 - T3 2026 (6 mois) |
+| **Budget** | 33 550 000 FCFA |
+
+## 2. ÉNONCÉ
+
+Identifier, sélectionner et nommer 9 membres du Conseil d'Administration (40% actionnaires, 30% indépendants, 20% management, 10% personnalités) et constituer 4 Comités spécialisés (Audit & Risques, RH, Stratégique, Académique) avec ~20 membres au total. Objectif: gouvernance équilibrée, experte et diversifiée.
+
+## 3. PÉRIMÈTRE
+
+**Exigences:**
+- Définition profils recherchés (compétences, expérience, disponibilité)
+- Critères sélection (indépendance, diversité genre/âge, réseau)
+- Sourcing candidats (headhunter, réseau Joliba, associations)
+- Évaluation (entretiens, due diligence, références)
+- Négociation conditions (rémunération 30M FCFA/an total CA, engagement temps)
+- Nomination officielle AG
+- Onboarding (formation, documentation, visite)
+- Constitution Comités
+
+**Besoins:**
+- Expertise diversifiée (académique, finance, stratégie, opérationnel)
+- Supervision efficace et challenge constructif
+- Crédibilité externe
+- Accès réseaux professionnels
+- Conformité standards gouvernance
+
+## 4. CLIENTÈLE VISÉE
+
+**Directs:** Actionnaires, Direction Générale, IUC (institution)
+**Indirects:** Étudiants, personnel, partenaires, futurs investisseurs
+
+## 5. OBJECTIFS SMART
+
+| Objectif | Indicateur | Échéance |
+|----------|-----------|----------|
+| Profils définis | Document validé | Mai 2026 |
+| Shortlist constituée | 15-20 candidats qualifiés | Juin 2026 |
+| Entretiens réalisés | 100% présélectionnés rencontrés | Juil 2026 |
+| CA nommé | 9 membres, lettres signées | Août 2026 |
+| Comités constitués | 4 Comités, présidents désignés | Sept 2026 |
+| Onboarding | 100% formés | Sept 2026 |
+| 1ère réunion CA | PV disponible | Sept 2026 |
+
+## 6. BÉNÉFICES
+
+- **Gouvernance:** CA équilibré, 4 Comités opérationnels, mix optimal compétences
+- **Qualitatifs:** Expertise haut niveau, réseau étendu, crédibilité
+- **Stratégiques:** Accompagnement croissance, challenge direction, facilitation partenariats
+
+## 7. LIVRABLES
+
+1. Document profils et critères
+2. Matrice compétences cibles
+3. Longlist (30-40) et shortlist (15-20)
+4. Grilles évaluation
+5. Rapports entretiens et due diligence
+6. Propositions nomination AG
+7. Lettres mission signées (9)
+8. Composition 4 Comités
+9. Pack onboarding
+10. PV AG nomination
+11. PV 1ère réunion CA
+12. Dashboard gouvernance
+
+## 8. PARTIES PRENANTES
+
+| Partie prenante | Rôle | Implication |
+|-----------------|------|-------------|
+| Joliba Capital | Validation finale | Très élevée |
+| Président CA désigné | Pilotage sélection | Très élevée |
+| Cabinet recrutement | Sourcing | Élevée |
+| Secrétaire Général | Coordination | Très élevée |
+| Candidats | Participation | Très élevée |
+
+## 9. EFFORTS ET BUDGET
+
+**Efforts:** Président CA (40% 6 mois), Sec. Général (50% 6 mois), DG (20% 6 mois)
+
+**Budget:**
+- Headhunter: 15M FCFA
+- Due diligence: 3M FCFA
+- Déplacements: 4M FCFA
+- Onboarding: 5M FCFA
+- Conseil juridique: 2M FCFA
+- Communication: 1,5M FCFA
+- Contingences: 3,05M FCFA
+- **Total: 33,55M FCFA**
+
+**Note:** Jetons présence (30M/an) = coûts récurrents séparés
+
+## 10. ÉCHÉANCIER
+
+| Phase | Durée | Période |
+|-------|-------|---------|
+| Préparation (profils, critères) | 1,5 mois | Avr-Mai 2026 |
+| Sourcing (longlist, shortlist) | 1,5 mois | Mai-Juin 2026 |
+| Évaluation (entretiens, DD) | 1,5 mois | Juin-Juil 2026 |
+| Nomination (AG, lettres) | 1 mois | Août 2026 |
+| Constitution Comités | 1 mois | Août-Sept 2026 |
+| Onboarding + 1ère réunion | 1 mois | Sept 2026 |
+
+## 11. RISQUES
+
+| Risque | P | I | Mitigation |
+|--------|---|---|------------|
+| Difficulté attirer profils qualité | M | TÉ | Rémunération attractive, réseau Joliba, headhunter |
+| Indisponibilité candidats | M | É | Clarification engagement dès départ |
+| Conflits intérêts | F | TÉ | Due diligence rigoureuse, déclarations |
+| Manque diversité | M | M | Critères diversité, recherche proactive |
+
+---
+
+# P1-I3: CALENDRIER ANNUEL CA ET COMITÉS
+
+## 1. IDENTIFICATION
+
+| **Nom du projet** | Restructurer et renforcer la gouvernance IUC |
+| **Initiative** | Définition calendrier annuel CA et Comités |
+| **Code** | P1-I3 |
+| **Responsable** | Secrétaire Général |
+| **Chef de projet** | Secrétaire Général |
+| **Période** | T3 2026 (Juil-Sept 2026, 3 mois) |
+| **Budget** | 5 000 000 FCFA |
+
+## 2. ÉNONCÉ
+
+Élaborer calendrier annuel fixe des réunions CA (4/an minimum) et Comités (12-15 total/an) pour assurer rythme de gouvernance régulier, prévisible et efficace. Permet planification administrative, qualité préparation dossiers et pilotage continu.
+
+## 3. PÉRIMÈTRE
+
+**Exigences:**
+- Analyse contraintes (année académique, clôtures, pics activité)
+- Définition fréquence optimale (CA: 4-6/an, Comités: 3-4/an chacun)
+- Articulation logique CA ↔ Comités (Comités préparent CA)
+- Sondage disponibilités administrateurs
+- Calendrier pluriannuel (3 ans, pattern reproductible)
+- Ordres du jour types par réunion
+- Planning production documentation (délais transmission J-15)
+- Validation CA
+- Communication et blocking agendas
+- Processus convocation formalisé
+
+**Besoins:**
+- Prévisibilité pour administrateurs
+- Temps préparation suffisant
+- Supervision régulière (vs ponctuelle)
+- Efficacité réunions
+- Respect cycles institutionnels
+
+## 4. CLIENTÈLE VISÉE
+
+**Directs:** 9 membres CA, 16 membres Comités, Secrétariat, Direction Générale
+**Indirects:** Directions opérationnelles, actionnaires
+
+## 5. OBJECTIFS SMART
+
+| Objectif | Indicateur | Échéance |
+|----------|-----------|----------|
+| Analyse contraintes | Document synthèse | Juil 2026 |
+| Fréquence définie | Décision formalisée | Juil 2026 |
+| Calendrier 3 ans | Dates précises validées | Août 2026 |
+| Validation CA | Calendrier approuvé | Sept 2026 |
+| Agendas bloqués | 100% membres confirmés | Sept 2026 |
+| Process convocation | Procédure documentée | Sept 2026 |
+| 1er cycle complet | 4 CA + 12 Comités tenus | Sept 2027 |
+
+## 6. BÉNÉFICES
+
+- **Organisationnels:** Présence >85%, documentation +30% qualité, durée réunions -20%
+- **Stratégiques:** Pilotage régulier, décisions au bon moment
+- **Opérationnels:** Workflow clair, stress réduit, articulation Comités-CA
+
+## 7. LIVRABLES
+
+1. Analyse contraintes IUC
+2. Décision fréquence instances
+3. Calendrier triennal détaillé (Excel/PDF)
+4. Ordres du jour types par réunion
+5. Planning production documentation
+6. Process convocation formalisé
+7. Validation CA (PV)
+8. Confirmations blocking agendas
+9. Procédure gestion absences/reports
+10. Tableau suivi taux présence
+
+## 8. PARTIES PRENANTES
+
+| Partie prenante | Rôle | Implication |
+|-----------------|------|-------------|
+| Secrétaire Général | Responsable et pilotage | Très élevée |
+| Membres CA et Comités | Validation disponibilités | Très élevée |
+| Direction Générale | Validation cohérence opérationnelle | Élevée |
+| Assistante direction | Support logistique | Moyenne |
+
+## 9. EFFORTS ET BUDGET
+
+**Efforts:** Secrétaire Général (60% 3 mois), Assistante (40% 3 mois)
+
+**Budget:**
+- Outil planification/collaboration: 1M FCFA
+- Consultant organisation: 2M FCFA
+- Sondage/consultation membres: 0,5M FCFA
+- Communication calendrier: 0,5M FCFA
+- Documentation process: 0,5M FCFA
+- Contingences: 0,5M FCFA
+- **Total: 5M FCFA**
+
+## 10. ÉCHÉANCIER
+
+| Phase | Durée | Période |
+|-------|-------|---------|
+| Analyse et consultation | 1 mois | Juil 2026 |
+| Élaboration calendrier | 1 mois | Août 2026 |
+| Validation et déploiement | 1 mois | Sept 2026 |
+
+**Calendrier type année:**
+- **Mars:** CA budget N+1, Comité Audit
+- **Avril:** AG approbation comptes
+- **Juin:** CA S1, Comité Académique
+- **Septembre:** Comité Stratégique, RH
+- **Octobre:** CA budget N+1 validé
+- **Décembre:** CA T4, Comité Audit risques
+
+## 11. RISQUES
+
+| Risque | P | I | Mitigation |
+|--------|---|---|------------|
+| Indisponibilités récurrentes membres | M | M | Sondage amont, dates fixées 18 mois avant |
+| Événements imprévus nécessitant reports | M | F | Procédure report claire, dates de secours |
+| Surcharge production documentation | M | M | Planning réaliste, ressources dédiées |
+| Non-respect délais convocation | F | M | Automatisation rappels, checklist |
+
+---
+
+# P1-I4: CARTOGRAPHIE PROCESSUS OPÉRATIONNELS
+
+## 1. IDENTIFICATION
+
+| **Nom du projet** | Restructurer et renforcer la gouvernance IUC |
+| **Initiative** | Cartographie complète des processus opérationnels et métiers |
+| **Code** | P1-I4 |
+| **Responsable** | Directeur Qualité et Performance |
+| **Chef de projet** | Chef de projet Processus (consultant) |
+| **Période** | T4 2026 - T2 2027 (9 mois) |
+| **Budget** | 45 000 000 FCFA |
+
+## 2. ÉNONCÉ
+
+Réaliser cartographie exhaustive des 125 processus IUC (15 management, 45 métier, 45 support, 20 amélioration) selon norme BPMN 2.0. Documenter flux, responsabilités (RACI), indicateurs, risques pour chaque processus. Identifier 30% processus à optimiser en priorité. Base indispensable pour transformation digitale et excellence opérationnelle.
+
+## 3. PÉRIMÈTRE
+
+**Exigences:**
+- Recensement exhaustif processus (interviews 50+ personnes)
+- Classification 4 catégories (management, métier, support, amélioration)
+- Fiches processus standardisées (objectif, inputs, outputs, RACI, KPIs, risques)
+- Diagrammes BPMN 2.0 (100+ diagrammes)
+- Matrices RACI complètes
+- Documentation processus critiques détaillée
+- Identification processus à optimiser (gains rapides)
+- Mesure situation actuelle (temps, coûts, erreurs)
+- Formation équipes à la lecture processus
+
+**Besoins:**
+- Visibilité exhaustive du fonctionnement IUC
+- Identification inefficiences et doublons
+- Base pour optimisation et digitalisation
+- Standardisation pratiques
+- Facilitation intégration nouveaux collaborateurs
+- Réduction dépendance aux personnes clés
+
+## 4. CLIENTÈLE VISÉE
+
+**Directs:** Direction Générale, Directions opérationnelles, Qualité, DSI
+**Indirects:** Ensemble personnel (450), futurs collaborateurs, auditeurs
+
+## 5. OBJECTIFS SMART
+
+| Objectif | Indicateur | Échéance |
+|----------|-----------|----------|
+| Recensement complet | 125 processus identifiés | Déc 2026 |
+| Fiches processus | 125 fiches complètes | Mars 2027 |
+| Diagrammes BPMN | 100+ diagrammes finalisés | Avr 2027 |
+| Matrices RACI | 125 matrices complètes | Avr 2027 |
+| Identification optimisations | 40 processus priorisés | Mai 2027 |
+| Documentation critique | 20 processus documentés en détail | Juin 2027 |
+| Formation | 100% managers formés | Juin 2027 |
+
+## 6. BÉNÉFICES
+
+- **Opérationnels:** Réduction 30% temps traitement, -50% erreurs (après optimisation)
+- **Organisationnels:** Standardisation, élimination doublons, onboarding facilité
+- **Stratégiques:** Base transformation digitale, amélioration continue structurée
+- **Financiers:** Équivalent 10 ETP libérés pour tâches à valeur ajoutée
+
+## 7. LIVRABLES
+
+1. Inventaire complet 125 processus
+2. 125 fiches processus standardisées
+3. 100+ diagrammes BPMN 2.0
+4. 125 matrices RACI
+5. Manuel cartographie processus IUC
+6. Base de données processus (outil digital)
+7. Rapport identification optimisations (40 processus)
+8. Documentation détaillée 20 processus critiques
+9. Mesures situation actuelle (benchmark interne)
+10. Kit formation lecture processus
+11. Plan d'optimisation priorisé
+12. Dashboard suivi processus
+
+## 8. PARTIES PRENANTES
+
+| Partie prenante | Rôle | Implication |
+|-----------------|------|-------------|
+| Direction Générale | Sponsor | Très élevée |
+| Dir. Qualité et Performance | Pilotage | Très élevée |
+| Consultant processus | Expertise méthodologique | Très élevée |
+| Directions opérationnelles | Contribution contenu | Très élevée |
+| Personnel opérationnel | Interviews, validation | Élevée |
+| DSI | Lien digitalisation | Élevée |
+
+## 9. EFFORTS ET BUDGET
+
+**Efforts:** Chef projet (100% 9 mois), Dir. Qualité (50% 9 mois), 3 consultants (100% 6 mois), Directions (30% 6 mois)
+
+**Budget:**
+- Consultant processus (3x6 mois): 30M FCFA
+- Outil cartographie (logiciel BPMN): 8M FCFA
+- Formation équipes: 3M FCFA
+- Déplacements/ateliers: 2M FCFA
+- Documentation: 1M FCFA
+- Contingences: 4,5M FCFA
+- **Total: 45M FCFA**
+
+## 10. ÉCHÉANCIER
+
+| Phase | Durée | Période |
+|-------|-------|---------|
+| Recensement et interviews | 3 mois | Oct-Déc 2026 |
+| Modélisation (BPMN, RACI) | 4 mois | Jan-Avr 2027 |
+| Documentation et priorisation | 2 mois | Mai-Juin 2027 |
+| Formation et déploiement | 1 mois | Juin 2027 |
+
+## 11. RISQUES
+
+| Risque | P | I | Mitigation |
+|--------|---|---|------------|
+| Indisponibilité contributeurs clés | É | É | Planning interviews flexibles, sponsors directions |
+| Complexité sous-estimée | M | M | Méthodologie éprouvée, consultants experts |
+| Résistance documentation pratiques | M | M | Communication sur bénéfices, implication |
+| Obsolescence rapide si pas mise à jour | É | É | Process de mise à jour continue, propriétaires processus |
+
+---
+
+# P1-I5: REFONTE PROCESSUS INTERNES
+
+## 1. IDENTIFICATION
+
+| **Nom du projet** | Restructurer et renforcer la gouvernance IUC |
+| **Initiative** | Refonte et optimisation des processus opérationnels internes |
+| **Code** | P1-I5 |
+| **Responsable** | Directeur Qualité et Performance |
+| **Chef de projet** | Chef de projet Lean/Amélioration Continue |
+| **Période** | T3 2027 - T2 2028 (12 mois) |
+| **Budget** | 55 000 000 FCFA |
+
+## 2. ÉNONCÉ
+
+Optimiser 40 processus identifiés comme prioritaires (cartographie P1-I4) selon méthodologie Lean Six Sigma. Éliminer gaspillages (7 mudas), simplifier flux, automatiser tâches répétitives, standardiser pratiques. Objectif: réduction 30% temps traitement, -50% erreurs, +25% satisfaction utilisateurs, libération 10 ETP.
+
+## 3. PÉRIMÈTRE
+
+**Exigences:**
+- Sélection 40 processus prioritaires (impact x faisabilité)
+- Analyse approfondie situation actuelle (VSM - Value Stream Mapping)
+- Identification 7 gaspillages Lean par processus
+- Conception processus optimisés (simplification, automatisation)
+- Tests sur pilotes avant généralisation
+- Déploiement généralisé (formation, documentation)
+- Automatisation via outils digitaux (RPA si applicable)
+- Standardisation (procédures, templates)
+- Amélioration continue (cycles PDCA)
+
+**Besoins:**
+- Efficacité opérationnelle accrue
+- Réduction bureaucratie
+- Expérience utilisateur améliorée (étudiants, personnel)
+- Libération capacité pour tâches à valeur ajoutée
+- Qualité et fiabilité processus
+
+## 4. CLIENTÈLE VISÉE
+
+**Directs:** Personnel administratif (200), directions opérationnelles
+**Indirects:** Étudiants (satisfaction), Direction Générale (efficience)
+
+## 5. OBJECTIFS SMART
+
+| Objectif | Indicateur | Échéance |
+|----------|-----------|----------|
+| Sélection processus | 40 processus priorisés | Sept 2027 |
+| Analyse VSM | 40 cartographies situation actuelle | Nov 2027 |
+| Processus optimisés conçus | 40 processus to-be définis | Fév 2028 |
+| Tests pilotes | 10 processus testés et validés | Avr 2028 |
+| Déploiement général | 40 processus déployés | Juin 2028 |
+| Réduction temps | -30% temps traitement moyen | Août 2028 |
+| Réduction erreurs | -50% taux erreur | Août 2028 |
+| Satisfaction | +25% satisfaction utilisateurs | Août 2028 |
+
+## 6. BÉNÉFICES
+
+- **Opérationnels:** 30% temps économisé, 50% erreurs réduites, 10 ETP redéployés
+- **Utilisateurs:** Délais raccourcis, simplicité accrue, self-service
+- **Financiers:** Économies 40M FCFA/an (masse salariale optimisée)
+- **Qualité:** Fiabilité, traçabilité, conformité
+
+## 7. LIVRABLES
+
+1. Matrice priorisation 40 processus
+2. 40 Value Stream Maps (as-is)
+3. 40 analyses gaspillages
+4. 40 processus optimisés (to-be)
+5. 10 rapports pilotes
+6. 40 procédures standardisées
+7. Templates et outils automatisés
+8. Plans formation (par processus)
+9. Documentation utilisateur
+10. Dashboards de suivi performance
+11. Rapports gains réalisés
+12. Programme amélioration continue
+
+## 8. PARTIES PRENANTES
+
+| Partie prenante | Rôle | Implication |
+|-----------------|------|-------------|
+| Direction Générale | Sponsor | Très élevée |
+| Dir. Qualité et Performance | Pilotage | Très élevée |
+| Consultant Lean Six Sigma | Expertise méthodologique | Très élevée |
+| Directions opérationnelles | Propriétaires processus | Très élevée |
+| Personnel administratif | Utilisateurs, contributeurs | Très élevée |
+| DSI | Automatisation | Élevée |
+
+## 9. EFFORTS ET BUDGET
+
+
+**Efforts:** Chef projet Lean (100% 12 mois), Dir. Qualité (40% 12 mois), 4 consultants (100% 9 mois), Équipes opérationnelles (40% 9 mois)
+
+**Budget:**
+- Consultants Lean Six Sigma (4x9 mois): 35M FCFA
+- Formation équipes méthodologie: 8M FCFA
+- Outils automatisation (RPA, workflows): 7M FCFA
+- Ateliers et déplacements: 2M FCFA
+- Communication changement: 1M FCFA
+- Contingences: 5,5M FCFA
+- **Total: 55M FCFA**
+
+## 10. ÉCHÉANCIER
+
+| Phase | Durée | Période |
+|-------|-------|---------|
+| Sélection et analyse (VSM) | 3 mois | Sept-Nov 2027 |
+| Conception processus optimisés | 3 mois | Déc 2027-Fév 2028 |
+| Pilotes et ajustements | 2 mois | Mars-Avr 2028 |
+| Déploiement général | 3 mois | Mai-Juil 2028 |
+| Stabilisation et mesure gains | 1 mois | Août 2028 |
+
+## 11. RISQUES
+
+| Risque | P | I | Mitigation |
+|--------|---|---|------------|
+| Résistance changement massive | TÉ | TÉ | Conduite changement intensive, quick wins, implication |
+| Gains inférieurs aux attentes | M | É | Mesures rigoureuses avant/après, benchmarks réalistes |
+| Complexité automatisation | M | M | Expertise DSI, solutions éprouvées, phasage |
+| Perturbation opérations pendant déploiement | É | É | Pilotes, formation préalable, support renforcé |
+
+## 12. APPROBATION
+
+| Rôle | Nom | Révision/Approbation | Date |
+|------|-----|---------------------|------|
+| Rédacteur de l'initiative | [À compléter] | Révision | |
+| Responsable de l'initiative | Dir. Qualité et Performance | Révision | |
+| Chef de projet | Chef projet Lean | Révision | |
+| Directrice Générale | [À compléter] | Approbation | |
+| Sponsor | Joliba Capital | Approbation finale | |
+
+---
+
+# P1-I6: RENFORCEMENT ÉQUIPE DE DIRECTION
+
+## 1. IDENTIFICATION
+
+| **Nom du projet** | Restructurer et renforcer la gouvernance IUC |
+| **Initiative** | Renforcement de l'équipe de direction |
+| **Code** | P1-I6 |
+| **Responsable** | Directrice Générale |
+| **Chef de projet** | Directeur RH |
+| **Période** | T1 2026 - T4 2027 (24 mois) |
+| **Budget** | 120 000 000 FCFA |
+
+## 2. ÉNONCÉ
+
+Recruter 15 postes de direction stratégiques pour renforcer capacité de pilotage et d'exécution: 2 DGA (Académique, Admin&Finances), DSI, Dir. Relations Entreprises, Dir. Relations Internationales, Dir. Qualité, Dir. Marketing, Dir. Développement Immobilier, Dir. PMO, Contrôleur Gestion, Resp. Alumni, Dir. Campus IT, Resp. Hub Entrepreneuriat, Resp. RSE, Dir. Audit Interne. Packages compétitifs (fixe + variable 15-30%, avantages).
+
+## 3. PÉRIMÈTRE
+
+**Exigences:**
+- Définition 15 fiches de poste détaillées
+- Grilles de compétences et d'évaluation
+- Benchmarking salarial marché (privé vs public)
+- Packages rémunération compétitifs
+- Sourcing multi-canal (headhunters, réseau Joliba, LinkedIn, annonces)
+- Processus sélection rigoureux (shortlist, entretiens multiples, assessment)
+- Due diligence candidats (références, background)
+- Négociations et offres
+- Onboarding structuré (3-6 mois)
+- Évaluations période d'essai
+
+**Besoins:**
+- Combler gaps de compétences critiques
+- Professionnaliser management
+- Capacité exécution projets transformations
+- Attirer et retenir top talents
+- Diversité perspectives (secteurs, formations, genres)
+
+## 4. CLIENTÈLE VISÉE
+
+**Directs:** Direction Générale, Comité Direction élargi, CA
+**Indirects:** Ensemble personnel (encadrement renforcé), étudiants (services améliorés)
+
+## 5. OBJECTIFS SMART
+
+| Objectif | Indicateur | Échéance |
+|----------|-----------|----------|
+| Fiches poste finalisées | 15 fiches validées | Mars 2026 |
+| Benchmarking salarial | Grilles définies | Avr 2026 |
+| Lancement recrutements | 15 annonces publiées | Mai 2026 |
+| 1ère vague (6 postes critiques) | Embauchés et opérationnels | Déc 2026 |
+| 2ème vague (6 postes) | Embauchés et opérationnels | Juin 2027 |
+| 3ème vague (3 postes) | Embauchés et opérationnels | Déc 2027 |
+| Taux rétention an 1 | >85% toujours en poste | Déc 2028 |
+
+## 6. BÉNÉFICES
+
+- **Organisationnels:** Capacité exécution x2, professionnalisation management
+- **Stratégiques:** Expertise pour transformation digitale, expansion, accréditations
+- **RH:** Attraction talents, culture performance, pipeline succession
+- **Opérationnels:** Meilleur pilotage, décisions data-driven, exécution projets
+
+## 7. LIVRABLES
+
+1. 15 fiches de poste détaillées
+2. Grilles de compétences par poste
+3. Benchmarking salarial marché
+4. 15 packages rémunération
+5. Annonces de recrutement (multi-canal)
+6. Rapports shortlists (candidats qualifiés)
+7. Grilles entretiens et assessment
+8. 15 rapports due diligence
+9. 15 contrats de travail signés
+10. Programmes onboarding par poste
+11. Évaluations période essai
+12. Nouvel organigramme complet
+
+## 8. PARTIES PRENANTES
+
+| Partie prenante | Rôle | Implication |
+|-----------------|------|-------------|
+| Directrice Générale | Sponsor, décisions finales | Très élevée |
+| Directeur RH | Pilotage recrutements | Très élevée |
+| Cabinets recrutement (3) | Sourcing postes clés | Élevée |
+| Comité Direction | Entretiens, évaluation | Élevée |
+| Joliba Capital | Validation profils stratégiques | Moyenne |
+| CA (Comité RH) | Approbation packages top management | Moyenne |
+
+## 9. EFFORTS ET BUDGET
+
+**Efforts:** DRH (60% 24 mois), DG (30% 24 mois), Équipe RH recrutement (2 personnes 80% 18 mois)
+
+**Budget:**
+- Cabinets recrutement (15 postes): 45M FCFA
+- Assessment centers: 8M FCFA
+- Due diligence: 5M FCFA
+- Relocation/installation (6 postes): 12M FCFA
+- Onboarding (séminaires, formations): 10M FCFA
+- Frais annonces et communication: 3M FCFA
+- Contingences recrutement (échecs, re-search): 15M FCFA
+- **Total budget recrutement: 98M FCFA**
+- **Surcoût masse salariale an 1 (6 mois moyen): 22M FCFA**
+- **TOTAL: 120M FCFA**
+
+**Note:** Masse salariale récurrente = 400M FCFA/an (15 postes x moyenne 26,6M)
+
+## 10. ÉCHÉANCIER
+
+| Vague | Postes | Période | Échéance |
+|-------|--------|---------|----------|
+| **Vague 1 (Critique)** | DGA Admin, DSI, PMO, Qualité, Contrôle Gestion, RH (renfort) | Mai-Déc 2026 | Déc 2026 |
+| **Vague 2 (Développement)** | DGA Académique, Rel. Entreprises, Rel. Internationales, Marketing, Alumni, Audit | Jan-Juin 2027 | Juin 2027 |
+| **Vague 3 (Innovation)** | Dir. Campus IT, Dir. Dév. Immobilier, Resp. Hub Entrepreneuriat, Resp. RSE | Juil-Déc 2027 | Déc 2027 |
+
+**Délai moyen recrutement par poste: 4-5 mois (annonce → embauche)**
+
+## 11. RISQUES
+
+| Risque | P | I | Mitigation |
+|--------|---|---|------------|
+| Difficulté attirer top talents (Yaoundé vs grandes villes) | É | TÉ | Packages compétitifs, projet motivant, flexibilité remote partiel |
+| Turnover élevé 1ères années | M | É | Onboarding solide, culture, perspectives évolution, rémunération variable |
+| Mauvaises recrues (fit culturel) | M | É | Process sélection rigoureux, période essai stricte, assessment |
+| Dépassement budgets recrutement | M | M | Contingences 15%, priorisation vagues si besoin |
+| Délais recrutement prolongés | É | É | Anticipation, multi-sourcing, cabinets performants |
+
+---
+
+# P1-I7: MANAGEMENT DE LA PERFORMANCE RH
+
+## 1. IDENTIFICATION
+
+| **Nom du projet** | Restructurer et renforcer la gouvernance IUC |
+| **Initiative** | Intégration d'un management de la performance RH |
+| **Code** | P1-I7 |
+| **Responsable** | Directeur RH |
+| **Chef de projet** | Responsable Formation & Développement |
+| **Période** | T1 2027 - T4 2027 (12 mois) |
+| **Budget** | 35 000 000 FCFA |
+
+## 2. ÉNONCÉ
+
+Déployer système complet de management de la performance: évaluation annuelle 360° pour 100% personnel (450 personnes), objectifs SMART individuels alignés stratégie, revues trimestrielles, rémunération variable liée performance (10-30% selon niveau), dashboard RH mensuel (turnover, absentéisme, satisfaction, formation). Culture de performance et d'excellence.
+
+## 3. PÉRIMÈTRE
+
+**Exigences:**
+- Grilles évaluation par famille de poste (25 critères standardisés)
+- Système 360° (auto-évaluation + hiérarchie + pairs pour managers)
+- Formation 100% managers à l'évaluation
+- Plateforme digitale de gestion performance
+- Cascading objectifs (stratégie → départements → individus)
+- Revues trimestrielles avancement
+- Politique rémunération variable (bonus liée performance)
+- Dashboard KPIs RH temps réel
+- Enquêtes satisfaction annuelles
+- Plans de développement individuels
+
+**Besoins:**
+- Culture de la performance
+- Méritocratie et équité
+- Motivation et engagement
+- Développement compétences structuré
+- Rétention talents
+- Alignement efforts individuels sur stratégie
+
+## 4. CLIENTÈLE VISÉE
+
+**Directs:** 450 collaborateurs (évalués et évaluateurs), Direction RH, Managers (65)
+**Indirects:** Direction Générale (pilotage RH), CA (Comité RH)
+
+## 5. OBJECTIFS SMART
+
+| Objectif | Indicateur | Échéance |
+|----------|-----------|----------|
+| Grilles évaluation définies | 10 grilles par famille poste | Mars 2027 |
+| Plateforme performance déployée | Outil opérationnel | Avr 2027 |
+| Managers formés | 100% formés (65 personnes) | Mai 2027 |
+| Objectifs 2027 définis | 100% collaborateurs ont 4-6 objectifs | Juin 2027 |
+| 1ère évaluation complète | 100% personnel évalué | Déc 2027 |
+| Rémunération variable versée | Bonus liés performance payés | Janv 2028 |
+| Satisfaction système | >70% collaborateurs satisfaits | Fév 2028 |
+
+## 6. BÉNÉFICES
+
+- **RH:** Turnover -30% (de ~20% à 14%), satisfaction +15 points
+- **Performance:** Productivité +20%, alignement stratégique
+- **Financiers:** Masse salariale optimisée, bonus sur performance réelle
+- **Culturels:** Culture excellence, méritocratie, développement
+
+## 7. LIVRABLES
+
+1. Politique de gestion de la performance (document cadre)
+2. 10 grilles d'évaluation par famille de poste
+3. Plateforme digitale de performance
+4. Kit formation managers évaluateurs
+5. Procédure cascading objectifs
+6. Modèle entretien annuel (trame)
+7. Politique rémunération variable
+8. Dashboard KPIs RH (Power BI)
+9. Enquête satisfaction RH
+10. Plans développement individuels (450)
+11. Rapport annuel performance RH
+12. Procédure de recalibration (fairness)
+
+## 8. PARTIES PRENANTES
+
+| Partie prenante | Rôle | Implication |
+|-----------------|------|-------------|
+| Direction Générale | Sponsor, définition objectifs top | Très élevée |
+| Directeur RH | Pilotage système | Très élevée |
+| Managers (65) | Évaluateurs, définition objectifs | Très élevée |
+| Collaborateurs (450) | Évalués, contributeurs | Très élevée |
+| Comité RH (CA) | Validation politique rémunération | Moyenne |
+| Éditeur logiciel RH | Plateforme performance | Élevée |
+
+## 9. EFFORTS ET BUDGET
+
+**Efforts:** Resp. Formation & Dév (100% 12 mois), DRH (40% 12 mois), Consultante RH (100% 6 mois), Managers (20h/an évaluations)
+
+**Budget:**
+- Plateforme digitale performance (licence + setup): 15M FCFA
+- Consultant RH système performance: 10M FCFA
+- Formation managers (65x2 jours): 5M FCFA
+- Enquêtes satisfaction (outil + analyse): 2M FCFA
+- Communication et conduite changement: 1,5M FCFA
+- Contingences: 3,35M FCFA
+- **Total: 35M FCFA**
+
+**Note:** Enveloppe rémunération variable (45M/an) = coûts récurrents masse salariale
+
+## 10. ÉCHÉANCIER
+
+| Phase | Durée | Période |
+|-------|-------|---------|
+| Conception système et grilles | 3 mois | Jan-Mars 2027 |
+| Déploiement plateforme et formation | 2 mois | Avr-Mai 2027 |
+| Définition objectifs 2027 | 1 mois | Juin 2027 |
+| Revues trimestrielles | 6 mois | Juil-Déc 2027 |
+| Évaluations annuelles | 2 mois | Nov-Déc 2027 |
+| Attribution bonus et recalibration | 1 mois | Janv 2028 |
+
+## 11. RISQUES
+
+| Risque | P | I | Mitigation |
+|--------|---|---|------------|
+| Résistance évaluations (culture non-confrontation) | É | É | Communication bénéfices, formation, accompagnement |
+| Subjectivité et biais évaluateurs | É | É | Formation anti-biais, recalibration, 360° |
+| Démotivation si bonus trop faibles | M | É | Enveloppes réalistes (10% masse pour 30% bonus moyen top performers) |
+| Plateforme mal adoptée | M | M | UX simple, formation, support, champions utilisateurs |
+
+---
+
+# P1-I8: ÉVALUATION CONTINUE QUALITÉ SERVICES
+
+## 1. IDENTIFICATION
+
+| **Nom du projet** | Restructurer et renforcer la gouvernance IUC |
+| **Initiative** | Politique d'évaluation continue de la qualité des services |
+| **Code** | P1-I8 |
+| **Responsable** | Directeur Qualité et Performance |
+| **Chef de projet** | Responsable Qualité |
+| **Période** | T2 2027 - T1 2028 (12 mois) |
+| **Budget** | 25 000 000 FCFA |
+
+## 2. ÉNONCÉ
+
+Mettre en place système d'évaluation continue de la qualité via enquêtes multiples (étudiants 3x/an, entreprises annuel, personnel annuel, alumni biannuel), indicateurs qualité mensuels (satisfaction >80%, NPS >40, réussite, employabilité >75%, remplissage >85%), gestion réclamations digitale (résolution <5 jours), amélioration continue structurée.
+
+## 3. PÉRIMÈTRE
+
+**Exigences:**
+- Enquêtes satisfaction structurées (questionnaires validés scientifiquement)
+- Plateforme digitale de recueil (web + mobile)
+- Enquêtes étudiants: enseignements (chaque semestre), services (annuel), insertion (6 mois et 2 ans post-diplôme)
+- Enquêtes entreprises, personnel, alumni (calendrier défini)
+- Dashboard qualité temps réel (20+ KPIs)
+- Système gestion réclamations (ticketing, escalade automatique)
+- Analyse réclamations récurrentes et plans d'action
+- Boucles amélioration continue (PDCA)
+- Communication résultats et actions
+
+**Besoins:**
+- Mesure satisfaction parties prenantes
+- Identification problèmes qualité rapidement
+- Amélioration continue basée données
+- Responsabilisation sur qualité
+- Transparence et écoute clients
+
+## 4. CLIENTÈLE VISÉE
+
+**Directs:** Étudiants (5000+), entreprises partenaires (100+), personnel (450), alumni (5000+)
+**Indirects:** Direction Générale, Directions opérationnelles (feedback pour amélioration)
+
+## 5. OBJECTIFS SMART
+
+| Objectif | Indicateur | Échéance |
+|----------|-----------|----------|
+| Plateforme enquêtes déployée | Outil opérationnel | Juin 2027 |
+| 1ère enquête étudiants | >70% taux réponse | Juil 2027 |
+| Dashboard qualité actif | 20 KPIs suivis temps réel | Août 2027 |
+| Système réclamations | Plateforme opérationnelle | Sept 2027 |
+| Satisfaction globale étudiants | >80% | Déc 2027 |
+| NPS étudiant | >40 | Déc 2027 |
+| Délai traitement réclamations | <5 jours moyen | Déc 2027 |
+| Taux employabilité 6 mois | >75% | Mars 2028 |
+
+## 6. BÉNÉFICES
+
+- **Qualité:** Satisfaction +15 points, réclamations -40% (résolution rapide)
+- **Opérationnels:** Problèmes identifiés et résolus rapidement, amélioration continue
+- **Stratégiques:** Feedback marché, anticipation insatisfaction, loyauté accrue
+- **Réputation:** NPS positif, bouche-à-oreille favorable
+
+## 7. LIVRABLES
+
+1. Questionnaires enquêtes validés (étudiants, entreprises, personnel, alumni)
+2. Plateforme digitale enquêtes (web + mobile)
+3. Calendrier annuel des enquêtes
+4. Dashboard qualité temps réel (Power BI)
+5. Définition 20+ KPIs qualité
+6. Plateforme gestion réclamations (ticketing)
+7. Procédure traitement réclamations (SLA, escalade)
+8. Rapports d'analyse enquêtes (semestriels)
+9. Plans d'action amélioration qualité
+10. Communication résultats (interne/externe)
+11. Boucles PDCA documentées
+12. Rapport annuel qualité
+
+## 8. PARTIES PRENANTES
+
+| Partie prenante | Rôle | Implication |
+|-----------------|------|-------------|
+| Direction Générale | Sponsor, revue indicateurs | Élevée |
+| Dir. Qualité et Performance | Pilotage | Très élevée |
+| Directions opérationnelles | Contributeurs amélioration | Très élevée |
+| Étudiants | Répondants enquêtes | Très élevée |
+| Personnel | Répondants et amélioration | Élevée |
+| Entreprises et Alumni | Répondants | Moyenne |
+| DSI | Support plateformes | Élevée |
+
+## 9. EFFORTS ET BUDGET
+
+**Efforts:** Resp. Qualité (100% 12 mois), 2 chargés qualité (80% 12 mois), Directions (20% pour amélioration)
+
+**Budget:**
+- Plateforme enquêtes (licence SaaS 3 ans): 8M FCFA
+- Plateforme gestion réclamations: 5M FCFA
+- Conseil méthodologie enquêtes: 4M FCFA
+- Dashboard qualité (Power BI setup): 3M FCFA
+- Formation équipes qualité: 2M FCFA
+- Communication et sensibilisation: 1,5M FCFA
+- Contingences: 2,5M FCFA
+- **Total: 25M FCFA**
+
+## 10. ÉCHÉANCIER
+
+| Phase | Durée | Période |
+|-------|-------|---------|
+| Conception questionnaires et KPIs | 2 mois | Avr-Mai 2027 |
+| Déploiement plateformes | 2 mois | Juin-Juil 2027 |
+| 1er cycle enquêtes | 3 mois | Août-Oct 2027 |
+| Analyse et plans d'action | 2 mois | Nov-Déc 2027 |
+| Amélioration continue (cycles PDCA) | 3 mois | Janv-Mars 2028 |
+
+## 11. RISQUES
+
+| Risque | P | I | Mitigation |
+|--------|---|---|------------|
+| Taux réponse enquêtes faible (<50%) | M | É | Incentives, communication, simplicité questionnaires |
+| Insatisfaction révélée importante | M | É | Transparence, plans d'action rapides, communication progrès |
+| Réclamations submergent système | M | M | Dimensionnement adéquat équipe, SLA réalistes |
+| Lassitude enquêtes (trop fréquent) | F | M | Équilibre fréquence/pertinence, variété formats |
+
+---
+
+# P1-I9: STRUCTURES LEAN, AGILES ET ROBUSTES
+
+## 1. IDENTIFICATION
+
+| **Nom du projet** | Restructurer et renforcer la gouvernance IUC |
+| **Initiative** | Mise en place de structures lean, agiles et robustes |
+| **Code** | P1-I9 |
+| **Responsable** | Directrice Générale Adjointe Administration |
+| **Chef de projet** | Directeur Qualité et Performance |
+| **Période** | T1 2028 - T4 2028 (12 mois) |
+| **Budget** | 40 000 000 FCFA |
+
+## 2. ÉNONCÉ
+
+Transformer organisation selon 3 principes: LEAN (élimination gaspillages, VSM, kaizen, standardisation), AGILE (équipes pluridisciplinaires, sprints, OKRs trimestriels, expérimentation, feedback loops), ROBUSTE (PCA fonctions critiques, redondances compétences, cyber-résilience, trésorerie 3 mois, diversification fournisseurs). Structure matricielle par pôles de compétences vs départements rigides.
+
+## 3. PÉRIMÈTRE
+
+**Exigences:**
+
+**Lean:**
+- Value Stream Mapping chaînes de valeur
+- Élimination bureaucratie excessive
+- Flux tirés vs poussés
+- Standardisation tâches répétitives
+- Culture amélioration continue (kaizen)
+
+**Agile:**
+- Pôles thématiques transversaux (Digital, International, Qualité)
+- Mobilité interne facilitée
+- Gestion projet matricielle
+- OKRs trimestriels (vs annuels uniquement)
+- Sprints 2 semaines (projets IT/innovation)
+- Droit à l'erreur encadré (expérimentation)
+
+**Robustesse:**
+- Plans Continuité Activité (PCA) 10 fonctions critiques
+- Plans succession 20 postes clés
+- Cyber-résilience (DRP, sauvegardes, tests)
+- Trésorerie minimum 3 mois exploitation
+- Diversification fournisseurs critiques (>2 par catégorie)
+
+**Besoins:**
+- Agilité et adaptation rapide
+- Efficience opérationnelle maximale
+- Résilience face aux chocs (crise, turnover, cyber-attaque)
+- Innovation et expérimentation
+- Optimisation continue
+
+## 4. CLIENTÈLE VISÉE
+
+**Directs:** Direction Générale, Comité Direction, ensemble personnel (450)
+**Indirects:** Étudiants (services continus), actionnaires (risques maîtrisés)
+
+## 5. OBJECTIFS SMART
+
+| Objectif | Indicateur | Échéance |
+|----------|-----------|----------|
+| VSM réalisées | 15 chaînes valeur cartographiées | Mars 2028 |
+| Structure matricielle déployée | 5 pôles transversaux actifs | Avr 2028 |
+| OKRs trimestriels | 100% directions ont OKRs | Avr 2028 |
+| PCA finalisés | 10 PCA testés | Juin 2028 |
+| Plans succession | 20 postes clés couverts | Juin 2028 |
+| Trésorerie sécurisée | 3 mois exploitation disponibles | Sept 2028 |
+| DRP opérationnel | Plan testé avec succès | Oct 2028 |
+| Gains lean | 15% efficience accrue (indicateur composite) | Déc 2028 |
+
+## 6. BÉNÉFICES
+
+- **Lean:** 15% efficience, gaspillages éliminés, culture amélioration
+- **Agile:** Time-to-market -30% (nouveaux services), satisfaction +20%
+- **Robuste:** Résilience face crises, zéro interruption critique, cyber-secure
+- **Organisationnels:** Mobilité interne accrue, innovation structurée
+
+## 7. LIVRABLES
+
+1. 15 Value Stream Maps
+2. Rapports élimination gaspillages
+3. Nouvel organigramme matriciel
+4. Description 5 pôles transversaux
+5. Framework OKRs trimestriels
+6. 10 Plans Continuité Activité
+7. 20 Plans de succession documentés
+8. Disaster Recovery Plan (IT)
+9. Politique trésorerie et réserves
+10. Cartographie fournisseurs critiques
+11. Procédures gestion crise
+12. Rapports tests PCA et DRP
+
+## 8. PARTIES PRENANTES
+
+| Partie prenante | Rôle | Implication |
+|-----------------|------|-------------|
+| Direction Générale | Sponsor transformation | Très élevée |
+| DGA Administration | Pilotage initiative | Très élevée |
+| Dir. Qualité | Expertise lean | Très élevée |
+| PMO | Framework agile | Très élevée |
+| DSI | Cyber-résilience, DRP | Très élevée |
+| Toutes Directions | Contributeurs transformation | Élevée |
+| Consultant lean/agile | Méthodologie | Élevée |
+
+## 9. EFFORTS ET BUDGET
+
+**Efforts:** Chef projet (100% 12 mois), Dir. Qualité (60% 12 mois), PMO (60% 12 mois), DSI (40% 12 mois), Directions (30% 8 mois)
+
+**Budget:**
+- Consultant lean/agile (12 mois): 20M FCFA
+- Formation équipes (lean, agile, PCA): 8M FCFA
+- Outils (DRP, sauvegarde, OKRs): 6M FCFA
+- Constitution réserves trésorerie (impact trésorerie, non dépense): -
+- Tests PCA/DRP (simulations): 2M FCFA
+- Documentation et communication: 1,5M FCFA
+- Contingences: 4M FCFA
+- **Total: 40M FCFA**
+
+## 10. ÉCHÉANCIER
+
+| Phase | Durée | Période |
+|-------|-------|---------|
+| Diagnostic et VSM | 3 mois | Jan-Mars 2028 |
+| Conception organisation matricielle et OKRs | 2 mois | Avr-Mai 2028 |
+| PCA et plans succession | 3 mois | Avr-Juin 2028 |
+| Déploiement lean et agile | 4 mois | Juin-Sept 2028 |
+| Robustesse (DRP, trésorerie, tests) | 4 mois | Juil-Oct 2028 |
+| Stabilisation et mesure gains | 2 mois | Nov-Déc 2028 |
+
+## 11. RISQUES
+
+| Risque | P | I | Mitigation |
+|--------|---|---|------------|
+| Résistance changement organisation | É | TÉ | Conduite changement intensive, quick wins, formation |
+| Complexité matricielle (conflits responsabilités) | M | É | RACI clairs, arbitrages DG, communication |
+| Sous-estimation coûts robustesse (réserves) | M | M | Phasage constitution réserves, financement adapté |
+| Tests PCA perturbent opérations | F | M | Tests hors périodes critiques, simulations partielles |
+
+---
+
+# P1-I10: GPEC - GESTION PRÉVISIONNELLE EMPLOIS
+
+## 1. IDENTIFICATION
+
+| **Nom du projet** | Restructurer et renforcer la gouvernance IUC |
+| **Initiative** | Mise en place GPEC (Gestion Prévisionnelle Emplois et Compétences) |
+| **Code** | P1-I10 |
+| **# FICHES DE MANDAT - PROJET 1
+## RESTRUCTURER ET RENFORCER LA GOUVERNANCE IUC
+
+**Document de référence pour le pilotage des 12 initiatives du Projet 1**
+
+---
+
+# TABLE DES MATIÈRES
+
+| Initiative | Titre | Page |
+|------------|-------|------|
+| P1-I1 | Transformation juridique en SAS | 3 |
+| P1-I2 | Identification membres CA et Comités | 10 |
+| P1-I3 | Calendrier annuel CA et Comités | 17 |
+| P1-I4 | Cartographie processus opérationnels | 23 |
+| P1-I5 | Refonte processus internes | 30 |
+| P1-I6 | Renforcement équipe de direction | 37 |
+| P1-I7 | Management de la performance RH | 44 |
+| P1-I8 | Évaluation continue qualité services | 51 |
+| P1-I9 | Structures lean, agiles et robustes | 58 |
+| P1-I10 | GPEC - Gestion Prévisionnelle Emplois | 65 |
+| P1-I11 | Gestion budgétaire - Phase 1 | 72 |
+| P1-I12 | Gestion budgétaire - Phase 2 | 79 |
+
+---
+
+# P1-I1: TRANSFORMATION JURIDIQUE EN SAS
+
+## 1. IDENTIFICATION
+
+| **Nom du projet** | Restructurer et renforcer la gouvernance IUC |
+| **Initiative** | Transformation juridique : Société Unipersonnelle → SAS |
+| **Code** | P1-I1 |
+| **Responsable** | Directeur Juridique / Secrétaire Général |
+| **Chef de projet** | Juriste Senior (à désigner) |
+| **Période** | T1 2026 - T4 2026 (12 mois) |
+| **Budget** | 23 650 000 FCFA |
+
+## 2. ÉNONCÉ
+
+Transformer la structure juridique de l'IUC en Société par Actions Simplifiée pour moderniser la gouvernance, faciliter les levées de fonds (objectif: 2-3 milliards FCFA sur 3 ans), renforcer la crédibilité institutionnelle et préparer la croissance. La SAS offre flexibilité capitalistique, gouvernance sur-mesure et attractivité investisseurs.
+
+## 3. PÉRIMÈTRE
+
+**Exigences principales:**
+- Audit juridique exhaustif structure actuelle
+- Valorisation IUC (3 méthodes: DCF, multiples, actif net)
+- Rédaction statuts SAS (50-70 pages) et pacte actionnaires (30-50 pages)
+- Validation AGE transformation
+- Formalités RCCM et publications légales
+- Mise à jour tous contrats institutionnels
+- Communication transformation (interne/externe)
+
+**Besoins:**
+- Sécurisation juridique croissance
+- Attractivité investisseurs institutionnels
+- Mécanismes entrée/sortie actionnaires
+- Gouvernance moderne (CA, comités)
+- Crédibilité partenaires bancaires/académiques
+
+## 4. CLIENTÈLE VISÉE
+
+**Directs:** Actionnaires (Joliba Capital, futurs investisseurs), Direction Générale, futur CA
+**Indirects:** Personnel, étudiants, banques, partenaires académiques
+
+## 5. OBJECTIFS SMART
+
+| Objectif | Indicateur | Échéance |
+|----------|-----------|----------|
+| Audit juridique | Rapport validé | Mars 2026 |
+| Valorisation | 3 méthodes, montant validé | Avril 2026 |
+| Statuts et pacte | Documents finalisés | Juin 2026 |
+| AGE transformation | PV approuvé | Juillet 2026 |
+| RCCM SAS | Nouveau RCCM obtenu | Sept 2026 |
+| Mise à jour contrats | 100% contrats actualisés | Nov 2026 |
+| Communication | 100% parties prenantes informées | Déc 2026 |
+
+## 6. BÉNÉFICES
+
+- **Juridiques:** Conformité standards internationaux, protection patrimoniale
+- **Financiers:** Facilitation levées fonds, valorisation clarifiée
+- **Stratégiques:** Image professionnelle, flexibilité M&A
+- **Organisationnels:** Séparation propriété/gestion, rôles clairs
+
+## 7. LIVRABLES
+
+1. Rapport audit juridique complet
+2. Rapport valorisation (3 méthodes)
+3. Statuts SAS finaux (50-70 pages)
+4. Pacte actionnaires signé (30-50 pages)
+5. Règlement intérieur CA (projet)
+6. PV AGE transformation
+7. Dossier RCCM complet
+8. Nouveau RCCM SAS
+9. Publications légales
+10. Contrats actualisés (dossier)
+11. Plan communication
+12. Documentation formation gouvernance
+
+## 8. PARTIES PRENANTES
+
+| Partie prenante | Rôle | Implication |
+|-----------------|------|-------------|
+| Direction Générale | Sponsor exécutif | Très élevée |
+| Joliba Capital | Actionnaire, validation | Très élevée |
+| Cabinet juridique externe | Conseil, rédaction | Très élevée |
+| Expert-comptable | Valorisation, audit | Élevée |
+| Chef de projet | Coordination | Très élevée |
+| RCCM/Administration | Enregistrement | Moyenne |
+
+## 9. EFFORTS ET BUDGET
+
+**Efforts:** Chef projet (80% 12 mois), Dir. Juridique (50% 12 mois), DG (15% 12 mois)
+
+**Budget:**
+- Cabinet juridique: 12M FCFA
+- Valorisation: 3M FCFA
+- RCCM/publications: 2M FCFA
+- Communication: 2M FCFA
+- Formation: 1M FCFA
+- Contingences: 2,15M FCFA
+- **Total: 23,65M FCFA**
+
+## 10. ÉCHÉANCIER
+
+| Phase | Durée | Période |
+|-------|-------|---------|
+| Diagnostic (audit juridique/financier) | 3 mois | Jan-Mar 2026 |
+| Valorisation | 3 mois | Fév-Avr 2026 |
+| Rédaction documents | 3 mois | Avr-Juin 2026 |
+| Validation AGE | 1 mois | Juil 2026 |
+| Formalités RCCM | 2 mois | Août-Sept 2026 |
+| Transition/Communication | 3 mois | Oct-Déc 2026 |
+
+## 11. RISQUES
+
+| Risque | P | I | Mitigation |
+|--------|---|---|------------|
+| Retards administratifs RCCM | M | É | Anticipation, dossier complet, relations |
+| Désaccord valorisation | F | TÉ | 3 méthodes indépendantes, médiateur |
+| Coûts dépassés | F | M | Contingences 10%, devis détaillés |
+| Documents non conformes | M | É | Audit préalable rigoureux |
+
+---
+
+# P1-I2: IDENTIFICATION MEMBRES CA ET COMITÉS
+
+## 1. IDENTIFICATION
+
+| **Nom du projet** | Restructurer et renforcer la gouvernance IUC |
+| **Initiative** | Identification et nomination membres CA et Comités |
+| **Code** | P1-I2 |
+| **Responsable** | Président CA désigné |
+| **Chef de projet** | Secrétaire Général |
+| **Période** | T2 2026 - T3 2026 (6 mois) |
+| **Budget** | 33 550 000 FCFA |
+
+## 2. ÉNONCÉ
+
+Identifier, sélectionner et nommer 9 membres du Conseil d'Administration (40% actionnaires, 30% indépendants, 20% management, 10% personnalités) et constituer 4 Comités spécialisés (Audit & Risques, RH, Stratégique, Académique) avec ~20 membres au total. Objectif: gouvernance équilibrée, experte et diversifiée.
+
+## 3. PÉRIMÈTRE
+
+**Exigences:**
+- Définition profils recherchés (compétences, expérience, disponibilité)
+- Critères sélection (indépendance, diversité genre/âge, réseau)
+- Sourcing candidats (headhunter, réseau Joliba, associations)
+- Évaluation (entretiens, due diligence, références)
+- Négociation conditions (rémunération 30M FCFA/an total CA, engagement temps)
+- Nomination officielle AG
+- Onboarding (formation, documentation, visite)
+- Constitution Comités
+
+**Besoins:**
+- Expertise diversifiée (académique, finance, stratégie, opérationnel)
+- Supervision efficace et challenge constructif
+- Crédibilité externe
+- Accès réseaux professionnels
+- Conformité standards gouvernance
+
+## 4. CLIENTÈLE VISÉE
+
+**Directs:** Actionnaires, Direction Générale, IUC (institution)
+**Indirects:** Étudiants, personnel, partenaires, futurs investisseurs
+
+## 5. OBJECTIFS SMART
+
+| Objectif | Indicateur | Échéance |
+|----------|-----------|----------|
+| Profils définis | Document validé | Mai 2026 |
+| Shortlist constituée | 15-20 candidats qualifiés | Juin 2026 |
+| Entretiens réalisés | 100% présélectionnés rencontrés | Juil 2026 |
+| CA nommé | 9 membres, lettres signées | Août 2026 |
+| Comités constitués | 4 Comités, présidents désignés | Sept 2026 |
+| Onboarding | 100% formés | Sept 2026 |
+| 1ère réunion CA | PV disponible | Sept 2026 |
+
+## 6. BÉNÉFICES
+
+- **Gouvernance:** CA équilibré, 4 Comités opérationnels, mix optimal compétences
+- **Qualitatifs:** Expertise haut niveau, réseau étendu, crédibilité
+- **Stratégiques:** Accompagnement croissance, challenge direction, facilitation partenariats
+
+## 7. LIVRABLES
+
+1. Document profils et critères
+2. Matrice compétences cibles
+3. Longlist (30-40) et shortlist (15-20)
+4. Grilles évaluation
+5. Rapports entretiens et due diligence
+6. Propositions nomination AG
+7. Lettres mission signées (9)
+8. Composition 4 Comités
+9. Pack onboarding
+10. PV AG nomination
+11. PV 1ère réunion CA
+12. Dashboard gouvernance
+
+## 8. PARTIES PRENANTES
+
+| Partie prenante | Rôle | Implication |
+|-----------------|------|-------------|
+| Joliba Capital | Validation finale | Très élevée |
+| Président CA désigné | Pilotage sélection | Très élevée |
+| Cabinet recrutement | Sourcing | Élevée |
+| Secrétaire Général | Coordination | Très élevée |
+| Candidats | Participation | Très élevée |
+
+## 9. EFFORTS ET BUDGET
+
+**Efforts:** Président CA (40% 6 mois), Sec. Général (50% 6 mois), DG (20% 6 mois)
+
+**Budget:**
+- Headhunter: 15M FCFA
+- Due diligence: 3M FCFA
+- Déplacements: 4M FCFA
+- Onboarding: 5M FCFA
+- Conseil juridique: 2M FCFA
+- Communication: 1,5M FCFA
+- Contingences: 3,05M FCFA
+- **Total: 33,55M FCFA**
+
+**Note:** Jetons présence (30M/an) = coûts récurrents séparés
+
+## 10. ÉCHÉANCIER
+
+| Phase | Durée | Période |
+|-------|-------|---------|
+| Préparation (profils, critères) | 1,5 mois | Avr-Mai 2026 |
+| Sourcing (longlist, shortlist) | 1,5 mois | Mai-Juin 2026 |
+| Évaluation (entretiens, DD) | 1,5 mois | Juin-Juil 2026 |
+| Nomination (AG, lettres) | 1 mois | Août 2026 |
+| Constitution Comités | 1 mois | Août-Sept 2026 |
+| Onboarding + 1ère réunion | 1 mois | Sept 2026 |
+
+## 11. RISQUES
+
+| Risque | P | I | Mitigation |
+|--------|---|---|------------|
+| Difficulté attirer profils qualité | M | TÉ | Rémunération attractive, réseau Joliba, headhunter |
+| Indisponibilité candidats | M | É | Clarification engagement dès départ |
+| Conflits intérêts | F | TÉ | Due diligence rigoureuse, déclarations |
+| Manque diversité | M | M | Critères diversité, recherche proactive |
+
+---
+
+# P1-I3: CALENDRIER ANNUEL CA ET COMITÉS
+
+## 1. IDENTIFICATION
+
+| **Nom du projet** | Restructurer et renforcer la gouvernance IUC |
+| **Initiative** | Définition calendrier annuel CA et Comités |
+| **Code** | P1-I3 |
+| **Responsable** | Secrétaire Général |
+| **Chef de projet** | Secrétaire Général |
+| **Période** | T3 2026 (Juil-Sept 2026, 3 mois) |
+| **Budget** | 5 000 000 FCFA |
+
+## 2. ÉNONCÉ
+
+Élaborer calendrier annuel fixe des réunions CA (4/an minimum) et Comités (12-15 total/an) pour assurer rythme de gouvernance régulier, prévisible et efficace. Permet planification administrative, qualité préparation dossiers et pilotage continu.
+
+## 3. PÉRIMÈTRE
+
+**Exigences:**
+- Analyse contraintes (année académique, clôtures, pics activité)
+- Définition fréquence optimale (CA: 4-6/an, Comités: 3-4/an chacun)
+- Articulation logique CA ↔ Comités (Comités préparent CA)
+- Sondage disponibilités administrateurs
+- Calendrier pluriannuel (3 ans, pattern reproductible)
+- Ordres du jour types par réunion
+- Planning production documentation (délais transmission J-15)
+- Validation CA
+- Communication et blocking agendas
+- Processus convocation formalisé
+
+**Besoins:**
+- Prévisibilité pour administrateurs
+- Temps préparation suffisant
+- Supervision régulière (vs ponctuelle)
+- Efficacité réunions
+- Respect cycles institutionnels
+
+## 4. CLIENTÈLE VISÉE
+
+**Directs:** 9 membres CA, 16 membres Comités, Secrétariat, Direction Générale
+**Indirects:** Directions opérationnelles, actionnaires
+
+## 5. OBJECTIFS SMART
+
+| Objectif | Indicateur | Échéance |
+|----------|-----------|----------|
+| Analyse contraintes | Document synthèse | Juil 2026 |
+| Fréquence définie | Décision formalisée | Juil 2026 |
+| Calendrier 3 ans | Dates précises validées | Août 2026 |
+| Validation CA | Calendrier approuvé | Sept 2026 |
+| Agendas bloqués | 100% membres confirmés | Sept 2026 |
+| Process convocation | Procédure documentée | Sept 2026 |
+| 1er cycle complet | 4 CA + 12 Comités tenus | Sept 2027 |
+
+## 6. BÉNÉFICES
+
+- **Organisationnels:** Présence >85%, documentation +30% qualité, durée réunions -20%
+- **Stratégiques:** Pilotage régulier, décisions au bon moment
+- **Opérationnels:** Workflow clair, stress réduit, articulation Comités-CA
+
+## 7. LIVRABLES
+
+1. Analyse contraintes IUC
+2. Décision fréquence instances
+3. Calendrier triennal détaillé (Excel/PDF)
+4. Ordres du jour types par réunion
+5. Planning production documentation
+6. Process convocation formalisé
+7. Validation CA (PV)
+8. Confirmations blocking agendas
+9. Procédure gestion absences/reports
+10. Tableau suivi taux présence
+
+## 8. PARTIES PRENANTES
+
+| Partie prenante | Rôle | Implication |
+|-----------------|------|-------------|
+| Secrétaire Général | Responsable et pilotage | Très élevée |
+| Membres CA et Comités | Validation disponibilités | Très élevée |
+| Direction Générale | Validation cohérence opérationnelle | Élevée |
+| Assistante direction | Support logistique | Moyenne |
+
+## 9. EFFORTS ET BUDGET
+
+**Efforts:** Secrétaire Général (60% 3 mois), Assistante (40% 3 mois)
+
+**Budget:**
+- Outil planification/collaboration: 1M FCFA
+- Consultant organisation: 2M FCFA
+- Sondage/consultation membres: 0,5M FCFA
+- Communication calendrier: 0,5M FCFA
+- Documentation process: 0,5M FCFA
+- Contingences: 0,5M FCFA
+- **Total: 5M FCFA**
+
+## 10. ÉCHÉANCIER
+
+| Phase | Durée | Période |
+|-------|-------|---------|
+| Analyse et consultation | 1 mois | Juil 2026 |
+| Élaboration calendrier | 1 mois | Août 2026 |
+| Validation et déploiement | 1 mois | Sept 2026 |
+
+**Calendrier type année:**
+- **Mars:** CA budget N+1, Comité Audit
+- **Avril:** AG approbation comptes
+- **Juin:** CA S1, Comité Académique
+- **Septembre:** Comité Stratégique, RH
+- **Octobre:** CA budget N+1 validé
+- **Décembre:** CA T4, Comité Audit risques
+
+## 11. RISQUES
+
+| Risque | P | I | Mitigation |
+|--------|---|---|------------|
+| Indisponibilités récurrentes membres | M | M | Sondage amont, dates fixées 18 mois avant |
+| Événements imprévus nécessitant reports | M | F | Procédure report claire, dates de secours |
+| Surcharge production documentation | M | M | Planning réaliste, ressources dédiées |
+| Non-respect délais convocation | F | M | Automatisation rappels, checklist |
+
+---
+
+# P1-I4: CARTOGRAPHIE PROCESSUS OPÉRATIONNELS
+
+## 1. IDENTIFICATION
+
+| **Nom du projet** | Restructurer et renforcer la gouvernance IUC |
+| **Initiative** | Cartographie complète des processus opérationnels et métiers |
+| **Code** | P1-I4 |
+| **Responsable** | Directeur Qualité et Performance |
+| **Chef de projet** | Chef de projet Processus (consultant) |
+| **Période** | T4 2026 - T2 2027 (9 mois) |
+| **Budget** | 45 000 000 FCFA |
+
+## 2. ÉNONCÉ
+
+Réaliser cartographie exhaustive des 125 processus IUC (15 management, 45 métier, 45 support, 20 amélioration) selon norme BPMN 2.0. Documenter flux, responsabilités (RACI), indicateurs, risques pour chaque processus. Identifier 30% processus à optimiser en priorité. Base indispensable pour transformation digitale et excellence opérationnelle.
+
+## 3. PÉRIMÈTRE
+
+**Exigences:**
+- Recensement exhaustif processus (interviews 50+ personnes)
+- Classification 4 catégories (management, métier, support, amélioration)
+- Fiches processus standardisées (objectif, inputs, outputs, RACI, KPIs, risques)
+- Diagrammes BPMN 2.0 (100+ diagrammes)
+- Matrices RACI complètes
+- Documentation processus critiques détaillée
+- Identification processus à optimiser (gains rapides)
+- Mesure situation actuelle (temps, coûts, erreurs)
+- Formation équipes à la lecture processus
+
+**Besoins:**
+- Visibilité exhaustive du fonctionnement IUC
+- Identification inefficiences et doublons
+- Base pour optimisation et digitalisation
+- Standardisation pratiques
+- Facilitation intégration nouveaux collaborateurs
+- Réduction dépendance aux personnes clés
+
+## 4. CLIENTÈLE VISÉE
+
+**Directs:** Direction Générale, Directions opérationnelles, Qualité, DSI
+**Indirects:** Ensemble personnel (450), futurs collaborateurs, auditeurs
+
+## 5. OBJECTIFS SMART
+
+| Objectif | Indicateur | Échéance |
+|----------|-----------|----------|
+| Recensement complet | 125 processus identifiés | Déc 2026 |
+| Fiches processus | 125 fiches complètes | Mars 2027 |
+| Diagrammes BPMN | 100+ diagrammes finalisés | Avr 2027 |
+| Matrices RACI | 125 matrices complètes | Avr 2027 |
+| Identification optimisations | 40 processus priorisés | Mai 2027 |
+| Documentation critique | 20 processus documentés en détail | Juin 2027 |
+| Formation | 100% managers formés | Juin 2027 |
+
+## 6. BÉNÉFICES
+
+- **Opérationnels:** Réduction 30% temps traitement, -50% erreurs (après optimisation)
+- **Organisationnels:** Standardisation, élimination doublons, onboarding facilité
+- **Stratégiques:** Base transformation digitale, amélioration continue structurée
+- **Financiers:** Équivalent 10 ETP libérés pour tâches à valeur ajoutée
+
+## 7. LIVRABLES
+
+1. Inventaire complet 125 processus
+2. 125 fiches processus standardisées
+3. 100+ diagrammes BPMN 2.0
+4. 125 matrices RACI
+5. Manuel cartographie processus IUC
+6. Base de données processus (outil digital)
+7. Rapport identification optimisations (40 processus)
+8. Documentation détaillée 20 processus critiques
+9. Mesures situation actuelle (benchmark interne)
+10. Kit formation lecture processus
+11. Plan d'optimisation priorisé
+12. Dashboard suivi processus
+
+## 8. PARTIES PRENANTES
+
+| Partie prenante | Rôle | Implication |
+|-----------------|------|-------------|
+| Direction Générale | Sponsor | Très élevée |
+| Dir. Qualité et Performance | Pilotage | Très élevée |
+| Consultant processus | Expertise méthodologique | Très élevée |
+| Directions opérationnelles | Contribution contenu | Très élevée |
+| Personnel opérationnel | Interviews, validation | Élevée |
+| DSI | Lien digitalisation | Élevée |
+
+## 9. EFFORTS ET BUDGET
+
+**Efforts:** Chef projet (100% 9 mois), Dir. Qualité (50% 9 mois), 3 consultants (100% 6 mois), Directions (30% 6 mois)
+
+**Budget:**
+- Consultant processus (3x6 mois): 30M FCFA
+- Outil cartographie (logiciel BPMN): 8M FCFA
+- Formation équipes: 3M FCFA
+- Déplacements/ateliers: 2M FCFA
+- Documentation: 1M FCFA
+- Contingences: 4,5M FCFA
+- **Total: 45M FCFA**
+
+## 10. ÉCHÉANCIER
+
+| Phase | Durée | Période |
+|-------|-------|---------|
+| Recensement et interviews | 3 mois | Oct-Déc 2026 |
+| Modélisation (BPMN, RACI) | 4 mois | Jan-Avr 2027 |
+| Documentation et priorisation | 2 mois | Mai-Juin 2027 |
+| Formation et déploiement | 1 mois | Juin 2027 |
+
+## 11. RISQUES
+
+| Risque | P | I | Mitigation |
+|--------|---|---|------------|
+| Indisponibilité contributeurs clés | É | É | Planning interviews flexibles, sponsors directions |
+| Complexité sous-estimée | M | M | Méthodologie éprouvée, consultants experts |
+| Résistance documentation pratiques | M | M | Communication sur bénéfices, implication |
+| Obsolescence rapide si pas mise à jour | É | É | Process de mise à jour continue, propriétaires processus |
+
+---
+
+# P1-I5: REFONTE PROCESSUS INTERNES
+
+## 1. IDENTIFICATION
+
+| **Nom du projet** | Restructurer et renforcer la gouvernance IUC |
+| **Initiative** | Refonte et optimisation des processus opérationnels internes |
+| **Code** | P1-I5 |
+| **Responsable** | Directeur Qualité et Performance |
+| **Chef de projet** | Chef de projet Lean/Amélioration Continue |
+| **Période** | T3 2027 - T2 2028 (12 mois) |
+| **Budget** | 55 000 000 FCFA |
+
+## 2. ÉNONCÉ
+
+Optimiser 40 processus identifiés comme prioritaires (cartographie P1-I4) selon méthodologie Lean Six Sigma. Éliminer gaspillages (7 mudas), simplifier flux, automatiser tâches répétitives, standardiser pratiques. Objectif: réduction 30% temps traitement, -50% erreurs, +25% satisfaction utilisateurs, libération 10 ETP.
+
+## 3. PÉRIMÈTRE
+
+**Exigences:**
+- Sélection 40 processus prioritaires (impact x faisabilité)
+- Analyse approfondie situation actuelle (VSM - Value Stream Mapping)
+- Identification 7 gaspillages Lean par processus
+- Conception processus optimisés (simplification, automatisation)
+- Tests sur pilotes avant généralisation
+- Déploiement généralisé (formation, documentation)
+- Automatisation via outils digitaux (RPA si applicable)
+- Standardisation (procédures, templates)
+- Amélioration continue (cycles PDCA)
+
+**Besoins:**
+- Efficacité opérationnelle accrue
+- Réduction bureaucratie
+- Expérience utilisateur améliorée (étudiants, personnel)
+- Libération capacité pour tâches à valeur ajoutée
+- Qualité et fiabilité processus
+
+## 4. CLIENTÈLE VISÉE
+
+**Directs:** Personnel administratif (200), directions opérationnelles
+**Indirects:** Étudiants (satisfaction), Direction Générale (efficience)
+
+## 5. OBJECTIFS SMART
+
+| Objectif | Indicateur | Échéance |
+|----------|-----------|----------|
+| Sélection processus | 40 processus priorisés | Sept 2027 |
+| Analyse VSM | 40 cartographies situation actuelle | Nov 2027 |
+| Processus optimisés conçus | 40 processus to-be définis | Fév 2028 |
+| Tests pilotes | 10 processus testés et validés | Avr 2028 |
+| Déploiement général | 40 processus déployés | Juin 2028 |
+| Réduction temps | -30% temps traitement moyen | Août 2028 |
+| Réduction erreurs | -50% taux erreur | Août 2028 |
+| Satisfaction | +25% satisfaction utilisateurs | Août 2028 |
+
+## 6. BÉNÉFICES
+
+- **Opérationnels:** 30% temps économisé, 50% erreurs réduites, 10 ETP redéployés
+- **Utilisateurs:** Délais raccourcis, simplicité accrue, self-service
+- **Financiers:** Économies 40M FCFA/an (masse salariale optimisée)
+- **Qualité:** Fiabilité, traçabilité, conformité
+
+## 7. LIVRABLES
+
+1. Matrice priorisation 40 processus
+2. 40 Value Stream Maps (as-is)
+3. 40 analyses gaspillages
+4. 40 processus optimisés (to-be)
+5. 10 rapports pilotes
+6. 40 procédures standardisées
+7. Templates et outils automatisés
+8. Plans formation (par processus)
+9. Documentation utilisateur
+10. Dashboards de suivi performance
+11. Rapports gains réalisés
+12. Programme amélioration continue
+
+## 8. PARTIES PRENANTES
+
+| Partie prenante | Rôle | Implication |
+|-----------------|------|-------------|
+| Direction Générale | Sponsor | Très élevée |
+| Dir. Qualité et Performance | Pilotage | Très élevée |
+| Consultant Lean Six Sigma | Expertise méthodologique | Très élevée |
+| Directions opérationnelles | Propriétaires processus | Très élevée |
+| Personnel administratif | Utilisateurs, contributeurs | Très élevée |
+| DSI | Automatisation | Élevée |
+
+## 9. EFFORTS ET BUDGET
+
+**Efforts:** Chef projet Lean (100% 12 mois), Dir. Qualité (40% 12 mois), 4 consultants (100% 9 mois), Équ

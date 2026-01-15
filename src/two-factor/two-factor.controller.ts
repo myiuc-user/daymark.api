@@ -13,6 +13,7 @@ import {
 import { TwoFactorService } from './two-factor.service';
 import { JwtGuard } from '../common/guards/jwt.guard';
 import { SkipTwoFactor } from './skip-two-factor.decorator';
+import { Public } from '../common/decorators/public.decorator';
 import { 
   SetupTOTPDto, 
   VerifyCodeDto, 
@@ -89,13 +90,13 @@ export class TwoFactorController {
   }
 
   @Post('recovery/request')
-  @SkipTwoFactor()
+  @Public()
   async requestRecovery(@Body() body: { email: string }) {
     return this.twoFactorService.requestRecovery(body.email);
   }
 
   @Post('recovery/verify')
-  @SkipTwoFactor()
+  @Public()
   async verifyRecovery(@Body() body: { token: string }) {
     return this.twoFactorService.verifyRecoveryToken(body.token);
   }

